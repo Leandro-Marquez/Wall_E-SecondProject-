@@ -1,8 +1,8 @@
 public class Token 
 {
-    public object Value {get ; set ;}
+    public string Value {get ; set ;}
     public TokenType Type {get ;}
-    public Token(TokenType type ,object value)
+    public Token(TokenType type ,string value)
     {
         Value = value;
         Type = type;
