@@ -12,3 +12,17 @@ C:\Users\dellg\Desktop\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0
 C:\Users\dellg\Desktop\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).pdb
 C:\Users\dellg\Desktop\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).genruntimeconfig.cache
 C:\Users\dellg\Desktop\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\ref\WALL_E(Segundo_Proyecto_De_Programacion).dll
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\bin\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).exe
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\bin\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).deps.json
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\bin\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).runtimeconfig.json
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\bin\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).dll
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\bin\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).pdb
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).GeneratedMSBuildEditorConfig.editorconfig
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).AssemblyInfoInputs.cache
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).AssemblyInfo.cs
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).csproj.CoreCompileInputs.cache
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).dll
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\refint\WALL_E(Segundo_Proyecto_De_Programacion).dll
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).pdb
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\WALL_E(Segundo_Proyecto_De_Programacion).genruntimeconfig.cache
+D:\SCHOOL\PROJECTS FIRST YEAR\Proyecto Unity\WALL_E(Segundo_Proyecto_De_Programacion)\obj\Debug\net9.0\ref\WALL_E(Segundo_Proyecto_De_Programacion).dll

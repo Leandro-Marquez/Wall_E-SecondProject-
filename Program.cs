@@ -6,7 +6,7 @@ class Program
         string example = @"Spawn(0, 0)
                            Color(""Black"")
                            n <- 5
-                           k <- 3 + 3 ** 10
+                           k <- 3 + 3 ** 10 / 3 % 4 - 7
                            n <- k * 2
                            actual-x <- GetActualX()
                            i <- 0

@@ -15,9 +15,9 @@ public class Lexer
         // definiendo las expresiones regulares 
         string ReservedKeyword = @"GoTo";
         string Bool = @"true|false";
-        string Identifier = @"^[-a-z-A-Z-_][-a-z-A-Z-0-9-_]*";
-        string Delimiter = @"[\(\)\{\}\[\]]";
         string ArithmeticOperator = @"(?:[+\--*/%\***])";
+        string Identifier = @"^[a-z-A-Z-_][a-z-A-Z-0-9-_]*";
+        string Delimiter = @"[\(\)\{\}\[\]]";
         string ComparisonOperator = @"(?:==|>=|<=|>|<)";
         string AssignmentOperator =  @"(<-)";
         string LogicOperator = @"(?:&&|\|\||!)";
@@ -29,9 +29,9 @@ public class Lexer
         {
             { ReservedKeyword    , TokenType.ReservedKeyword },
             { Bool               , TokenType.Bool },
+            { ArithmeticOperator , TokenType.ArithmeticOperator },
             { Identifier         , TokenType.Identifier },
             { Delimiter          , TokenType.Delimiter},
-            { ArithmeticOperator , TokenType.ArithmeticOperator },
             { ComparisonOperator , TokenType.ComparisonOperator },
             { AssignmentOperator , TokenType.AssignmentOperator },
             { LogicOperator      , TokenType.LogicOperator },

@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dellg\\Desktop\\WALL_E(Segundo_Proyecto_De_Programacion)\\WALL_E(Segundo_Proyecto_De_Programacion).csproj",
+      "projectUniqueName": "D:\\SCHOOL\\PROJECTS FIRST YEAR\\Proyecto Unity\\WALL_E(Segundo_Proyecto_De_Programacion)\\WALL_E(Segundo_Proyecto_De_Programacion).csproj",
       "projectName": "WALL_E(Segundo_Proyecto_De_Programacion)",
-      "projectPath": "C:\\Users\\dellg\\Desktop\\WALL_E(Segundo_Proyecto_De_Programacion)\\WALL_E(Segundo_Proyecto_De_Programacion).csproj",
+      "projectPath": "D:\\SCHOOL\\PROJECTS FIRST YEAR\\Proyecto Unity\\WALL_E(Segundo_Proyecto_De_Programacion)\\WALL_E(Segundo_Proyecto_De_Programacion).csproj",
       "packagesPath": "C:\\Users\\dellg\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dellg\\Desktop\\WALL_E(Segundo_Proyecto_De_Programacion)\\obj\\",
+      "outputPath": "D:\\SCHOOL\\PROJECTS FIRST YEAR\\Proyecto Unity\\WALL_E(Segundo_Proyecto_De_Programacion)\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\dellg\\AppData\\Roaming\\NuGet\\NuGet.Config"
