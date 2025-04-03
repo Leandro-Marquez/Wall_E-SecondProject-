@@ -66,14 +66,14 @@ public class Lexer
 
             input = input.Substring(betterIndex).Trim(); // saltar el token completo y limpiar caracteres vacios para seguir analizando 
 
-            if (betterTokenType == TokenType.ArithmeticOperator && !string.IsNullOrEmpty(input)) 
+            if (betterTokenType == TokenType.ArithmeticOperator && !string.IsNullOrEmpty(input)) //verificar el caso de un operador de multiplicacion si se tiene otro al lado seria potencia 
             {
                 var NextToken = Regex.Match(input, ArithmeticOperator);
 
-                if (NextToken.Success && NextToken.Index == 0)
+                if (NextToken.Success && NextToken.Index == 0) //si se tiene token
                 {
-                    tokens[tokens.Count - 1].Value += NextToken.Value;
-                    input = input.Substring(NextToken.Length).Trim();
+                    tokens[tokens.Count - 1].Value += NextToken.Value; //agregar el otro signo de multiplicacion 
+                    input = input.Substring(NextToken.Length).Trim(); //saltarse el espacio del signo y limpiar los espacios en blanco
                 }
             } 
         }

@@ -33,8 +33,8 @@ class Program
             System.Console.Write(tokens[i].Type + " : " + tokens[i].Value);
             System.Console.WriteLine();
         }
-        System.Console.WriteLine("==================================================================");
-        Parser parser = new Parser(tokens);
-        parser.Parse();
+        // System.Console.WriteLine("==================================================================");
+        // Parser parser = new Parser(tokens);
+        // parser.Parse();
     }
 }
