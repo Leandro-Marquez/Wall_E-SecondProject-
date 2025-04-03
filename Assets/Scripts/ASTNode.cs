@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 public abstract class ASTNode //clase abstracta para tratar a todo tipo de nodo como uno mismo
