@@ -1,13 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 public class Lexer
 {
     string input;
-    public List<Token> tokens = new List<Token>();
+    public List<Token> tokens {get ; set;}
     public Lexer(string input)
     {
         this.input = input;
+        tokens = new List<Token>();
     }
     public void Tokenize()
     {
@@ -78,5 +80,6 @@ public class Lexer
                 }
             } 
         }
+        tokens.Add(new Token(TokenType.LineJump, "")); //agregar a la lista de tokens una vez se tokenizo todo el salto de linea para controlar que se termino la linea
     }
 }

@@ -10,4 +10,4 @@ public class Token //clase token para poder guardar organizadamente todos los pe
 }
 
 //enum para tener los tipos de TOKENS mas organizados y su facil manejo 
-public enum TokenType{Identifier , Delimiter , ReservedKeyword , LogicOperator , AssignmentOperator , ArithmeticOperator , ComparisonOperator , String , Number , Comma , Bool}
+public enum TokenType{Identifier , Delimiter , ReservedKeyword , LogicOperator , AssignmentOperator , ArithmeticOperator , ComparisonOperator , String , Number , Comma , Bool , LineJump}
