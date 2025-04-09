@@ -1,115 +1,155 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
-public abstract class ASTNode //clase abstracta para tratar a todo tipo de nodo como uno mismo
+public abstract class ASTNode
 {
-    public abstract void Print();  
+    public abstract void Print(string indent = "", bool last = true);
 }
 
-public class FunctionNode : ASTNode //nodo de funcion
+public class FunctionNode : ASTNode
 {
-    public string Name { get; set; } //nombre de la funcion 
-    public List<ASTNode> Params { get; set; } //lista de parametros de la funcion
-    public FunctionNode (string name, List<ASTNode> Params) //constructr de la clase 
+    public string Name { get; set; }
+    public List<ASTNode> Params { get; set; }
+
+    public FunctionNode(string name, List<ASTNode> Params)
     {
         Name = name;
         this.Params = Params;
     }
 
-    public override void Print()
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"Function: {Name}");
+
+        indent += last ? "   " : "│  ";
+        
+        for (int i = 0; i < Params.Count; i++)
+        {
+            Params[i].Print(indent, i == Params.Count - 1);
+        }
     }
 }
-public class VariableNode : ASTNode //nodo de variable 
+
+public class VariableNode : ASTNode
 {
-    public string Name {get; set;} //nombre de la variable
-    public ASTNode Value { get; set;} //valor de la variable 
-    public VariableNode(string name, ASTNode value) //constructor de la clase 
+    public string Name { get; set; }
+    public ASTNode Value { get; set; }
+
+    public VariableNode(string name, ASTNode value)
     {
         Name = name;
         Value = value;
     }
 
-    public override void Print()
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"Variable: {Name}");
+        
+        Value?.Print(indent + (last ? "   " : "│  "), true);
     }
 }
-public class NumberLiteralNode : ASTNode //nodo literal numerico 
+
+public class NumberLiteralNode : ASTNode
 {
-    public int Value { get; set; } //valor del nodo
-    public NumberLiteralNode(int value) //constructor de la clase 
+    public int Value { get; set; }
+
+    public NumberLiteralNode(int value)
     {
         Value = value;
     }
 
-    public override void Print()
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"Number: {Value}");
     }
 }
-public class StringLiteralNode : ASTNode //nodo literal de string
+
+public class StringLiteralNode : ASTNode
 {
-    public string Value { get; set; } //valor de la variable 
-    public StringLiteralNode(string value) //constructor de la clase 
+    public string Value { get; set; }
+
+    public StringLiteralNode(string value)
     {
         Value = value;
     }
 
-    public override void Print()
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"String: \"{Value}\"");
     }
 }
-public class BooleanLiteralNode : ASTNode //nodo literal booleano 
+
+public class BooleanLiteralNode : ASTNode
 {
-    public bool Value { get; set; } //valor del nodo
-    public BooleanLiteralNode(bool value) //constructor de la clase 
+    public bool Value { get; set; }
+
+    public BooleanLiteralNode(bool value)
     {
         Value = value;
     }
 
-    public override void Print()
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"Boolean: {Value}");
     }
 }
-public class LabelNode : ASTNode //nodo de etiqueta 
+
+public class LabelNode : ASTNode
 {
-    public string Label {get; set;} //nombre o valor de la etiqueta 
-    public LabelNode(string label) //constructor de la clase 
+    public string Label { get; set; }
+
+    public LabelNode(string label)
     {
         Label = label;
     }
-    public override void Print()
+
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"Label: {Label}");
     }
 }
-public class GoToNode : ASTNode //nodo del GoTo
+
+public class GoToNode : ASTNode
 {
-    public string Label { get; set; } //etiqueta a donde llevara la ejecucion
-    public ConditionNode Condition { get; set; } //condicion que se debe cumplir para la llevar la ejecucion a la etiqueta 
-    public GoToNode(string label, ConditionNode condition) //consrtructor de la clase 
+    public string Label { get; set; }
+    public ConditionNode Condition { get; set; }
+
+    public GoToNode(string label, ConditionNode condition)
     {
         Label = label;
         Condition = condition;
     }
 
-    public override void Print()
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"GoTo: {Label}");
+        
+        Condition?.Print(indent + (last ? "   " : "│  "), true);
     }
 }
-public class ConditionNode : ASTNode //nodo de condicion
+
+public class ConditionNode : ASTNode
 {
-    public bool Value {get;} //valor final de la condicion 
-    public Token Operator {get; set;} //operador, puede ser de comparacion o logico 
-    public ASTNode LeftMember {get; set;} //miembro izquierdo 
-    public ASTNode RightMember {get; set;} //miembro derecho 
-    public ConditionNode(bool value, Token Operator , ASTNode leftMember, ASTNode rightMember) //constructor de la clase 
+    public bool Value { get; }
+    public Token Operator { get; set; }
+    public ASTNode LeftMember { get; set; }
+    public ASTNode RightMember { get; set; }
+
+    public ConditionNode(bool value, Token Operator, ASTNode leftMember, ASTNode rightMember)
     {
         Value = value;
         this.Operator = Operator;
@@ -117,25 +157,37 @@ public class ConditionNode : ASTNode //nodo de condicion
         RightMember = rightMember;
     }
 
-    public override void Print()
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"Condition (Operator: {Operator?.Value})");
+        
+        LeftMember?.Print(indent + (last ? "   " : "│  "), false);
+        RightMember?.Print(indent + (last ? "   " : "│  "), true);
     }
 }
-public class BinaryOperationNode : ASTNode //nodo de operacion binaria
+
+public class BinaryOperationNode : ASTNode
 {
-    public Token Operator {get; set;} //operador de la operacion binaria 
-    public ASTNode LeftMember { get; set;} //miembro izquierdo
-    public ASTNode RightMember { get; set;} //miembro derecho
-    public BinaryOperationNode(Token Operator, ASTNode leftMember, ASTNode rightMember) //constructor de la clase 
+    public Token Operator { get; set; }
+    public ASTNode LeftMember { get; set; }
+    public ASTNode RightMember { get; set; }
+
+    public BinaryOperationNode(Token Operator, ASTNode leftMember, ASTNode rightMember)
     {
         this.Operator = Operator;
         LeftMember = leftMember;
         RightMember = rightMember;
     }
 
-    public override void Print()
+    public override void Print(string indent = "", bool last = true)
     {
-        throw new NotImplementedException();
+        Console.Write(indent);
+        Console.Write(last ? "└──" : "├──");
+        Console.WriteLine($"Binary Operation (Operator: {Operator?.Value})");
+        
+        LeftMember?.Print(indent + (last ? "   " : "│  "), false);
+        RightMember?.Print(indent + (last ? "   " : "│  "), true);
     }
 }
