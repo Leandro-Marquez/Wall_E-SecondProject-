@@ -24,83 +24,87 @@ public class Parser
         this.tokens = tokens; //inicializar la lista de tokens con la que se le pasa al constructor 
         currentToken = tokens[currentIndex];
     }
-    public void Parse()
+    public void Parse() //metodo principal que lo parsea todo 
     {
-        while(currentIndex < tokens.Count)
+        while(currentIndex < tokens.Count) //mientras haya tokens por analizar se continua parseando
         {
-            if(tokens[currentIndex].Type == TokenType.LineJump)
+            if(tokens[currentIndex].Type == TokenType.LineJump) //si se tiene un salto de linea continuar parseando lo proximo 
             {
                 currentIndex += 1;
                 continue;
             }
+            //si se trata de una invocacion de funcion 
             if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Value == "(")
             {
-                FunctionNode functionNode = ParseFunction();
-                aSTNodes.Add(functionNode);
+                FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardar el nodo funcion 
+                aSTNodes.Add(functionNode); //agregar a la lista de ASTNodes finales 
+            }
+            //si se trataa de una asignacion a Variable 
+            else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Value == "<-")
+            {
+                VariableNode variableNode = ParseVariable();
+                aSTNodes.Add(variableNode);
+                if(Context.variablesValues.ContainsKey(variableNode.Name))
+                {   
+                    Context.variablesValues[variableNode.Name] = variableNode.Value;
+                }
+                else Context.variablesValues.Add(variableNode.Name,variableNode.Value);
+                //definir la variable en el contextooooooooooooooooooooooooo
             }
             else currentIndex += 1; //si no es una funcion ni salto de linea, se avanza
             
         }
     }
-
-    private FunctionNode ParseFunction()
+    private FunctionNode ParseFunction() //metodo principal para parsear la invocacion de funcion 
     {
-        if(currentIndex >= tokens.Count) return new FunctionNode("",new List<ASTNode>());
+        if(currentIndex >= tokens.Count) return new FunctionNode("",new List<ASTNode>());//en caso de que se salga de los limites de la lista de tokens(extremo)
         
-        string functionName = tokens[currentIndex].Value;
+        string functionName = tokens[currentIndex].Value; //guardar el nombre de la funcion 
         currentIndex += 2; // Saltar nombre de función y '('
     
-        var functionNode = new FunctionNode(functionName, new List<ASTNode>());
+        var functionNode = new FunctionNode(functionName, new List<ASTNode>());//inicializar el nodo de funcion
     
-        while (currentIndex < tokens.Count && tokens[currentIndex].Value != ")")
+        while (currentIndex < tokens.Count && tokens[currentIndex].Value != ")") //mientras se este en rango y no se tenga parentesis cerrado 
         {
-            if(tokens[currentIndex].Value == ",")
+            if(tokens[currentIndex].Value == ",") //si es una coma 
             {
-                currentIndex += 1;
+                currentIndex += 1; //aumentar el indice y continuar con la proxima iteracion
                 continue;
             }
     
-            var param = ParseParams();
-            if(param != null)
-            {
-                functionNode.Params.Add(param);
-            }
+            var param = ParseParams(); //parsear parametros hasta el momento
+            //si no es nulo, significa que se tiene parametros, agregar y continuar 
+            if(param != null) functionNode.Params.Add(param);
         }
     
-        if(currentIndex < tokens.Count && tokens[currentIndex].Value == ")")
+        if(currentIndex < tokens.Count && tokens[currentIndex].Value == ")") //si se llega al final de la invocacion, saltar el parentesis 
         {
             currentIndex += 1; // Saltar el ')'
         }
-    
-        return functionNode;
+        return functionNode; //retornar el nodo funcion parseado 
     }
-    private ASTNode ParseParams()
+    private ASTNode ParseParams() //metodo principal para parsear parametros 
     {
-        List<object> inFix = new List<object>();
-        if(tokens[currentIndex].Value == ",") currentIndex += 1;
-        
-        while (currentIndex < tokens.Count && 
-               tokens[currentIndex].Value != "," && 
-               tokens[currentIndex].Value != ")" && 
-               tokens[currentIndex].Type != TokenType.LineJump)
+        List<object> inFix = new List<object>(); //lista de elementos en notacion infija 
+        if(tokens[currentIndex].Value == ",") currentIndex += 1; //si llega encima de una coma, saltarla 
+        //si se esta en rango, no es una coma, ni un parentesis cerrado ni un salto de linea 
+        while (currentIndex < tokens.Count && tokens[currentIndex].Value != "," && tokens[currentIndex].Value != ")" && tokens[currentIndex].Type != TokenType.LineJump)
         {
-            if(tokens[currentIndex].Type == TokenType.Identifier && 
-               currentIndex + 1 < tokens.Count && 
-               tokens[currentIndex + 1].Value == "(")
+            //si trata de una invocacion de funcion, parsear la funcion anidada
+            if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(")
             {
-                // Parsear la función anidada
                 inFix.Add(ParseFunction());
-                // No incrementar currentIndex aquí porque ParseFunction ya lo hace
+                //no se incrementa currentIndex aquí porque ParseFunction ya lo hace
             }
             else
             {
-                inFix.Add(tokens[currentIndex]);
-                currentIndex += 1;
+                inFix.Add(tokens[currentIndex]); //de lo contrario agregar a lista de elementos en notacion infija 
+                currentIndex += 1; //aumentar el indice para continuar con el proximo elemento 
             }
         }
         
-        List<object> postFix = ConvertPostFix(inFix);
-        return ParsePostFix(postFix);
+        List<object> postFix = ConvertPostFix(inFix); //convertir a notacion postfija todo lo que se tenia en notacion infija 
+        return ParsePostFix(postFix); //retornar el nodo que se obtiene a partir de parsear la notacion postfija
     }
     private List<object> ConvertPostFix(List<object> inFix) //convertir de notacion infija a postfija
     {
@@ -174,37 +178,46 @@ public class Parser
         ASTNode [] list = nodes.ToArray();
         return list[0];
     }
-    // private VariableNode ParseVariable()
-    // {
-    //     VariableNode variableNode = new VariableNode(tokens[currentIndex].Value,null);
-    //     currentIndex += 2; //estoy sobre el primer valor de la asignacion a la variable 
-    //     if(tokens[currentIndex + 1].Type == TokenType.ArithmeticOperator)
-    //     {
-    //         List<Token> Infix = new List<Token>();
-    //         while(tokens[currentIndex].Type != TokenType.LineJump)
-    //         {
-    //             if(tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Value == "(")
-    //             {
-    //                 FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardarlo en el nodo de funcion 
-    //                 aSTNodes.Add(functionNode); //agregar el nodo de funcion a la lista de nodos a evaluar 
-    //                 if(currentToken.Type == TokenType.LineJump)
-    //                 {
-    //                     currentIndex += 1;
-    //                     continue;
-    //                 }
-    //             }
-    //             Infix.Add(tokens[currentIndex]);
-    //             Infix.Add(tokens[currentIndex + 1]);
-    //             currentIndex += 1;
-    //         }
-    //         Infix.Add(tokens[currentIndex]);
-    //         List<Token> postFix = ConvertPostFix(Infix);
+    private VariableNode ParseVariable()
+    {
+        if(currentIndex >= tokens.Count) return new VariableNode("",null);//en caso de que se salga de los limites de la lista de tokens(extremo)
 
-    //     }
-    //     else if (tokens[currentIndex + 1].Value == "(")
-    //     {
+        string variableName = tokens[currentIndex].Value; //guardar el nombre de la funcion 
+        currentIndex += 2; // Saltar nombre de la variable y '<-'
+        var variableNode = new VariableNode(variableName,null);
 
-    //     }
-    //     return null;
-    // }
+        if(currentIndex + 1 < tokens.Count )
+        {
+            List<object> Infix = new List<object>();
+            /*tokens[currentIndex].Type != TokenType.LineJump*/
+            while(currentIndex + 1 < tokens.Count && (tokens[currentIndex].Type == TokenType.ArithmeticOperator || tokens[currentIndex].Type == TokenType.LogicOperator || tokens[currentIndex].Type == TokenType.ComparisonOperator
+            || tokens[currentIndex + 1].Type == TokenType.ArithmeticOperator || tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator))
+            {
+                if(tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Value == "(")
+                {
+                    FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardarlo en el nodo de funcion 
+                    Infix.Add(functionNode);
+                }
+                else
+                {
+                    Infix.Add(tokens[currentIndex]);
+                    currentIndex += 1;
+                }
+            }
+            if(tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Value == "(")
+            {
+                FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardarlo en el nodo de funcion 
+                Infix.Add(functionNode);
+                List<object> post = ConvertPostFix(Infix);
+                variableNode.Value = ParsePostFix(post);
+                return variableNode;
+            }
+            Infix.Add(tokens[currentIndex]);
+            List<object> postFix = ConvertPostFix(Infix);
+            variableNode.Value = ParsePostFix(postFix);
+            return variableNode;
+
+        }
+        return null;
+    }
 }
