@@ -7,29 +7,25 @@ using TMPro;
 
 public class WindowsFileExplorer : MonoBehaviour
 {
-    public string loadedFilePath { get; private set; }
-    public string loadedFileContent { get; private set; }
+    public string loadedFilePath { get; private set; } //ruta del archivo seleccionado para importarlo 
+    public string loadedFileContent { get; private set; } //cadena de texto del archivo cargado 
 
-    public TMP_InputField textFileContent;
-    // Método para abrir el explorador y seleccionar un archivo
-    public void OpenFileDialog()
+    public TMP_InputField textFileContent; //inputField en la escena en Unity 
+    public void OpenFileDialog() // Método para abrir el explorador y seleccionar un archivo
     {
         OpenFileDialog fileDialog = new OpenFileDialog();
         
-        // Configura el filtro de extensiones (ej: .txt, .pw)
+        // Configurar el filtro de extensiones (ej: .txt, .pw)
         fileDialog.Filter = "Archivos de texto (*.txt)|*.txt|Archivos PW (*.pw)|*.pw|Todos los archivos (*.*)|*.*";
         fileDialog.FilterIndex = 1; // Filtro predeterminado
         
-        // Abre el diálogo
-        if (fileDialog.ShowDialog() == DialogResult.OK)
+        if (fileDialog.ShowDialog() == DialogResult.OK) //abrir el cuadro de dialogo 
         {
             loadedFilePath = fileDialog.FileName;
             loadedFileContent = File.ReadAllText(loadedFilePath);
 
             textFileContent.text = loadedFileContent;
             Cover.input = textFileContent.text;
-            // Debug.Log($"Archivo cargado: {loadedFilePath}");
-            // Debug.Log($"Contenido:\n{loadedFileContent}");
         }
     }
 }

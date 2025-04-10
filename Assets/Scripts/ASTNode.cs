@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 using System.Collections.Generic;
 
 public abstract class ASTNode
@@ -19,9 +19,7 @@ public class FunctionNode : ASTNode
 
     public override void Print(string indent = "", bool last = true)
     {
-        Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"Function: {Name}");
+        Debug.Log(indent + (last ? "└──" : "├──") + $"Function: {Name}");
 
         indent += last ? "   " : "│  ";
         
@@ -45,9 +43,7 @@ public class VariableNode : ASTNode
 
     public override void Print(string indent = "", bool last = true)
     {
-        Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"Variable: {Name}");
+        Debug.Log(indent + (last ? "└──" : "├──") + $"Variable: {Name}");
         
         Value?.Print(indent + (last ? "   " : "│  "), true);
     }
@@ -64,9 +60,7 @@ public class NumberLiteralNode : ASTNode
 
     public override void Print(string indent = "", bool last = true)
     {
-        Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"Number: {Value}");
+        Debug.Log(indent + (last ? "└──" : "├──") + $"Number: {Value}");
     }
 }
 
@@ -81,9 +75,7 @@ public class StringLiteralNode : ASTNode
 
     public override void Print(string indent = "", bool last = true)
     {
-        Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"String: \"{Value}\"");
+        Debug.Log(indent + (last ? "└──" : "├──") + $"String: \"{Value}\"");
     }
 }
 
@@ -98,9 +90,7 @@ public class BooleanLiteralNode : ASTNode
 
     public override void Print(string indent = "", bool last = true)
     {
-        Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"Boolean: {Value}");
+        Debug.Log(indent + (last ? "└──" : "├──") + $"Boolean: {Value}");
     }
 }
 
@@ -115,9 +105,7 @@ public class LabelNode : ASTNode
 
     public override void Print(string indent = "", bool last = true)
     {
-        Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"Label: {Label}");
+        Debug.Log(indent + (last ? "└──" : "├──") + $"Label: {Label}");
     }
 }
 
@@ -134,58 +122,24 @@ public class GoToNode : ASTNode
 
     public override void Print(string indent = "", bool last = true)
     {
-        Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine("GoTo");
+        Debug.Log(indent + (last ? "└──" : "├──") + "GoTo");
         
         // Imprimir la etiqueta (si existe)
         indent += last ? "   " : "│  ";
         if (Label != null)
         {
-            Console.Write(indent);
-            Console.Write("├──");
-            Console.WriteLine($"Label: {Label.Label}");
+            Debug.Log(indent + "├──" + $"Label: {Label.Label}");
         }
         else
         {
-            Console.Write(indent);
-            Console.Write("├──");
-            Console.WriteLine("Label: (null)");
+            Debug.Log(indent + "├──" + "Label: (null)");
         }
     
         // Imprimir la condición (si existe)
-        Console.Write(indent);
-        Console.Write("└──");
-        Console.WriteLine("Condition:");
+        Debug.Log(indent + "└──" + "Condition:");
         Condition?.Print(indent + "   ", true);
     }
 }
-
-// public class ConditionNode : ASTNode
-// {
-//     public bool Value { get; }
-//     public Token Operator { get; set; }
-//     public ASTNode LeftMember { get; set; }
-//     public ASTNode RightMember { get; set; }
-
-//     public ConditionNode(bool value, Token Operator, ASTNode leftMember, ASTNode rightMember)
-//     {
-//         Value = value;
-//         this.Operator = Operator;
-//         LeftMember = leftMember;
-//         RightMember = rightMember;
-//     }
-
-//     public override void Print(string indent = "", bool last = true)
-//     {
-//         Console.Write(indent);
-//         Console.Write(last ? "└──" : "├──");
-//         Console.WriteLine($"Condition (Operator: {Operator?.Value})");
-        
-//         LeftMember?.Print(indent + (last ? "   " : "│  "), false);
-//         RightMember?.Print(indent + (last ? "   " : "│  "), true);
-//     }
-// }
 
 public class BinaryOperationNode : ASTNode
 {
@@ -202,9 +156,7 @@ public class BinaryOperationNode : ASTNode
 
     public override void Print(string indent = "", bool last = true)
     {
-        Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"Binary Operation (Operator: {Operator?.Value})");
+        Debug.Log(indent + (last ? "└──" : "├──") + $"Binary Operation (Operator: {Operator?.Value})");
         
         LeftMember?.Print(indent + (last ? "   " : "│  "), false);
         RightMember?.Print(indent + (last ? "   " : "│  "), true);

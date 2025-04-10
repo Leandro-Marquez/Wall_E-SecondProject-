@@ -1,16 +1,14 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+using TMPro;
 
 class Cover : MonoBehaviour
 {
+    public GameObject runButton;
     public static string input;
-    // public void Start()
-    // {
-    //     Read();
-    // }
+    public TMP_InputField usersInput; //inputField en la escena en Unity 
     
     // public static void Read()
     // {
@@ -40,5 +38,15 @@ class Cover : MonoBehaviour
         
         Parser parser = new Parser(tokens);
         parser.Parse();
+        for (int i = 0; i < parser.aSTNodes.Count; i++)
+        {
+            parser.aSTNodes[i].Print();
+        }
+    }
+    void Update()
+    {
+        if(usersInput is not null ) input = usersInput.text;
+        if(string.IsNullOrEmpty(input)) runButton.SetActive(false);
+        else runButton.SetActive(true);
     }
 }
