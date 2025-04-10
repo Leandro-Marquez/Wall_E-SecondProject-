@@ -123,10 +123,10 @@ public class LabelNode : ASTNode
 
 public class GoToNode : ASTNode
 {
-    public string Label { get; set; }
-    public ConditionNode Condition { get; set; }
+    public LabelNode Label { get; set; }
+    public ASTNode Condition { get; set; }
 
-    public GoToNode(string label, ConditionNode condition)
+    public GoToNode(LabelNode label, ASTNode condition)
     {
         Label = label;
         Condition = condition;
@@ -136,37 +136,56 @@ public class GoToNode : ASTNode
     {
         Console.Write(indent);
         Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"GoTo: {Label}");
+        Console.WriteLine("GoTo");
         
-        Condition?.Print(indent + (last ? "   " : "│  "), true);
-    }
-}
-
-public class ConditionNode : ASTNode
-{
-    public bool Value { get; }
-    public Token Operator { get; set; }
-    public ASTNode LeftMember { get; set; }
-    public ASTNode RightMember { get; set; }
-
-    public ConditionNode(bool value, Token Operator, ASTNode leftMember, ASTNode rightMember)
-    {
-        Value = value;
-        this.Operator = Operator;
-        LeftMember = leftMember;
-        RightMember = rightMember;
-    }
-
-    public override void Print(string indent = "", bool last = true)
-    {
+        // Imprimir la etiqueta (si existe)
+        indent += last ? "   " : "│  ";
+        if (Label != null)
+        {
+            Console.Write(indent);
+            Console.Write("├──");
+            Console.WriteLine($"Label: {Label.Label}");
+        }
+        else
+        {
+            Console.Write(indent);
+            Console.Write("├──");
+            Console.WriteLine("Label: (null)");
+        }
+    
+        // Imprimir la condición (si existe)
         Console.Write(indent);
-        Console.Write(last ? "└──" : "├──");
-        Console.WriteLine($"Condition (Operator: {Operator?.Value})");
-        
-        LeftMember?.Print(indent + (last ? "   " : "│  "), false);
-        RightMember?.Print(indent + (last ? "   " : "│  "), true);
+        Console.Write("└──");
+        Console.WriteLine("Condition:");
+        Condition?.Print(indent + "   ", true);
     }
 }
+
+// public class ConditionNode : ASTNode
+// {
+//     public bool Value { get; }
+//     public Token Operator { get; set; }
+//     public ASTNode LeftMember { get; set; }
+//     public ASTNode RightMember { get; set; }
+
+//     public ConditionNode(bool value, Token Operator, ASTNode leftMember, ASTNode rightMember)
+//     {
+//         Value = value;
+//         this.Operator = Operator;
+//         LeftMember = leftMember;
+//         RightMember = rightMember;
+//     }
+
+//     public override void Print(string indent = "", bool last = true)
+//     {
+//         Console.Write(indent);
+//         Console.Write(last ? "└──" : "├──");
+//         Console.WriteLine($"Condition (Operator: {Operator?.Value})");
+        
+//         LeftMember?.Print(indent + (last ? "   " : "│  "), false);
+//         RightMember?.Print(indent + (last ? "   " : "│  "), true);
+//     }
+// }
 
 public class BinaryOperationNode : ASTNode
 {

@@ -4,14 +4,19 @@ public class Parser
 {
     Dictionary<string , int > operatorPrecedence = new Dictionary<string , int>()  
     { //diccionario para guardar los operador con sus respectivas precedencias 
-        {"+" , 1},
-        {"-" , 1},
-        {"*" , 2},
-        {"/" , 2},
-        {"%" , 2},
-        {"**", 3},
+        {"+" , 2},
+        {"-" , 2},
+        {"*" , 3},
+        {"/" , 3},
+        {"%" , 3},
+        {"**", 4},
         {"&&", 1},
         {"||", 0},
+        {"==", 0},
+        {">=", 0},
+        {"<=", 0},
+        {"<" , 0},
+        {">" , 0},
     };
     
     private int currentIndex; //guardar el indice del token actual que se esta analizando 
@@ -49,10 +54,20 @@ public class Parser
                     Context.variablesValues[variableNode.Name] = variableNode.Value;
                 }
                 else Context.variablesValues.Add(variableNode.Name,variableNode.Value);
-                //definir la variable en el contextooooooooooooooooooooooooo
+            }
+            //si se trata de una etiqueta 
+            else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
+            {
+                aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
+                currentIndex += 1;
+            }
+            //si se trata de un GoTo
+            else if(tokens[currentIndex].Type == TokenType.ReservedKeyword && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "[")
+            {
+                aSTNodes.Add(ParseGoTo());
+                currentIndex += 1;
             }
             else currentIndex += 1; //si no es una funcion ni salto de linea, se avanza
-            
         }
     }
     private FunctionNode ParseFunction() //metodo principal para parsear la invocacion de funcion 
@@ -120,7 +135,7 @@ public class Parser
                 FunctionNode a = (FunctionNode)inFix[i];
                 outPut.Add(a); //mientras que no sea un operador aritmetico significa que puede ser una variable o una llamada a un metodo 
             }
-            else if(aux is not null && aux.Type != TokenType.ArithmeticOperator)
+            else if(aux is not null && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.LogicOperator && aux.Type != TokenType.ComparisonOperator)
             {
                 outPut.Add((Token)aux);
             }
@@ -166,7 +181,7 @@ public class Parser
                 nodes.Add(a);
             }
             //si el tipo de token actual es un operador aritmetico o logico se debe crear un nodo de operacion bineria con el los ultimos dos nodos como hijos derecho e izquierdo   
-            else if(aux is not null && (aux.Type == TokenType.ArithmeticOperator || aux.Type == TokenType.LogicOperator))
+            else if(aux is not null && (aux.Type == TokenType.ArithmeticOperator || aux.Type == TokenType.LogicOperator || aux.Type == TokenType.ComparisonOperator))
             {
                 BinaryOperationNode binaryOperationNode = new BinaryOperationNode(aux , nodes[nodes.Count-2] , nodes[nodes.Count-1]); //crear nodo con el operador actual y con los respectivos dos ultimos nodos como hijos 
                 nodes.RemoveAt(nodes.Count-1); //una vez se creo el nodo elimnar los dos ultimos nodos hojas
@@ -175,49 +190,68 @@ public class Parser
                 if(i == postFix.Count-1) return binaryOperationNode;
             }
         }
-        ASTNode [] list = nodes.ToArray();
-        return list[0];
+        ASTNode [] list = nodes.ToArray();//convertir la lista de nodos a array para poder indexar correctamente sin tener problemas 
+        return list[0]; //retornar el primer nodod y unico
     }
-    private VariableNode ParseVariable()
+    private VariableNode ParseVariable() //metodo prinicpla para parsear asignaciones de variable 
     {
-        if(currentIndex >= tokens.Count) return new VariableNode("",null);//en caso de que se salga de los limites de la lista de tokens(extremo)
+        if (currentIndex >= tokens.Count) return new VariableNode("", null); //si no se esta en rangos salir, se llego aqui por error(extremo)
 
-        string variableName = tokens[currentIndex].Value; //guardar el nombre de la funcion 
-        currentIndex += 2; // Saltar nombre de la variable y '<-'
-        var variableNode = new VariableNode(variableName,null);
+        string variableName = tokens[currentIndex].Value; //guardar el nombre correctamente para asignarselo al nodo variable correctamete 
+        currentIndex += 2; // Saltar nombre y '<-'
+        var variableNode = new VariableNode(variableName, null); //crear el nodo variable con nombre ya 
 
-        if(currentIndex + 1 < tokens.Count )
+        List<object> infix = new List<object>();//lista de elementos en notacion infija 
+
+        while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump) //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
         {
-            List<object> Infix = new List<object>();
-            /*tokens[currentIndex].Type != TokenType.LineJump*/
-            while(currentIndex + 1 < tokens.Count && (tokens[currentIndex].Type == TokenType.ArithmeticOperator || tokens[currentIndex].Type == TokenType.LogicOperator || tokens[currentIndex].Type == TokenType.ComparisonOperator
-            || tokens[currentIndex + 1].Type == TokenType.ArithmeticOperator || tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator))
+            //si se trata de una de una funcion 
+            if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(")
             {
-                if(tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Value == "(")
-                {
-                    FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardarlo en el nodo de funcion 
-                    Infix.Add(functionNode);
-                }
-                else
-                {
-                    Infix.Add(tokens[currentIndex]);
-                    currentIndex += 1;
-                }
+                infix.Add(ParseFunction()); //agregar el nodo funcion paraseado correctamente 
             }
-            if(tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Value == "(")
+            //en cualquier otro caso agregar a la lista en notacion infija 
+            else if (tokens[currentIndex].Type == TokenType.Number || tokens[currentIndex].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex].Type == TokenType.LogicOperator ||  tokens[currentIndex].Type == TokenType.ComparisonOperator) // <- Incluye Arithmetic, Logic, Comparison
             {
-                FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardarlo en el nodo de funcion 
-                Infix.Add(functionNode);
-                List<object> post = ConvertPostFix(Infix);
-                variableNode.Value = ParsePostFix(post);
-                return variableNode;
+                infix.Add(tokens[currentIndex]); //agregar a la lista en notacion infija 
+                currentIndex++; //aumentar el indice
             }
-            Infix.Add(tokens[currentIndex]);
-            List<object> postFix = ConvertPostFix(Infix);
-            variableNode.Value = ParsePostFix(postFix);
-            return variableNode;
-
+            else break; // Si no es parte de la expresión, salir
         }
-        return null;
+        if (infix.Count > 0) //si se tiene al menos un elemento en notacion infija 
+        {
+            List<object> postFix = ConvertPostFix(infix); //guardar los elementos convertidos a notacion postfija
+            variableNode.Value = ParsePostFix(postFix); //asignarle el valor del resultado de parsear la notacion postfija al nodo de variable  
+        }
+        return variableNode; //retoirnar correctamente el nodo de variable 
+    }
+
+    private GoToNode ParseGoTo()
+    {
+        var goToNode = new GoToNode(new LabelNode(tokens[currentIndex + 2].Value ),null);
+        currentIndex += 5; //se posiciona sobre el primer item de la condicion 
+
+        List<object> infix = new List<object>();//lista de elementos en notacion infija 
+
+        while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump && tokens[currentIndex].Type != TokenType.ReservedKeyword && tokens[currentIndex].Value != ")") //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
+        {
+            //si se trata de una de una funcion 
+            if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(")
+            {
+                infix.Add(ParseFunction()); //agregar el nodo funcion paraseado correctamente 
+            }
+            else //en cualquier otro caso agregar a la lista en notacion infija 
+            {
+                infix.Add(tokens[currentIndex]); //agregar a la lista en notacion infija 
+                currentIndex++; //aumentar el indice
+            }
+        }
+        if (infix.Count > 0) //si se tiene al menos un elemento en notacion infija 
+        {
+            List<object> postFix = ConvertPostFix(infix); //guardar los elementos convertidos a notacion postfija
+            goToNode.Condition = ParsePostFix(postFix); //asignarle el valor del resultado de parsear la notacion postfija al nodo de variable  
+        }
+
+        return goToNode;
     }
 }
