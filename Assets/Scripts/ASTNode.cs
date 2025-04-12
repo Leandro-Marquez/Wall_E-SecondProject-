@@ -1,9 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Mathematics;
+using System;
 
 public abstract class ASTNode
 {
     public abstract void Print(string indent = "", bool last = true);
+    public abstract object Evaluate();
 }
 
 public class FunctionNode : ASTNode
@@ -28,6 +31,11 @@ public class FunctionNode : ASTNode
             Params[i].Print(indent, i == Params.Count - 1);
         }
     }
+
+    public override object Evaluate()
+    {
+        throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrrrr
+    }
 }
 
 public class VariableNode : ASTNode
@@ -47,6 +55,11 @@ public class VariableNode : ASTNode
         
         Value?.Print(indent + (last ? "   " : "│  "), true);
     }
+
+    public override object Evaluate()
+    {
+       return Value.Evaluate();
+    }
 }
 
 public class NumberLiteralNode : ASTNode
@@ -61,6 +74,11 @@ public class NumberLiteralNode : ASTNode
     public override void Print(string indent = "", bool last = true)
     {
         Debug.Log(indent + (last ? "└──" : "├──") + $"Number: {Value}");
+    }
+
+    public override object Evaluate()
+    {
+        return Value;
     }
 }
 
@@ -77,6 +95,11 @@ public class StringLiteralNode : ASTNode
     {
         Debug.Log(indent + (last ? "└──" : "├──") + $"String: \"{Value}\"");
     }
+
+    public override object Evaluate()
+    {
+        return Value;
+    }
 }
 
 public class BooleanLiteralNode : ASTNode
@@ -92,6 +115,11 @@ public class BooleanLiteralNode : ASTNode
     {
         Debug.Log(indent + (last ? "└──" : "├──") + $"Boolean: {Value}");
     }
+
+    public override object Evaluate()
+    {
+        return Value;
+    }
 }
 
 public class LabelNode : ASTNode
@@ -106,6 +134,11 @@ public class LabelNode : ASTNode
     public override void Print(string indent = "", bool last = true)
     {
         Debug.Log(indent + (last ? "└──" : "├──") + $"Label: {Label}");
+    }
+
+    public override object Evaluate()
+    {
+        throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrr
     }
 }
 
@@ -139,6 +172,11 @@ public class GoToNode : ASTNode
         Debug.Log(indent + "└──" + "Condition:");
         Condition?.Print(indent + "   ", true);
     }
+
+    public override object Evaluate()
+    {
+        throw new System.NotImplementedException();//implementarrrrrrrrrrrrrrrrrr
+    }
 }
 
 public class BinaryOperationNode : ASTNode
@@ -160,5 +198,33 @@ public class BinaryOperationNode : ASTNode
         
         LeftMember?.Print(indent + (last ? "   " : "│  "), false);
         RightMember?.Print(indent + (last ? "   " : "│  "), true);
+    }
+
+    public override object Evaluate()
+    {
+        return Operator.Value switch
+        {
+            "+"  => (int)LeftMember.Evaluate() + (int)RightMember.Evaluate(),
+            "-"  => (int)LeftMember.Evaluate() - (int)RightMember.Evaluate(),
+            "*"  => (int)LeftMember.Evaluate() * (int)RightMember.Evaluate(),
+            "/"  => (int)LeftMember.Evaluate() / (int)RightMember.Evaluate(),
+            "%"  => (int)LeftMember.Evaluate() % (int)RightMember.Evaluate(),
+            "**" => (int)Math.Pow((double)LeftMember.Evaluate() , (double)RightMember.Evaluate()),
+            "==" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
+            "!=" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
+            ">=" => (int)LeftMember.Evaluate() >= (int)RightMember.Evaluate(),
+            ">"  => (int)LeftMember.Evaluate() > (int)RightMember.Evaluate(),
+            "<=" => (int)LeftMember.Evaluate() <= (int)RightMember.Evaluate(),
+            "<"  => (int)LeftMember.Evaluate() < (int)RightMember.Evaluate(),
+            "||" => (bool)LeftMember.Evaluate() || (bool)RightMember.Evaluate(),
+            "&&" => (bool)LeftMember.Evaluate() && (bool)RightMember.Evaluate(),
+        };
+    }
+    private bool AreEqual(object left, object right) //mejorarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr con los erroressssssssssssss
+    {
+        if (left.GetType() != right.GetType())
+            throw new InvalidOperationException($"No se pueden comparar {left.GetType().Name} y {right.GetType().Name}");
+
+        return object.Equals(left, right);
     }
 }

@@ -21,7 +21,7 @@ public class Lexer
         string ArithmeticOperator = @"(?:[+\--*/%\***])";
         string Identifier = @"^[a-z-A-Z-_][a-z-A-Z-0-9-_]*";
         string Delimiter = @"[\(\)\{\}\[\]]";
-        string ComparisonOperator = @"(?:==|>=|<=|>|<)";
+        string ComparisonOperator = @"(?:==|!=|>=|<=|>|<)";
         string AssignmentOperator =  @"(<-)";
         string LogicOperator = @"(?:&&|\|\||!)";
         string String = @"""(([^""\\]|\.)*?)""";

@@ -17,6 +17,7 @@ public class Parser
         {"<=", 0},
         {"<" , 0},
         {">" , 0},
+        {"!=", 0}
     };
     
     private int currentIndex; //guardar el indice del token actual que se esta analizando 
