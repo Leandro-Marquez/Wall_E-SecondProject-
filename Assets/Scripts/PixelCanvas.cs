@@ -14,8 +14,8 @@ public class PixelCanvasController : MonoBehaviour
     void Start()
     {
         InitializeCanvas();
-        DrawPerfectSmiley();
-        Paint();
+        // DrawPerfectSmiley();
+        // Paint();
     }
 
     void InitializeCanvas()
@@ -114,15 +114,15 @@ public class PixelCanvasController : MonoBehaviour
         }
     }
 
-    public void Paint()
-    {
-        // Ejemplo de uso con el sistema corregido:
-        SetPixel(0, 0, Color.red);       // Esquina SUPERIOR IZQUIERDA
-        SetPixel(0, 63, Color.blue);     // Esquina SUPERIOR DERECHA
-        SetPixel(0, 2, Color.blue);     // Esquina SUPERIOR DERECHA
-        SetPixel(0, 4, Color.blue);     // Esquina SUPERIOR DERECHA
+    // public void Paint()
+    // {
+    //     // Ejemplo de uso con el sistema corregido:
+    //     SetPixel(0, 0, Color.red);       // Esquina SUPERIOR IZQUIERDA
+    //     SetPixel(0, 63, Color.blue);     // Esquina SUPERIOR DERECHA
+    //     SetPixel(0, 2, Color.blue);     // Esquina SUPERIOR DERECHA
+    //     SetPixel(0, 4, Color.blue);     // Esquina SUPERIOR DERECHA
 
-        // SetPixel(63, 0, Color.green);    // Esquina INFERIOR IZQUIERDA
-        // SetPixel(63, 63, Color.yellow);  // Esquina INFERIOR DERECHA
-    }
+    //     // SetPixel(63, 0, Color.green);    // Esquina INFERIOR IZQUIERDA
+    //     // SetPixel(63, 63, Color.yellow);  // Esquina INFERIOR DERECHA
+    // }
 }

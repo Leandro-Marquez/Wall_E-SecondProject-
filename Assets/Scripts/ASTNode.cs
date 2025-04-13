@@ -37,10 +37,28 @@ public class FunctionNode : ASTNode
         //manejas los casos de funciones especiales
         if(this.Name == "Spawn")
         {
-            if(this.Params.Count != 2) Error.errors.Add((ErrorType.Run_Time_Error,"Spawn() command must contain two parameters"));
+            if(this.Params.Count != 2) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Spawn()"));
             else 
             {
-                
+
+                // Context.InitializeCanvas();
+                var x = Params[0].Evaluate();
+                var y = Params[1].Evaluate();
+                if(x is int xValue && y is int yValue)
+                {
+                    Context.wallEPosition.x = (int)x;
+                    Context.wallEPosition.y = (int)y;
+                }
+                else
+                {
+                    // Mensaje de error detallado
+                    string errorMsg = "Invalid types in 'Spawn': ";
+                    if (x is not int) 
+                        errorMsg += $"X must be int, but got '{x?.GetType().Name}'. ";
+                    if (y is not int) 
+                        errorMsg += $"Y must be int, but got '{y?.GetType().Name}'.";
+                    Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
+                }
             }
         }
         throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrrrr
@@ -218,7 +236,7 @@ public class BinaryOperationNode : ASTNode
             "*"  => (int)LeftMember.Evaluate() * (int)RightMember.Evaluate(),
             "/"  => (int)LeftMember.Evaluate() / (int)RightMember.Evaluate(),
             "%"  => (int)LeftMember.Evaluate() % (int)RightMember.Evaluate(),
-            "**" => (int)Math.Pow((double)LeftMember.Evaluate() , (double)RightMember.Evaluate()),
+            "**" => Convert.ToInt32(Math.Pow((double)LeftMember.Evaluate() , (double)RightMember.Evaluate())),
             "==" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
             "!=" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
             ">=" => (int)LeftMember.Evaluate() >= (int)RightMember.Evaluate(),
