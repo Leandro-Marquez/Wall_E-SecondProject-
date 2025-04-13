@@ -34,6 +34,15 @@ public class FunctionNode : ASTNode
 
     public override object Evaluate()
     {
+        //manejas los casos de funciones especiales
+        if(this.Name == "Spawn")
+        {
+            if(this.Params.Count != 2) Error.errors.Add((ErrorType.Run_Time_Error,"Spawn() command must contain two parameters"));
+            else 
+            {
+                
+            }
+        }
         throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrrrr
     }
 }

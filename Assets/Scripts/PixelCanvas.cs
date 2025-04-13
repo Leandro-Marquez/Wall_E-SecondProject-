@@ -3,8 +3,8 @@ using UnityEngine;
 public class PixelCanvasController : MonoBehaviour
 {
     [Header("Configuración")]
-    [SerializeField] private int gridHeight = 64; // Filas (X aumenta hacia abajo)
-    [SerializeField] private int gridWidth = 64;  // Columnas (Y aumenta hacia derecha)
+    [SerializeField] private int gridHeight = 64; 
+    [SerializeField] private int gridWidth = 64;  
     [SerializeField] private int targetResolution = 1080;
 
     private Texture2D texture;
@@ -15,7 +15,7 @@ public class PixelCanvasController : MonoBehaviour
     {
         InitializeCanvas();
         DrawPerfectSmiley();
-        // Paint();
+        Paint();
     }
 
     void InitializeCanvas()
@@ -59,8 +59,6 @@ public class PixelCanvasController : MonoBehaviour
         );
     }
 
-    // X = Fila (0 arriba, aumenta hacia abajo)
-    // Y = Columna (0 izquierda, aumenta hacia derecha)
     public void SetPixel(int x, int y, Color color)
     {
         if (x >= 0 && x < gridHeight && y >= 0 && y < gridWidth)
