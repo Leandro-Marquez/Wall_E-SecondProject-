@@ -1,50 +1,54 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class PixelCanvas : MonoBehaviour
+[RequireComponent(typeof(GridLayoutGroup))]
+public class DynamicPixelGrid : MonoBehaviour
 {
-    public int gridSize = 256; // 256x256 celdas
-    public GameObject cellPrefab; // Prefab de cada celda (con Image)
-    private GameObject[,] grid; // Matriz para almacenar celdas
+    public int gridSize = 256;
+    public float cellSize = 2f; // Tamaño inicial de cada celda
+    public Color defaultColor = Color.white;
+
+    private Image[,] cells;
+    private GridLayoutGroup gridLayout;
 
     void Start()
     {
-        CreateGrid();
+        InitializeGrid();
     }
 
-    void CreateGrid()
+    public void InitializeGrid()
     {
-        grid = new GameObject[gridSize, gridSize];
-        float cellSize = 1080f / gridSize; // Tamaño de cada celda
+        gridLayout = GetComponent<GridLayoutGroup>();
+        gridLayout.cellSize = Vector2.one * cellSize;
+        gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        gridLayout.constraintCount = gridSize;
 
-        for (int x = 0; x < gridSize; x++)
+        cells = new Image[gridSize, gridSize];
+
+        // Crear celdas
+        for (int i = 0; i < gridSize; i++)
         {
-            for (int y = 0; y < gridSize; y++)
+            for (int j = 0; j < gridSize; j++)
             {
-                // Instanciar celda
-                GameObject cell = Instantiate(cellPrefab, transform);
-                RectTransform rt = cell.GetComponent<RectTransform>();
+                GameObject cellObj = new GameObject($"Cell_{i}_{j}");
+                cellObj.transform.SetParent(transform, false);
                 
-                // Posición y tamaño
-                rt.anchoredPosition = new Vector2(x * cellSize, y * cellSize);
-                rt.sizeDelta = new Vector2(cellSize, cellSize);
-                
-                // Guardar referencia
-                grid[x, y] = cell;
+                Image img = cellObj.AddComponent<Image>();
+                img.color = defaultColor;
+                cells[i, j] = img;
             }
         }
     }
 
-    // Obtener celda por coordenadas
-    public GameObject GetCell(int x, int y)
+    public void SetCellColor(int x, int y, Color color)
     {
         if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
-            return grid[x, y];
-        else
-        {
-            Debug.LogError($"Coordenadas inválidas: ({x}, {y})");
-            return null;
-        }
+            cells[x, y].color = color;
+    }
+
+    public void UpdateCellSize(float newSize)
+    {
+        cellSize = newSize;
+        gridLayout.cellSize = Vector2.one * cellSize;
     }
 }

@@ -34,13 +34,14 @@ class Cover : MonoBehaviour
         lexer.Tokenize();
         List<Token> tokens = lexer.tokens;
         //imprimirrrrrr
-        for (int i = 0; i < tokens.Count ; i++) Debug.Log(tokens[i].Type + " : " + tokens[i].Value);   
+        // for (int i = 0; i < tokens.Count ; i++) Debug.Log(tokens[i].Type + " : " + tokens[i].Value);   
         
         Parser parser = new Parser(tokens);
         parser.Parse();
         for (int i = 0; i < parser.aSTNodes.Count; i++)
         {
-            parser.aSTNodes[i].Print();
+            Debug.Log(i);
+            // parser.aSTNodes[i].Print();
         }
     }
     void Update()

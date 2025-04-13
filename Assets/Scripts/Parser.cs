@@ -60,6 +60,7 @@ public class Parser
             else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
             {
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
+                Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count);
                 currentIndex += 1;
             }
             //si se trata de un GoTo
