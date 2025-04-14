@@ -40,14 +40,17 @@ public class FunctionNode : ASTNode
             if(this.Params.Count != 2) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Spawn()"));
             else 
             {
-
-                // Context.InitializeCanvas();
                 var x = Params[0].Evaluate();
                 var y = Params[1].Evaluate();
                 if(x is int xValue && y is int yValue)
                 {
-                    Context.wallEPosition.x = (int)x;
-                    Context.wallEPosition.y = (int)y;
+                    if(xValue >= 0 && xValue < Context.canvasSize && yValue >= 0 && yValue < Context.canvasSize)
+                    {
+                        Context.wallEPosition.x = (int)x;
+                        Context.wallEPosition.y = (int)y;    
+                        Context.wallEPositionChanged = true;
+                    }
+                    else Error.errors.Add((ErrorType.Run_Time_Error, "Spawn() parameters must be positive and less than Canvas'Size"));
                 }
                 else
                 {
@@ -61,7 +64,50 @@ public class FunctionNode : ASTNode
                 }
             }
         }
-        throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrrrr
+        if(this.Name == "Color")
+        {
+            if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Color()"));
+            else
+            {
+                var a = Params[0].Evaluate();
+                if(a is not string aValue) Error.errors.Add((ErrorType.Run_Time_Error, "Color() parameter must be String Type"));
+                switch (a)
+                {
+                    case "Red":
+                        Context.brushColor = a.ToString();
+                        break;
+                    case "Blue":
+                        Context.brushColor = a.ToString();
+                        break;
+                    case "Green":
+                        Context.brushColor = a.ToString();
+                        break;
+                    case "Yellow":
+                        Context.brushColor = a.ToString();
+                        break;
+                    case "Orange":
+                        Context.brushColor = a.ToString();
+                        break;
+                    case "Purple":
+                        Context.brushColor = a.ToString();
+                        break;
+                    case "Black":
+                        Context.brushColor = a.ToString();
+                        break;
+                    case "White":
+                        Context.brushColor = a.ToString();
+                        break;
+                    case "Transparent":
+                        Context.brushColor = a.ToString();
+                        break;
+                    default:
+                        Error.errors.Add((ErrorType.Run_Time_Error, "Current expresion is not valid like a Color Type"));
+                        break;
+                }
+            }
+        }
+        return null;
+        // throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrrrr
     }
 }
 
@@ -236,7 +282,7 @@ public class BinaryOperationNode : ASTNode
             "*"  => (int)LeftMember.Evaluate() * (int)RightMember.Evaluate(),
             "/"  => (int)LeftMember.Evaluate() / (int)RightMember.Evaluate(),
             "%"  => (int)LeftMember.Evaluate() % (int)RightMember.Evaluate(),
-            "**" => Convert.ToInt32(Math.Pow((double)LeftMember.Evaluate() , (double)RightMember.Evaluate())),
+            "**" => (int)Math.Pow((int)RightMember.Evaluate(),(int)LeftMember.Evaluate()),/*Convert.ToInt32(Math.Pow((double)LeftMember.Evaluate() , (double)RightMember.Evaluate()))*/
             "==" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
             "!=" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
             ">=" => (int)LeftMember.Evaluate() >= (int)RightMember.Evaluate(),
