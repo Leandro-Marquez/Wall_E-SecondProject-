@@ -64,7 +64,7 @@ public class FunctionNode : ASTNode
                 }
             }
         }
-        if(this.Name == "Color")
+        else if(this.Name == "Color")
         {
             if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Color()"));
             else
@@ -106,6 +106,16 @@ public class FunctionNode : ASTNode
                 }
             }
         }
+        else if(this.Name == "GetActualX")
+        {
+            if(this.Params.Count > 0) Error.errors.Add((ErrorType.Run_Time_Error, "GetActualX() does not contains parameters"));
+            else return Context.wallEPosition.x;
+        }
+        else if(this.Name == "GetActualY")
+        {
+            if(this.Params.Count > 0) Error.errors.Add((ErrorType.Run_Time_Error, "GetActualY() does not contains parameters"));
+            else return Context.wallEPosition.y;
+        }
         return null;
         // throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrrrr
     }
@@ -131,7 +141,7 @@ public class VariableNode : ASTNode
 
     public override object Evaluate()
     {
-       return Value.Evaluate();
+       return Context.variablesValues[Name].Evaluate();
     }
 }
 
@@ -157,7 +167,7 @@ public class NumberLiteralNode : ASTNode
 
 public class StringLiteralNode : ASTNode
 {
-    public string Value { get; set; }
+    public object Value { get; set; }
 
     public StringLiteralNode(string value)
     {

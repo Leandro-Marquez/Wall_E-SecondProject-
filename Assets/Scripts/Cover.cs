@@ -76,15 +76,14 @@ class Cover : MonoBehaviour
         
         for (int i = 0; i < parser.aSTNodes.Count; i++)
         {
-            parser.aSTNodes[i].Evaluate();
+            // parser.aSTNodes[i].Evaluate();
             // Debug.Log(i);
-            // parser.aSTNodes[i].Print();
+            parser.aSTNodes[i].Print();
         }
         Debug.Log(Context.brushColor);
         Debug.Log(Context.pincelZize);
         Debug.Log(Context.canvasSize);
         Debug.Log(Context.wallEPosition.x + " , " + Context.wallEPosition.y);
-
         Debug.Log("============================================");
         for (var i = 0; i < Error.errors.Count ; i++)
         {
@@ -94,7 +93,11 @@ class Cover : MonoBehaviour
     void Update()
     {
         if(usersInput is not null ) input = usersInput.text;
-        if(string.IsNullOrEmpty(input)) runButton.SetActive(false);
+        if(string.IsNullOrEmpty(input))
+        {
+            runButton.SetActive(false);
+            exportButton.SetActive(false);
+        }
         else
         {
             runButton.SetActive(true);

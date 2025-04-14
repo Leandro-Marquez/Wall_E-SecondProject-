@@ -5,81 +5,86 @@ using System.Text.RegularExpressions;
 public class Lexer
 {
     string input;
-    public List<Token> tokens {get ; set;}
+    public List<Token> tokens { get; set; }
+
     public Lexer(string input)
     {
         this.input = input;
         tokens = new List<Token>();
     }
+
     public void Tokenize()
     {
-        input.Trim(); // eliminar los espacios en blanco antes y despues del ultimo caracter respectivamente 
-        
-        // definiendo las expresiones regulares 
+        input = input.Trim(); // Eliminar espacios al inicio/final
+
+        // Expresiones regulares actualizadas
         string ReservedKeyword = @"GoTo";
         string Bool = @"true|false";
-        string ArithmeticOperator = @"(?:[+\--*/%\***])";
-        string Identifier = @"^[a-z-A-Z_][a-z-A-Z0-9_]*";
+        string ArithmeticOperator = @"(?:[+\-*/%\*])";
+        string Identifier = @"^[a-zA-Z_][a-zA-Z0-9_]*";
         string Delimiter = @"[\(\)\{\}\[\]]";
         string ComparisonOperator = @"(?:==|!=|>=|<=|>|<)";
-        string AssignmentOperator =  @"(<-)";
+        string AssignmentOperator = @"(<-)";
         string LogicOperator = @"(?:&&|\|\||!)";
-        string String = @"""(([^""\\]|\.)*?)""";
+        string String = @"""((?:[^""\\]|\\.)*)""";  // Grupo de captura sin comillas
         string Number = @"\d+";
         string Comma = @",";
 
         var Diccionario = new Dictionary<string, TokenType>
         {
-            { ReservedKeyword    , TokenType.ReservedKeyword },
-            { Bool               , TokenType.Bool },
-            { ArithmeticOperator , TokenType.ArithmeticOperator },
-            { Identifier         , TokenType.Identifier },
-            { Delimiter          , TokenType.Delimiter},
-            { ComparisonOperator , TokenType.ComparisonOperator },
-            { AssignmentOperator , TokenType.AssignmentOperator },
-            { LogicOperator      , TokenType.LogicOperator },
-            { String             , TokenType.String },
-            { Number             , TokenType.Number },
-            { Comma              , TokenType.Comma },
+            { ReservedKeyword,    TokenType.ReservedKeyword },
+            { Bool,              TokenType.Bool },
+            { ArithmeticOperator, TokenType.ArithmeticOperator },
+            { Identifier,        TokenType.Identifier },
+            { Delimiter,         TokenType.Delimiter },
+            { ComparisonOperator,TokenType.ComparisonOperator },
+            { AssignmentOperator,TokenType.AssignmentOperator },
+            { LogicOperator,     TokenType.LogicOperator },
+            { String,           TokenType.String },
+            { Number,           TokenType.Number },
+            { Comma,            TokenType.Comma },
         };
 
-        while(!string.IsNullOrEmpty(input)) // mientras que la entrada no sea nula ni vacia 
+        while (!string.IsNullOrEmpty(input))
         {
-            string betterToken = null!; // guardar el mejor token 
-            TokenType betterTokenType = TokenType.ReservedKeyword; // guardar el mejor tipo de token 
-            int betterIndex = 0; // guardar la mejor longitud de token 
-            foreach (var item in Diccionario) // iterar por el diccionario 
+            string bestToken = null;
+            TokenType bestTokenType = TokenType.ReservedKeyword;
+            int bestLength = 0;
+
+            foreach (var item in Diccionario)
             {
-                var token = Regex.Match(input , item.Key);
-                if (token.Success && token.Index == 0 && token.Length > betterIndex) // verificar si hay algun token para la E.R actual, si el token se encuentra al inicio de la entrada, y si tiene mejor longitud que el mejor hasta el momento 
+                var match = Regex.Match(input, item.Key);
+                if (match.Success && match.Index == 0 && match.Length > bestLength)
                 {
-                    betterToken = token.Value; // guardar el mejor tokn hasta ahora 
-                    betterTokenType = item.Value; // asignarle a dicho token su respectivo tipo
-                    betterIndex = token.Length; // guardar la longitud del token con el que se hizo match
+                    bestToken = match.Value;
+                    bestTokenType = item.Value;
+                    bestLength = match.Length;
                 }
             }
 
-            if(betterToken is null) // en caso de que sea nulo
+            if (bestToken == null)
             {
-                input = input.Substring(1).Trim(); // saltar el primer caracter y limpiar caracteres vacios al inicio 
-                continue; // continuar con el ciclo 
+                input = input.Substring(1).Trim();
+                continue;
             }
-            // si llego a este punto significa que el mejor token no es nulo
-            tokens.Add(new Token(betterTokenType , betterToken)); // agregar un nuevo token a la lista de tokens 
 
-            input = input.Substring(betterIndex).Trim(); // saltar el token completo y limpiar caracteres vacios para seguir analizando 
-
-            if (betterTokenType == TokenType.ArithmeticOperator && !string.IsNullOrEmpty(input)) //verificar el caso de un operador de multiplicacion si se tiene otro al lado seria potencia 
+            // Manejo especial para strings (eliminar comillas)
+            if (bestTokenType == TokenType.String)
             {
-                var NextToken = Regex.Match(input, ArithmeticOperator);
+                bestToken = Regex.Match(bestToken, @"""((?:[^""\\]|\\.)*)""").Groups[1].Value;
+            }
 
-                if (NextToken.Success && NextToken.Index == 0) //si se tiene token
-                {
-                    tokens[tokens.Count - 1].Value += NextToken.Value; //agregar el otro signo de multiplicacion 
-                    input = input.Substring(NextToken.Length).Trim(); //saltarse el espacio del signo y limpiar los espacios en blanco
-                }
-            } 
+            tokens.Add(new Token(bestTokenType, bestToken));
+            input = input.Substring(bestLength).Trim();
+
+            // Manejo de operador ** (potencia)
+            if (bestTokenType == TokenType.ArithmeticOperator && bestToken == "*" && !string.IsNullOrEmpty(input) && input.StartsWith("*"))
+            {
+                tokens[tokens.Count - 1].Value = "**";
+                input = input.Substring(1).Trim();
+            }
         }
-        tokens.Add(new Token(TokenType.LineJump, "")); //agregar a la lista de tokens una vez se tokenizo todo el salto de linea para controlar que se termino la linea
+
+        tokens.Add(new Token(TokenType.LineJump, ""));
     }
 }
