@@ -77,23 +77,27 @@ class Cover : MonoBehaviour
         
         for (int i = 0; i < parser.aSTNodes.Count; i++)
         {
-            parser.aSTNodes[i].Print();
+            // parser.aSTNodes[i].Print();
 
             parser.aSTNodes[i].Evaluate();
             // Debug.Log(i);
         }
+
+
         Debug.Log("Brush Color : " + Context.brushColor);
         Debug.Log("Pincel Zize : " + Context.pincelZize);
         Debug.Log("Canvas Zize : " + Context.canvasSize);
         Debug.Log("X: " + Context.wallEPosition.x + " , Y: " + Context.wallEPosition.y);
+        
+        Debug.Log("======================================" + Context.variablesValues.Count);
+        foreach (var item in Context.variablesValues)
+        {
+            Debug.Log(item.Key + ": " + item.Value.Evaluate());
+        }
     }
     void Update()
     {   
-        if(usersInput is not null )
-        {
-            input = usersInput.text;
-            // usersInput.text = input;
-        }
+        if(usersInput is not null ) input = usersInput.text;
         if(string.IsNullOrEmpty(input))
         {
             runButton.SetActive(false);

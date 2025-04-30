@@ -17,7 +17,6 @@ public class Parser
         {"<=", 0},
         {"<" , 0},
         {">" , 0},
-        {"!=", 0}
     };
     
     private int currentIndex; //guardar el indice del token actual que se esta analizando 
@@ -60,7 +59,6 @@ public class Parser
             else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
             {
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
-                Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count);
                 currentIndex += 1;
             }
             //si se trata de un GoTo
@@ -193,7 +191,7 @@ public class Parser
             }
         }
         ASTNode [] list = nodes.ToArray();//convertir la lista de nodos a array para poder indexar correctamente sin tener problemas 
-        return list[0]; //retornar el primer nodo y unico
+        return list[0]; //retornar el primer nodod y unico
     }
     private VariableNode ParseVariable() //metodo prinicpla para parsear asignaciones de variable 
     {
@@ -207,16 +205,28 @@ public class Parser
 
         while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump) //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
         {
-            //si se trata de una funcion 
+            //si se trata de una de una funcion 
             if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(")
             {
                 infix.Add(ParseFunction()); //agregar el nodo funcion paraseado correctamente 
             }
             //en cualquier otro caso agregar a la lista en notacion infija 
-            else if (tokens[currentIndex].Type == TokenType.Number || tokens[currentIndex].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex].Type == TokenType.LogicOperator ||  tokens[currentIndex].Type == TokenType.ComparisonOperator) // <- Incluye Arithmetic, Logic, Comparison
+            else if (tokens[currentIndex].Type == TokenType.String ||tokens[currentIndex].Type == TokenType.Bool ||tokens[currentIndex].Type == TokenType.Number || tokens[currentIndex].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex].Type == TokenType.LogicOperator ||  tokens[currentIndex].Type == TokenType.ComparisonOperator) // <- Incluye Arithmetic, Logic, Comparison
             {
                 infix.Add(tokens[currentIndex]); //agregar a la lista en notacion infija 
                 currentIndex++; //aumentar el indice
+            }
+            //variables
+            else if (tokens[currentIndex].Type == TokenType.Identifier && (currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator) )
+            {
+                infix.Add(tokens[currentIndex]);
+                currentIndex ++;
+            }
+            //variables
+            else if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex - 1 >= 0 && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator)
+            {
+                infix.Add(tokens[currentIndex]);
+                currentIndex ++;
             }
             else break; // Si no es parte de la expresión, salir
         }

@@ -141,7 +141,7 @@ public class VariableNode : ASTNode
 
     public override object Evaluate()
     {
-    //    Debug.Log(Context.variablesValues[Name] + " siiii"); 
+        
        return Context.variablesValues[Name].Evaluate();
     }
 }
