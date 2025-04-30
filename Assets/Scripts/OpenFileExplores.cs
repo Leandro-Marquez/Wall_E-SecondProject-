@@ -25,7 +25,7 @@ public class WindowsFileExplorer : MonoBehaviour
             loadedFileContent = File.ReadAllText(loadedFilePath);
 
             textFileContent.text = loadedFileContent;
-            Cover.input = textFileContent.text;
+            Cover.input += textFileContent.text;
         }
     }
 }

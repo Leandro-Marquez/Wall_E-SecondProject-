@@ -1,16 +1,16 @@
-﻿// See https://aka.ms/new-console-template for more information
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
 using System;
 using UnityEditor;
-
+using Unity.VisualScripting;
 class Cover : MonoBehaviour
 {
     public GameObject runButton,exportButton;
     public static string input;
-    public TMP_InputField usersInput; //inputField en la escena en Unity 
+    public TMP_InputField usersInput;
+    public AudioSource errorSound;
     public GameObject editor;
     public GameObject errorsPanel;
     public GameObject runAndImportButtons;
@@ -28,7 +28,7 @@ class Cover : MonoBehaviour
         string text = canvasSizeInputField.text;
         if(text == "")
         {
-            //reproducir sonido de errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+            errorSound.Play();
             return;
         }
         else canvasSize = int.Parse(text.ToString());
@@ -59,10 +59,11 @@ class Cover : MonoBehaviour
     {
         if(canvasSize == 0)
         {
-            Error.errors.Add((ErrorType.Semantic_Error,"Any valid Canvas'Size must be positive "));
+            Error.errors.Add((ErrorType.Semantic_Error,"Any valid Canvas's Size must be positive "));
             return;
         }
         else Context.canvasSize = canvasSize;
+        input = usersInput.text;
         Lexer lexer = new Lexer(input);
         lexer.Tokenize();
         List<Token> tokens = lexer.tokens;
@@ -76,23 +77,23 @@ class Cover : MonoBehaviour
         
         for (int i = 0; i < parser.aSTNodes.Count; i++)
         {
-            // parser.aSTNodes[i].Evaluate();
-            // Debug.Log(i);
             parser.aSTNodes[i].Print();
+
+            parser.aSTNodes[i].Evaluate();
+            // Debug.Log(i);
         }
-        Debug.Log(Context.brushColor);
-        Debug.Log(Context.pincelZize);
-        Debug.Log(Context.canvasSize);
-        Debug.Log(Context.wallEPosition.x + " , " + Context.wallEPosition.y);
-        Debug.Log("============================================");
-        for (var i = 0; i < Error.errors.Count ; i++)
-        {
-            Debug.Log(Error.errors[i].Item1 + " :" + Error.errors[i].Item2);
-        }
+        Debug.Log("Brush Color : " + Context.brushColor);
+        Debug.Log("Pincel Zize : " + Context.pincelZize);
+        Debug.Log("Canvas Zize : " + Context.canvasSize);
+        Debug.Log("X: " + Context.wallEPosition.x + " , Y: " + Context.wallEPosition.y);
     }
     void Update()
-    {
-        if(usersInput is not null ) input = usersInput.text;
+    {   
+        if(usersInput is not null )
+        {
+            input = usersInput.text;
+            // usersInput.text = input;
+        }
         if(string.IsNullOrEmpty(input))
         {
             runButton.SetActive(false);
@@ -105,3 +106,12 @@ class Cover : MonoBehaviour
         }
     }
 }
+
+
+// Spawn(3 + 2 * 3 / 6 + 1 % 4 , 4)
+// Color("Black")
+
+// n <- 5
+// k <- 3 + 3 * 10
+// n <- k * 2
+

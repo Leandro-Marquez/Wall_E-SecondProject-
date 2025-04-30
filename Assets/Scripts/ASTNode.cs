@@ -141,6 +141,7 @@ public class VariableNode : ASTNode
 
     public override object Evaluate()
     {
+    //    Debug.Log(Context.variablesValues[Name] + " siiii"); 
        return Context.variablesValues[Name].Evaluate();
     }
 }
@@ -171,6 +172,7 @@ public class StringLiteralNode : ASTNode
 
     public StringLiteralNode(string value)
     {
+        if(value[0] == '"') value.Substring(1,value.Length-2);
         Value = value;
     }
 

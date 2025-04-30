@@ -193,7 +193,7 @@ public class Parser
             }
         }
         ASTNode [] list = nodes.ToArray();//convertir la lista de nodos a array para poder indexar correctamente sin tener problemas 
-        return list[0]; //retornar el primer nodod y unico
+        return list[0]; //retornar el primer nodo y unico
     }
     private VariableNode ParseVariable() //metodo prinicpla para parsear asignaciones de variable 
     {
@@ -207,7 +207,7 @@ public class Parser
 
         while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump) //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
         {
-            //si se trata de una de una funcion 
+            //si se trata de una funcion 
             if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(")
             {
                 infix.Add(ParseFunction()); //agregar el nodo funcion paraseado correctamente 
