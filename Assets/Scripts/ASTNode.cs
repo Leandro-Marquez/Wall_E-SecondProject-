@@ -133,7 +133,7 @@ public class FunctionNode : ASTNode
                 for (var i = 0; i < this.Params.Count ; i++)
                 {
                     var a = this.Params[i].Evaluate();
-                    if(a is not int) Error.errors.Add((ErrorType.Run_Time_Error,"DrawLine's Method must recibe ints"));
+                    if(a is not int) Error.errors.Add((ErrorType.Run_Time_Error,"DrawLine's Method must recibe Int's Type"));
                     else ints.Add((int)a);
                 }
                 (int x , int y) dir;
@@ -158,7 +158,7 @@ public class FunctionNode : ASTNode
                 {
                     var a = Params[0].Evaluate();
                     if(a is int) Context.pincelZize = (int)a;    
-                    else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe int"));
+                    else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe Int's Type"));
                 }
                 break;
             case "IsBrushSize":
@@ -171,7 +171,42 @@ public class FunctionNode : ASTNode
                         if(Context.pincelZize == (int)a) return 1;
                         else return 0;
                     }  
-                    else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe int"));
+                    else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe Int's Type"));
+                }
+                break;
+            case "IsBrushColor":
+                if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsBrushColor()"));
+                else
+                {
+                    var a = Params[0].Evaluate();
+                    if(a is string)
+                    {
+                        switch (a)
+                        {
+                            case "Red":
+                                return Context.brushColor = (string)a;
+                            case "Blue":
+                                return Context.brushColor = (string)a;
+                            case "Green":
+                                return Context.brushColor = (string)a;
+                            case "Yellow":
+                                return Context.brushColor = (string)a;
+                            case "Orange":
+                                return Context.brushColor = (string)a;
+                            case "Purple":
+                                return Context.brushColor = (string)a;
+                            case "Black":
+                                return Context.brushColor = (string)a;
+                            case "White":
+                                return Context.brushColor = (string)a;
+                            case "Transparent":
+                                return Context.brushColor = (string)a;
+                            default:
+                                Error.errors.Add((ErrorType.Run_Time_Error, "Current expresion is not valid like a Color Type"));
+                                break;
+                        }
+                    }
+                    else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe String's Type"));
                 }
                 break;
             case "DrawCircle":
