@@ -130,4 +130,7 @@ class Cover : MonoBehaviour
 // actual-x <- GetActualX() + GetActualY()
 // i <- 0
 // loop-1
-// DrawLine(1, 0, 1)
+// DrawLine(1, 0, 12)
+// DrawLine(0, 1, 12)
+// DrawLine(1, 1, 12)
+

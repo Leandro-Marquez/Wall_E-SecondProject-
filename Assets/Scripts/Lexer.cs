@@ -21,7 +21,7 @@ public class Lexer
         string ReservedKeyword = @"GoTo";
         string Bool = @"true|false";
         string ArithmeticOperator = @"(?:[+\-*/%\*])";
-        string Identifier = @"^[a-z-A-Z-_][a-z-A-Z0-9-_]*";
+        string Identifier = @"^[a-zA-Z_][a-zA-Z0-9-_]*";
         string Delimiter = @"[\(\)\{\}\[\]]";
         string ComparisonOperator = @"(?:==|!=|>=|<=|>|<)";
         string AssignmentOperator = @"(<-)";

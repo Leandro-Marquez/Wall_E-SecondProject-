@@ -35,128 +35,137 @@ public class FunctionNode : ASTNode
     public override object Evaluate()
     {
         //manejas los casos de funciones especiales
-        if(this.Name == "Spawn")
+        string aux = this.Name;
+        switch (aux)
         {
-            if(this.Params.Count != 2) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Spawn()"));
-            else 
-            {
-                var x = Params[0].Evaluate();
-                var y = Params[1].Evaluate();
-                if(x is int xValue && y is int yValue)
+            case "Spawn":
+                if(this.Params.Count != 2) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Spawn()"));
+                else 
                 {
-                    if(xValue >= 0 && xValue < Context.canvasSize && yValue >= 0 && yValue < Context.canvasSize)
+                    var x = Params[0].Evaluate();
+                    var y = Params[1].Evaluate();
+                    if(x is int xValue && y is int yValue)
                     {
-                        Context.wallEPosition.x = (int)x;
-                        Context.wallEPosition.y = (int)y;    
-                        Context.wallEPositionChanged = true;
+                        if(xValue >= 0 && xValue < Context.canvasSize && yValue >= 0 && yValue < Context.canvasSize)
+                        {
+                            Context.wallEPosition.x = (int)x;
+                            Context.wallEPosition.y = (int)y;    
+                            Context.wallEPositionChanged = true;
+                        }
+                        else Error.errors.Add((ErrorType.Run_Time_Error, "Spawn() parameters must be positive and less than Canvas'Size"));
                     }
-                    else Error.errors.Add((ErrorType.Run_Time_Error, "Spawn() parameters must be positive and less than Canvas'Size"));
+                    else
+                    {
+                        // Mensaje de error detallado
+                        string errorMsg = "Invalid types in 'Spawn': ";
+                        if (x is not int) 
+                            errorMsg += $"X must be int, but got '{x?.GetType().Name}'. ";
+                        if (y is not int) 
+                            errorMsg += $"Y must be int, but got '{y?.GetType().Name}'.";
+                        Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
+                    }
                 }
+                break;
+            case "Color":
+                if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Color()"));
                 else
                 {
-                    // Mensaje de error detallado
-                    string errorMsg = "Invalid types in 'Spawn': ";
-                    if (x is not int) 
-                        errorMsg += $"X must be int, but got '{x?.GetType().Name}'. ";
-                    if (y is not int) 
-                        errorMsg += $"Y must be int, but got '{y?.GetType().Name}'.";
-                    Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
+                    var a = Params[0].Evaluate();
+                    if(a is not string aValue) Error.errors.Add((ErrorType.Run_Time_Error, "Color() parameter must be String Type"));
+                    switch (a)
+                    {
+                        case "Red":
+                            Context.brushColor = a.ToString();
+                            break;
+                        case "Blue":
+                            Context.brushColor = a.ToString();
+                            break;
+                        case "Green":
+                            Context.brushColor = a.ToString();
+                            break;
+                        case "Yellow":
+                            Context.brushColor = a.ToString();
+                            break;
+                        case "Orange":
+                            Context.brushColor = a.ToString();
+                            break;
+                        case "Purple":
+                            Context.brushColor = a.ToString();
+                            break;
+                        case "Black":
+                            Context.brushColor = a.ToString();
+                            break;
+                        case "White":
+                            Context.brushColor = a.ToString();
+                            break;
+                        case "Transparent":
+                            Context.brushColor = a.ToString();
+                            break;
+                        default:
+                            Error.errors.Add((ErrorType.Run_Time_Error, "Current expresion is not valid like a Color Type"));
+                            break;
+                    }
                 }
-            }
-        }
-        else if(this.Name == "Color")
-        {
-            if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Color()"));
-            else
-            {
-                var a = Params[0].Evaluate();
-                if(a is not string aValue) Error.errors.Add((ErrorType.Run_Time_Error, "Color() parameter must be String Type"));
-                switch (a)
+                break;
+            case "GetCanvasZize":  
+                if(this.Params.Count > 0)
                 {
-                    case "Red":
-                        Context.brushColor = a.ToString();
-                        break;
-                    case "Blue":
-                        Context.brushColor = a.ToString();
-                        break;
-                    case "Green":
-                        Context.brushColor = a.ToString();
-                        break;
-                    case "Yellow":
-                        Context.brushColor = a.ToString();
-                        break;
-                    case "Orange":
-                        Context.brushColor = a.ToString();
-                        break;
-                    case "Purple":
-                        Context.brushColor = a.ToString();
-                        break;
-                    case "Black":
-                        Context.brushColor = a.ToString();
-                        break;
-                    case "White":
-                        Context.brushColor = a.ToString();
-                        break;
-                    case "Transparent":
-                        Context.brushColor = a.ToString();
-                        break;
-                    default:
-                        Error.errors.Add((ErrorType.Run_Time_Error, "Current expresion is not valid like a Color Type"));
-                        break;
+                    Error.errors.Add((ErrorType.Run_Time_Error , "GetCanvasZize() does not contains parameters"));
+                    return null;
                 }
-            }
-        }
-        else if(this.Name == "GetCanvasZize")
-        {   
-            if(this.Params.Count > 0)
-            {
-                Error.errors.Add((ErrorType.Run_Time_Error , "GetCanvasZize() does not contains parameters"));
-                return null;
-            }
-            return Context.canvasSize;
-        }
-        else if(this.Name == "GetActualX")
-        {
-            if(this.Params.Count > 0)
-            {
-                Error.errors.Add((ErrorType.Run_Time_Error, "GetActualX() does not contains parameters"));
-                return null;
-            }
-            else return Context.wallEPosition.x;
-        }
-        else if(this.Name == "GetActualY")
-        {
-            if(this.Params.Count > 0) Error.errors.Add((ErrorType.Run_Time_Error, "GetActualY() does not contains parameters"));
-            else return Context.wallEPosition.y;
-        }
-        else if(this.Name == "DrawLine")
-        {
-            if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawLine()"));
-            List<int> ints = new List<int>();
-            for (var i = 0; i < this.Params.Count ; i++)
-            {
-                var a = this.Params[i].Evaluate();
-                if(a is not int) Error.errors.Add((ErrorType.Run_Time_Error,"DrawLine's Method must recibe ints"));
-                else ints.Add((int)a);
-            }
-            (int x , int y) dir;
-            dir.x = ints[0];
-            dir.y = ints[1];
-            for (var i = 1 ; i <= ints[2] ; i++)
-            {
-                int newX = Context.wallEPosition.x + dir.x;
-                int newY = Context.wallEPosition.y + dir.y;
-                if(newX >= 0 && newY >= 0 && newX < Context.canvasSize && newY < Context.canvasSize)
+                else return Context.canvasSize;
+                break;
+            case "GetActualX":
+                if(this.Params.Count > 0)
                 {
-                    Context.wallEPosition.x = newX;
-                    Context.wallEPosition.y = newY;
-                    Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
+                    Error.errors.Add((ErrorType.Run_Time_Error, "GetActualX() does not contains parameters"));
+                    return null;
                 }
-                else break;
-            }
+                else return Context.wallEPosition.x;
+                break;
+            case "GetActualY":    
+                if(this.Params.Count > 0) Error.errors.Add((ErrorType.Run_Time_Error, "GetActualY() does not contains parameters"));
+                else return Context.wallEPosition.y;
+                break;
+            case "DrawLine":
+                if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawLine()"));
+                List<int> ints = new List<int>();
+                for (var i = 0; i < this.Params.Count ; i++)
+                {
+                    var a = this.Params[i].Evaluate();
+                    if(a is not int) Error.errors.Add((ErrorType.Run_Time_Error,"DrawLine's Method must recibe ints"));
+                    else ints.Add((int)a);
+                }
+                (int x , int y) dir;
+                dir.y = ints[0];
+                dir.x = ints[1];
+                for (var i = 1 ; i <= ints[2] ; i++)
+                {
+                    int newX = Context.wallEPosition.x + dir.x;
+                    int newY = Context.wallEPosition.y + dir.y;
+                    if(newX >= 0 && newY >= 0 && newX < Context.canvasSize && newY < Context.canvasSize)
+                    {
+                        Context.wallEPosition.x = newX;
+                        Context.wallEPosition.y = newY;
+                        Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
+                    }
+                    else break;
+                }
+                break;
+            case "Size":
+                if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Size()"));
+                else
+                {
+                    var a = Params[0].Evaluate();
+                    if(a is int) Context.pincelZize = (int)a;    
+                    else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe ints"));
+                }
+                break;
+            case "DrawCircle":
+                
+                break;
         }
         return null;
-        // throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrrrr
     }
 }
 
@@ -211,7 +220,6 @@ public class StringLiteralNode : ASTNode
 
     public StringLiteralNode(string value)
     {
-        if(value[0] == '"') value.Substring(1,value.Length-2);
         Value = value;
     }
 
