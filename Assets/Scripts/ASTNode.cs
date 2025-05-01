@@ -158,7 +158,20 @@ public class FunctionNode : ASTNode
                 {
                     var a = Params[0].Evaluate();
                     if(a is int) Context.pincelZize = (int)a;    
-                    else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe ints"));
+                    else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe int"));
+                }
+                break;
+            case "IsBrushSize":
+                if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsBrushSize()"));
+                else
+                {
+                    var a = Params[0].Evaluate();
+                    if(a is int)
+                    {
+                        if(Context.pincelZize == (int)a) return 1;
+                        else return 0;
+                    }  
+                    else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe int"));
                 }
                 break;
             case "DrawCircle":
