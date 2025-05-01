@@ -144,8 +144,8 @@ public class FunctionNode : ASTNode
             dir.y = ints[1];
             for (var i = 1 ; i <= ints[2] ; i++)
             {
-                int newX = Context.wallEPosition.x + dir.x*i;
-                int newY = Context.wallEPosition.y + dir.x*i;
+                int newX = Context.wallEPosition.x + dir.x;
+                int newY = Context.wallEPosition.y + dir.y;
                 if(newX >= 0 && newY >= 0 && newX < Context.canvasSize && newY < Context.canvasSize)
                 {
                     Context.wallEPosition.x = newX;

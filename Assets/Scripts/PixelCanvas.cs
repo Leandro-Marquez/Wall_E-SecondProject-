@@ -2,15 +2,16 @@ using UnityEngine;
 
 public class PixelCanvasController : MonoBehaviour
 {
-    [Header("Configuración")]
-    [SerializeField] private int gridHeight = 64; 
-    [SerializeField] private int gridWidth = 64;  
+    // Configuración (serializada)
     [SerializeField] private int targetResolution = 1080;
+    public static int grid; // Público estático para acceso externo
 
     public static PixelCanvasController instance;
+
     private Texture2D texture;
     private SpriteRenderer spriteRenderer;
     private float pixelsPerUnit;
+    public static Parser parser;
 
     private void Awake()
     {
@@ -24,17 +25,26 @@ public class PixelCanvasController : MonoBehaviour
     }
     void Start()
     {
+        grid = Cover.canvasSize;
         InitializeCanvas();
+        for (int i = 0; i < parser.aSTNodes.Count; i++)
+        {
+            // parser.aSTNodes[i].Print();
+
+            parser.aSTNodes[i].Evaluate();
+            // Debug.Log(i);
+        }
+
         // DrawPerfectSmiley();
         // Paint();
     }
 
     void InitializeCanvas()
     {
-        pixelsPerUnit = targetResolution / (float)gridHeight;
+        pixelsPerUnit = targetResolution / (float)grid;
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        texture = new Texture2D(gridWidth, gridHeight, TextureFormat.RGBA32, false)
+        texture = new Texture2D(grid, grid, TextureFormat.RGBA32, false)
         {
             filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp
@@ -49,12 +59,12 @@ public class PixelCanvasController : MonoBehaviour
         if (Camera.main == null) return;
 
         Camera.main.orthographic = true;
-        Camera.main.orthographicSize = gridHeight / (2f * pixelsPerUnit);
+        Camera.main.orthographicSize = grid / (2f * pixelsPerUnit);
     }
 
     public void ClearCanvas()
     {
-        Color[] pixels = new Color[gridWidth * gridHeight];
+        Color[] pixels = new Color[grid * grid];
         for (int i = 0; i < pixels.Length; i++)
         {
             pixels[i] = Color.white;
@@ -62,68 +72,63 @@ public class PixelCanvasController : MonoBehaviour
         texture.SetPixels(pixels);
         texture.Apply();
 
-        spriteRenderer.sprite = Sprite.Create(
-            texture,
-            new Rect(0, 0, gridWidth, gridHeight),
-            Vector2.one * 0.5f,
-            pixelsPerUnit
-        );
+        spriteRenderer.sprite = Sprite.Create(texture,new Rect(0, 0, grid, grid),Vector2.one * 0.5f,pixelsPerUnit);
     }
 
-    public void SetPixel(int x, int y, Color color)
+public void SetPixel(int x, int y, Color color)
+{
+    if (x >= 0 && x < grid && y >= 0 && y < grid)
     {
-        if (x >= 0 && x < gridHeight && y >= 0 && y < gridWidth)
+        // (0,0) = esquina superior izquierda
+        texture.SetPixel(x, grid - 1 - y, color);  // Invierte Y para que el (0,0) esté arriba
+        texture.Apply();
+    }
+}
+
+    void DrawPerfectSmiley()
+    {
+        Color faceColor = Color.yellow;
+        Color eyeColor = Color.black;
+        Color mouthColor = Color.black;
+
+        // Cara (centro en X=32 filas, Y=32 columnas)
+        for (int fila = 10; fila < 54; fila++) // Filas (X)
         {
-            // Invertimos la fila (X) para que (0,0) esté arriba a la izquierda
-            texture.SetPixel(y, gridHeight - 1 - x, color);
-            texture.Apply();
+            for (int col = 10; col < 54; col++) // Columnas (Y)
+            {
+                if (Mathf.Pow(fila - 32, 2) + Mathf.Pow(col - 32, 2) <= 22 * 22)
+                {
+                    SetPixel(fila, col, faceColor);
+                }
+            }
+        }
+
+        // Ojos (X=20 filas, Y=20 y 44 columnas)
+        DrawCircle(20, 20, 4, eyeColor);  // Ojo izquierdo
+        DrawCircle(20, 44, 4, eyeColor);  // Ojo derecho
+
+        // Boca (X=40 filas, curva en columnas)
+        for (int col = 16; col < 48; col++)
+        {
+            int fila = (int)(32 + 8 * Mathf.Sin((col - 16) * Mathf.PI / 32));
+            SetPixel(fila, col, mouthColor);
+            SetPixel(fila + 1, col, mouthColor);
         }
     }
 
-    // void DrawPerfectSmiley()
-    // {
-    //     Color faceColor = Color.yellow;
-    //     Color eyeColor = Color.black;
-    //     Color mouthColor = Color.black;
-
-    //     // Cara (centro en X=32 filas, Y=32 columnas)
-    //     for (int fila = 10; fila < 54; fila++) // Filas (X)
-    //     {
-    //         for (int col = 10; col < 54; col++) // Columnas (Y)
-    //         {
-    //             if (Mathf.Pow(fila - 32, 2) + Mathf.Pow(col - 32, 2) <= 22 * 22)
-    //             {
-    //                 SetPixel(fila, col, faceColor);
-    //             }
-    //         }
-    //     }
-
-    //     // Ojos (X=20 filas, Y=20 y 44 columnas)
-    //     DrawCircle(20, 20, 4, eyeColor);  // Ojo izquierdo
-    //     DrawCircle(20, 44, 4, eyeColor);  // Ojo derecho
-
-    //     // Boca (X=40 filas, curva en columnas)
-    //     for (int col = 16; col < 48; col++)
-    //     {
-    //         int fila = (int)(32 + 8 * Mathf.Sin((col - 16) * Mathf.PI / 32));
-    //         SetPixel(fila, col, mouthColor);
-    //         SetPixel(fila + 1, col, mouthColor);
-    //     }
-    // }
-
-    // void DrawCircle(int centerX, int centerY, int radius, Color color)
-    // {
-    //     for (int fila = centerX - radius; fila <= centerX + radius; fila++)
-    //     {
-    //         for (int col = centerY - radius; col <= centerY + radius; col++)
-    //         {
-    //             if (Mathf.Pow(fila - centerX, 2) + Mathf.Pow(col - centerY, 2) <= radius * radius)
-    //             {
-    //                 SetPixel(fila, col, color);
-    //             }
-    //         }
-    //     }
-    // }
+    void DrawCircle(int centerX, int centerY, int radius, Color color)
+    {
+        for (int fila = centerX - radius; fila <= centerX + radius; fila++)
+        {
+            for (int col = centerY - radius; col <= centerY + radius; col++)
+            {
+                if (Mathf.Pow(fila - centerX, 2) + Mathf.Pow(col - centerY, 2) <= radius * radius)
+                {
+                    SetPixel(fila, col, color);
+                }
+            }
+        }
+    }
 
     // public void Paint()
     // {

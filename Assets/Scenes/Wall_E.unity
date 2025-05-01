@@ -236,8 +236,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b912556dd7ca5e649968623018e96c5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 64
-  gridHeight: 64
   targetResolution: 1080
 --- !u!212 &155202768
 SpriteRenderer:

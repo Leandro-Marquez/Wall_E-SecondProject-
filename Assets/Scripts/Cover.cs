@@ -5,6 +5,7 @@ using TMPro;
 using System;
 using UnityEditor;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 class Cover : MonoBehaviour
 {
     public GameObject runButton,exportButton;
@@ -18,7 +19,7 @@ class Cover : MonoBehaviour
     public GameObject canvasSizeInputEntireObject;
     public TMP_InputField canvasSizeInputField;
     public GameObject logWarningObject;
-    private static int canvasSize;
+    public static int canvasSize;
     public void Start()
     {
         canvasSize = 0;
@@ -63,6 +64,7 @@ class Cover : MonoBehaviour
             return;
         }
         else Context.canvasSize = canvasSize;
+        PixelCanvasController.grid = canvasSize;
         input = usersInput.text;
         Lexer lexer = new Lexer(input);
         lexer.Tokenize();
@@ -75,25 +77,31 @@ class Cover : MonoBehaviour
         
         if(parser.aSTNodes[0] is not FunctionNode) Error.errors.Add((ErrorType.Syntax_Error,"Any valid expression must begin with the Spawn(x,y) command"));
         
-        for (int i = 0; i < parser.aSTNodes.Count; i++)
+        if(Error.errors.Count == 0)
         {
-            // parser.aSTNodes[i].Print();
-
-            parser.aSTNodes[i].Evaluate();
-            // Debug.Log(i);
+            // Debug.Log("Siiii");
+            SceneManager.LoadScene(1);
         }
+        PixelCanvasController.parser = parser;
+        // for (int i = 0; i < parser.aSTNodes.Count; i++)
+        // {
+        //     // parser.aSTNodes[i].Print();
+
+        //     parser.aSTNodes[i].Evaluate();
+        //     // Debug.Log(i);
+        // }
 
 
-        Debug.Log("Brush Color : " + Context.brushColor);
-        Debug.Log("Pincel Zize : " + Context.pincelZize);
-        Debug.Log("Canvas Zize : " + Context.canvasSize);
-        Debug.Log("X: " + Context.wallEPosition.x + " , Y: " + Context.wallEPosition.y);
+        // Debug.Log("Brush Color : " + Context.brushColor);
+        // Debug.Log("Pincel Zize : " + Context.pincelZize);
+        // Debug.Log("Canvas Zize : " + Context.canvasSize);
+        // Debug.Log("X: " + Context.wallEPosition.x + " , Y: " + Context.wallEPosition.y);
         
-        Debug.Log("======================================" + Context.variablesValues.Count);
-        foreach (var item in Context.variablesValues)
-        {
-            Debug.Log(item.Key + ": " + item.Value.Evaluate());
-        } 
+        // Debug.Log("======================================" + Context.variablesValues.Count);
+        // foreach (var item in Context.variablesValues)
+        // {
+        //     Debug.Log(item.Key + ": " + item.Value.Evaluate());
+        // } 
     }
     void Update()
     {   
@@ -121,3 +129,5 @@ class Cover : MonoBehaviour
 
 // actual-x <- GetActualX() + GetActualY()
 // i <- 0
+// loop-1
+// DrawLine(1, 0, 1)
