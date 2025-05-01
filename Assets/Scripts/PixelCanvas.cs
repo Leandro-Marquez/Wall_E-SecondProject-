@@ -7,10 +7,21 @@ public class PixelCanvasController : MonoBehaviour
     [SerializeField] private int gridWidth = 64;  
     [SerializeField] private int targetResolution = 1080;
 
+    public static PixelCanvasController instance;
     private Texture2D texture;
     private SpriteRenderer spriteRenderer;
     private float pixelsPerUnit;
 
+    private void Awake()
+    {
+        // Verificar si ya existe una instancia
+        if (instance == null)
+        {
+            instance = this; // Asignar la instancia
+            DontDestroyOnLoad(gameObject); //no destruir en nuevas escenas
+        }
+        else Destroy(gameObject); // Destruir el duplicado
+    }
     void Start()
     {
         InitializeCanvas();
@@ -69,50 +80,50 @@ public class PixelCanvasController : MonoBehaviour
         }
     }
 
-    void DrawPerfectSmiley()
-    {
-        Color faceColor = Color.yellow;
-        Color eyeColor = Color.black;
-        Color mouthColor = Color.black;
+    // void DrawPerfectSmiley()
+    // {
+    //     Color faceColor = Color.yellow;
+    //     Color eyeColor = Color.black;
+    //     Color mouthColor = Color.black;
 
-        // Cara (centro en X=32 filas, Y=32 columnas)
-        for (int fila = 10; fila < 54; fila++) // Filas (X)
-        {
-            for (int col = 10; col < 54; col++) // Columnas (Y)
-            {
-                if (Mathf.Pow(fila - 32, 2) + Mathf.Pow(col - 32, 2) <= 22 * 22)
-                {
-                    SetPixel(fila, col, faceColor);
-                }
-            }
-        }
+    //     // Cara (centro en X=32 filas, Y=32 columnas)
+    //     for (int fila = 10; fila < 54; fila++) // Filas (X)
+    //     {
+    //         for (int col = 10; col < 54; col++) // Columnas (Y)
+    //         {
+    //             if (Mathf.Pow(fila - 32, 2) + Mathf.Pow(col - 32, 2) <= 22 * 22)
+    //             {
+    //                 SetPixel(fila, col, faceColor);
+    //             }
+    //         }
+    //     }
 
-        // Ojos (X=20 filas, Y=20 y 44 columnas)
-        DrawCircle(20, 20, 4, eyeColor);  // Ojo izquierdo
-        DrawCircle(20, 44, 4, eyeColor);  // Ojo derecho
+    //     // Ojos (X=20 filas, Y=20 y 44 columnas)
+    //     DrawCircle(20, 20, 4, eyeColor);  // Ojo izquierdo
+    //     DrawCircle(20, 44, 4, eyeColor);  // Ojo derecho
 
-        // Boca (X=40 filas, curva en columnas)
-        for (int col = 16; col < 48; col++)
-        {
-            int fila = (int)(32 + 8 * Mathf.Sin((col - 16) * Mathf.PI / 32));
-            SetPixel(fila, col, mouthColor);
-            SetPixel(fila + 1, col, mouthColor);
-        }
-    }
+    //     // Boca (X=40 filas, curva en columnas)
+    //     for (int col = 16; col < 48; col++)
+    //     {
+    //         int fila = (int)(32 + 8 * Mathf.Sin((col - 16) * Mathf.PI / 32));
+    //         SetPixel(fila, col, mouthColor);
+    //         SetPixel(fila + 1, col, mouthColor);
+    //     }
+    // }
 
-    void DrawCircle(int centerX, int centerY, int radius, Color color)
-    {
-        for (int fila = centerX - radius; fila <= centerX + radius; fila++)
-        {
-            for (int col = centerY - radius; col <= centerY + radius; col++)
-            {
-                if (Mathf.Pow(fila - centerX, 2) + Mathf.Pow(col - centerY, 2) <= radius * radius)
-                {
-                    SetPixel(fila, col, color);
-                }
-            }
-        }
-    }
+    // void DrawCircle(int centerX, int centerY, int radius, Color color)
+    // {
+    //     for (int fila = centerX - radius; fila <= centerX + radius; fila++)
+    //     {
+    //         for (int col = centerY - radius; col <= centerY + radius; col++)
+    //         {
+    //             if (Mathf.Pow(fila - centerX, 2) + Mathf.Pow(col - centerY, 2) <= radius * radius)
+    //             {
+    //                 SetPixel(fila, col, color);
+    //             }
+    //         }
+    //     }
+    // }
 
     // public void Paint()
     // {

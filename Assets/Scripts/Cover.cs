@@ -93,7 +93,7 @@ class Cover : MonoBehaviour
         foreach (var item in Context.variablesValues)
         {
             Debug.Log(item.Key + ": " + item.Value.Evaluate());
-        }
+        } 
     }
     void Update()
     {   
@@ -119,3 +119,5 @@ class Cover : MonoBehaviour
 // k <- 3 + 3 * 10
 // n <- k * 2
 
+// actual-x <- GetActualX() + GetActualY()
+// i <- 0

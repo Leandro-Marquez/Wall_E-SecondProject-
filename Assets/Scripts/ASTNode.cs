@@ -106,15 +106,54 @@ public class FunctionNode : ASTNode
                 }
             }
         }
+        else if(this.Name == "GetCanvasZize")
+        {   
+            if(this.Params.Count > 0)
+            {
+                Error.errors.Add((ErrorType.Run_Time_Error , "GetCanvasZize() does not contains parameters"));
+                return null;
+            }
+            return Context.canvasSize;
+        }
         else if(this.Name == "GetActualX")
         {
-            if(this.Params.Count > 0) Error.errors.Add((ErrorType.Run_Time_Error, "GetActualX() does not contains parameters"));
+            if(this.Params.Count > 0)
+            {
+                Error.errors.Add((ErrorType.Run_Time_Error, "GetActualX() does not contains parameters"));
+                return null;
+            }
             else return Context.wallEPosition.x;
         }
         else if(this.Name == "GetActualY")
         {
             if(this.Params.Count > 0) Error.errors.Add((ErrorType.Run_Time_Error, "GetActualY() does not contains parameters"));
             else return Context.wallEPosition.y;
+        }
+        else if(this.Name == "DrawLine")
+        {
+            if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawLine()"));
+            List<int> ints = new List<int>();
+            for (var i = 0; i < this.Params.Count ; i++)
+            {
+                var a = this.Params[i].Evaluate();
+                if(a is not int) Error.errors.Add((ErrorType.Run_Time_Error,"DrawLine's Method must recibe ints"));
+                else ints.Add((int)a);
+            }
+            (int x , int y) dir;
+            dir.x = ints[0];
+            dir.y = ints[1];
+            for (var i = 1 ; i <= ints[2] ; i++)
+            {
+                int newX = Context.wallEPosition.x + dir.x*i;
+                int newY = Context.wallEPosition.y + dir.x*i;
+                if(newX >= 0 && newY >= 0 && newX < Context.canvasSize && newY < Context.canvasSize)
+                {
+                    Context.wallEPosition.x = newX;
+                    Context.wallEPosition.y = newY;
+                    Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
+                }
+                else break;
+            }
         }
         return null;
         // throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrrrr
@@ -223,7 +262,7 @@ public class LabelNode : ASTNode
 
     public override object Evaluate()
     {
-        throw new System.NotImplementedException(); //implementarrrrrrrrrrrrrrrr
+        return Label;
     }
 }
 

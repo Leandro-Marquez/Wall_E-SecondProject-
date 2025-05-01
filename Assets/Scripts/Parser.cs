@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using Unity.VisualScripting;
 
 public class Parser
 {
@@ -173,13 +175,14 @@ public class Parser
             else if(aux is not null && aux.Type == TokenType.Bool) nodes.Add(new BooleanLiteralNode(bool.Parse(aux.Value)));//si el tipo de token actual es un booleano agregar a la lista de nodos un nodo literal booleano
             else if(aux is not null && aux.Type == TokenType.Identifier)
             {
+                // UnityEngine.Debug.Log(aux.Value + " siii");
                 nodes.Add(new VariableNode(aux.Value, Context.variablesValues[aux.Value])); //manejar nodos de variablessssssssssssssssssssssssssssssssssssss
             }
             else if(aux is null)
             {
                 FunctionNode a = (FunctionNode)postFix[i];
                 nodes.Add(a);
-            }
+            } 
             //si el tipo de token actual es un operador aritmetico o logico se debe crear un nodo de operacion bineria con el los ultimos dos nodos como hijos derecho e izquierdo   
             else if(aux is not null && (aux.Type == TokenType.ArithmeticOperator || aux.Type == TokenType.LogicOperator || aux.Type == TokenType.ComparisonOperator))
             {
@@ -265,5 +268,5 @@ public class Parser
         }
 
         return goToNode;
-    }
+    } 
 }
