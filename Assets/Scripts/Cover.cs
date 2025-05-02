@@ -124,7 +124,7 @@ class Cover : MonoBehaviour
 
 
 
-
+ 
 // Spawn(3 + 2 * 3 / 6 + 1 % 4 , 4)
 // Color("Black")
 
@@ -135,8 +135,8 @@ class Cover : MonoBehaviour
 // actual-x <- GetActualX() + GetActualY()
 // i <- 0
 // loop-1
-// DrawLine(1, 0, 12)
+// DrawLine(1, 0, actual-x)
 // DrawLine(0, 1, 12)
-// DrawLine(1, 1, 12)
 // Color("Red")
 // Fill()
+// DrawLine(1, 1, GetColorCount("Red" , 5 , 4 , 5 , 4))

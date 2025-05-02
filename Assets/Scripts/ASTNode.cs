@@ -114,7 +114,6 @@ public class FunctionNode : ASTNode
                     return null;
                 }
                 else return Context.canvasSize;
-                break;
             case "GetActualX":
                 if(this.Params.Count > 0)
                 {
@@ -122,7 +121,6 @@ public class FunctionNode : ASTNode
                     return null;
                 }
                 else return Context.wallEPosition.x;
-                break;
             case "GetActualY":    
                 if(this.Params.Count > 0) Error.errors.Add((ErrorType.Run_Time_Error, "GetActualY() does not contains parameters"));
                 else return Context.wallEPosition.y;
@@ -233,6 +231,85 @@ public class FunctionNode : ASTNode
                         }
                     }
                 } 
+                break;
+            case "GetColorCount" :
+                if(this.Params.Count != 5) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of GetColorCount()"));
+                else
+                {
+                    var color = Params[0].Evaluate();
+                    var x1 = Params[1].Evaluate();
+                    var y1 = Params[2].Evaluate();
+                    var x2 = Params[3].Evaluate();
+                    var y2 = Params[4].Evaluate();
+                    if(x1 is int x1Value && y1 is int y1Value && x2 is int x2Value && y2 is int y2Value && color is string colorValue)
+                    {
+                        if(x1Value >= 0 && x1Value < Context.canvasSize && y1Value >= 0 && y1Value < Context.canvasSize && x2Value >= 0 && x2Value < Context.canvasSize && y2Value >= 0 && y2Value < Context.canvasSize)
+                        {
+                            bool validColor = false;
+                            switch (color)
+                            {
+                                case "Red":
+                                    validColor = true;
+                                    break;
+                                case "Blue":
+                                    validColor = true;
+                                    break;
+                                case "Green":
+                                    validColor = true;
+                                    break;
+                                case "Yellow":
+                                    validColor = true;
+                                    break;
+                                case "Orange":
+                                    validColor = true;
+                                    break;
+                                case "Purple":
+                                    validColor = true;
+                                    break;
+                                case "Black":
+                                    validColor = true;
+                                    break;
+                                case "White":
+                                    validColor = true;
+                                    break;
+                                case "Transparent":
+                                    validColor = true;
+                                    break;
+                                default:
+                                    Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to ColorType"));
+                                    break;
+                            }
+                            if(validColor)
+                            {
+                                int n = 0;
+                                for (var i = (int)x1 ; i <= (int)x2 ; i++)
+                                {
+                                    for (var j = (int)y1 ; j <= (int)y2 ; j++)
+                                    {
+                                        if(ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(i,j)) == (string)color) n += 1; 
+                                    }
+                                }
+                                return n;
+                            }
+                        }
+                        else Error.errors.Add((ErrorType.Run_Time_Error, "GetColorCount() parameters must be positive and less than Canvas'Size"));
+                    }
+                    else
+                    {
+                        string errorMsg = "Invalid types in GetColorCount: ";
+                        if (x1 is not int) 
+                            errorMsg += $"X1 must be int, but got '{x1?.GetType().Name}'. ";
+                        if (y1 is not int) 
+                            errorMsg += $"Y1 must be int, but got '{y1?.GetType().Name}'.";
+                        if (x2 is not int) 
+                            errorMsg += $"X2 must be int, but got '{x2?.GetType().Name}'. ";
+                        if (y2 is not int) 
+                            errorMsg += $"Y2 must be int, but got '{y2?.GetType().Name}'.";
+                        if (color is not string) 
+                            errorMsg += $"Color must be String, but got '{color?.GetType().Name}'.";
+                        Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
+                    }
+                }
                 break;
             // case "DrawCircle":
                 
