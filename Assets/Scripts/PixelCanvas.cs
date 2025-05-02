@@ -35,6 +35,8 @@ public class PixelCanvasController : MonoBehaviour
             // Debug.Log(i);
         }
 
+        Debug.Log(Context.brushColor);
+        // Debug.Log(GetPixel())
         // DrawPerfectSmiley();
         // Paint();
     }
@@ -129,16 +131,9 @@ public void SetPixel(int x, int y, Color color)
             }
         }
     }
-
-    // public void Paint()
-    // {
-    //     // Ejemplo de uso con el sistema corregido:
-    //     SetPixel(0, 0, Color.red);       // Esquina SUPERIOR IZQUIERDA
-    //     SetPixel(0, 63, Color.blue);     // Esquina SUPERIOR DERECHA
-    //     SetPixel(0, 2, Color.blue);     // Esquina SUPERIOR DERECHA
-    //     SetPixel(0, 4, Color.blue);     // Esquina SUPERIOR DERECHA
-
-    //     // SetPixel(63, 0, Color.green);    // Esquina INFERIOR IZQUIERDA
-    //     // SetPixel(63, 63, Color.yellow);  // Esquina INFERIOR DERECHA
-    // }
+    public Color GetPixel(int x, int y)
+    {
+        if (x >= 0 && x < grid && y >= 0 && y < grid) return texture.GetPixel(x, grid - 1 - y);
+        else return Color.clear; // O puedes usar: throw new System.IndexOutOfRangeException();
+    }
 }

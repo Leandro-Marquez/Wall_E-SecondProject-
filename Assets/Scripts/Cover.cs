@@ -103,6 +103,7 @@ class Cover : MonoBehaviour
         //     Debug.Log(item.Key + ": " + item.Value.Evaluate());
         // } 
     }
+    
     void Update()
     {   
         if(usersInput is not null ) input = usersInput.text;
@@ -120,6 +121,10 @@ class Cover : MonoBehaviour
 }
 
 
+
+
+
+
 // Spawn(3 + 2 * 3 / 6 + 1 % 4 , 4)
 // Color("Black")
 
@@ -133,4 +138,5 @@ class Cover : MonoBehaviour
 // DrawLine(1, 0, 12)
 // DrawLine(0, 1, 12)
 // DrawLine(1, 1, 12)
-
+// Color("Red")
+// Fill()

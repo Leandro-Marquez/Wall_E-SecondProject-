@@ -44,8 +44,9 @@ class Context
             case "Transparent":
                 color1 = System.Drawing.Color.White;
                 break;
-        }
-        Debug.Log($"X: {x} , Y: {y}");
+        } 
         PixelCanvasController.instance.SetPixel(x , y , ColorConverter.ToUnityColor(color1));
+        // Debug.Log($"X: {x} ,Y: {y} = {ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(x, y))}");
     }
+
 }

@@ -202,16 +202,41 @@ public class FunctionNode : ASTNode
                             case "Transparent":
                                 return Context.brushColor = (string)a;
                             default:
-                                Error.errors.Add((ErrorType.Run_Time_Error, "Current expresion is not valid like a Color Type"));
+                                Error.errors.Add((ErrorType.Run_Time_Error, "IsBrushColor's Method must recibe a valid Color Type"));
                                 break;
                         }
                     }
                     else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe String's Type"));
                 }
                 break;
-            case "DrawCircle":
-                
+            case "Fill":
+                if(this.Params.Count != 0) Error.errors.Add((ErrorType.Run_Time_Error,"Fill's Method does not contains params"));
+                else
+                {
+                    List<(int x , int y)> values = new List<(int x , int y)> ();
+                    values.Add((Context.wallEPosition.x,Context.wallEPosition.y));
+                    string color = ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(Context.wallEPosition.x,Context.wallEPosition.y));
+                    Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
+                    for (var i = 0; i < values.Count ; i++)
+                    {
+                        int [] dirx = { 1 , -1 , 0 , 0 , -1 ,-1 , 1 , 1 };
+                        int [] diry = { 0 ,  0 , 1 ,-1 , -1 , 1 , 1 ,-1 };
+                        for (var j = 1 ; j < dirx.Length ; j++)
+                        {
+                            int newX = values[i].x + dirx[j];
+                            int newY = values[i].y + diry[j];
+                            if(newX >= 0 && newX < Context.canvasSize && newY >= 0 && newY < Context.canvasSize && color == ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(newX,newY)) && !values.Contains((newX,newY)))
+                            {
+                                values.Add((newX,newY));
+                                Context.Paint(newX,newY);
+                            }
+                        }
+                    }
+                } 
                 break;
+            // case "DrawCircle":
+                
+            //     break;
         }
         return null;
     }
@@ -384,14 +409,15 @@ public class BinaryOperationNode : ASTNode
     {
         return Operator.Value switch
         {
+            //hacer chequeo de tipoossssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
             "+"  => (int)LeftMember.Evaluate() + (int)RightMember.Evaluate(),
             "-"  => (int)LeftMember.Evaluate() - (int)RightMember.Evaluate(),
             "*"  => (int)LeftMember.Evaluate() * (int)RightMember.Evaluate(),
             "/"  => (int)LeftMember.Evaluate() / (int)RightMember.Evaluate(),
             "%"  => (int)LeftMember.Evaluate() % (int)RightMember.Evaluate(),
-            "**" => (int)Math.Pow((int)RightMember.Evaluate(),(int)LeftMember.Evaluate()),/*Convert.ToInt32(Math.Pow((double)LeftMember.Evaluate() , (double)RightMember.Evaluate()))*/
+            "**" => (int)Math.Pow((int)RightMember.Evaluate(),(int)LeftMember.Evaluate()),
             "==" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
-            "!=" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
+            "!=" => !AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
             ">=" => (int)LeftMember.Evaluate() >= (int)RightMember.Evaluate(),
             ">"  => (int)LeftMember.Evaluate() > (int)RightMember.Evaluate(),
             "<=" => (int)LeftMember.Evaluate() <= (int)RightMember.Evaluate(),
@@ -404,7 +430,6 @@ public class BinaryOperationNode : ASTNode
     {
         if (left.GetType() != right.GetType())
             throw new InvalidOperationException($"No se pueden comparar {left.GetType().Name} y {right.GetType().Name}");
-
         return object.Equals(left, right);
     }
 }
