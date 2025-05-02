@@ -311,9 +311,36 @@ public class FunctionNode : ASTNode
                     }
                 }
                 break;
-            // case "DrawCircle":
-                
-            //     break;
+            case "IsCanvasColor": 
+                if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsCanvasColor()"));
+                else
+                {
+                    var color = Params[0].Evaluate();
+                    var x = Params[1].Evaluate();
+                    var y = Params[2].Evaluate();
+                    if(color is string colorValue && x is int xValue && y is int yValue)
+                    {
+                        if((int)x >= 0 && (int)x < Context.canvasSize && (int)y >= 0 && (int)y < Context.canvasSize)
+                        {
+                            string colorAux = ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel((int) y ,(int) x));
+                            if(colorAux == (string)color) return 1;
+                            else return 0;
+                        }
+                        else Error.errors.Add((ErrorType.Run_Time_Error,"IsCanvasColor() parameters [x,y] must be positive and less than Canvas'Size "));
+                    }
+                    else
+                    {
+                        string errorMsg = "Invalid types in IsCanvasColor: ";
+                        if (x is not int) 
+                            errorMsg += $"X must be int, but got '{x?.GetType().Name}'. ";
+                        if (y is not int) 
+                            errorMsg += $"Y must be int, but got '{y?.GetType().Name}'.";
+                        if (color is not string) 
+                            errorMsg += $"Color must be string, but got '{color?.GetType().Name}'. ";
+                        Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
+                    }
+                }
+                break;
         }
         return null;
     }
