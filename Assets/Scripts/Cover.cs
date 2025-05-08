@@ -208,3 +208,10 @@ class Cover : MonoBehaviour
 // DrawLine(1,0 - 1, 50)    
 // DrawLine(1, 0, 200)     
 // DrawLine(1, 1, 50)    
+
+
+
+
+// Spawn(31,31)
+// Color("Purple")
+// DrawRectangle( 1, 1, 3, 12, 10)

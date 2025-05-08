@@ -431,40 +431,51 @@ public class FunctionNode : ASTNode
                     var dirX = Params[0].Evaluate();
                     var dirY = Params[1].Evaluate();
                     var distance = Params[2].Evaluate();
-                    var width = Params[2].Evaluate();
-                    var heigth = Params[2].Evaluate();
+                    var width = Params[3].Evaluate();
+                    var heigth = Params[4].Evaluate();
                     if(dirX is int dirXValue && dirY is int dirYValue && distance is int distanceValue && width is int widthValue && heigth is int heightValue && (int)distance > 0 && (int)width > 0 && (int)heigth > 0)
                     { 
                         // Obtener la posición actual de Wall-E
                         int actualX = Context.wallEPosition.x;
                         int actualY = Context.wallEPosition.y;
 
-                        int centerX = (int)actualX + (int)dirX * (int)distance;
-                        int centerY = (int)actualY + (int)dirY * (int)distance;
+                        // 2. Calcular centro del rectángulo
+                        int centerX = actualX + (int)dirX * (int)distance;
+                        int centerY = actualY + (int)dirY * (int)distance;
 
-                        // 2. Calcular los límites del rectángulo
-                        int halfWidth = (int)width / 2;
-                        int halfHeight = (int)heigth / 2;
+                        // 3. Calcular bordes absolutos (corregido)
+                        int left = centerX - (int)width / 2;
+                        int right = left + (int)width - 1;  // -1 para mantener dimensiones exactas
+                        int top = centerY - (int)heigth / 2;
+                        int bottom = top + (int)heigth - 1;
 
-                        int left = centerX - halfWidth;
-                        int right = centerX + halfWidth;
-                        int top = centerY - halfHeight;
-                        int bottom = centerY + halfHeight;
-
-                        // 3. Obtener tamaño del pincel
+                        // 4. Obtener tamaño del pincel
                         int brushSize = Context.pincelZize;
                         int halfBrush = brushSize / 2;
 
-                        // 4. Dibujar el rectángulo considerando el grosor del pincel
-                        for (int x = left - halfBrush; x <= right + halfBrush; x++)
+                        // 5. Dibujar rectángulo (versión corregida)
+                        for (int x = left; x <= right; x++)
                         {
-                            for (int y = top - halfBrush; y <= bottom + halfBrush; y++)
+                            for (int y = top; y <= bottom; y++)
                             {
-                                if (x >= 0 && x < Context.canvasSize && y >= 0 && y < Context.canvasSize)
+                                // Dibujar solo los bordes
+                                bool isBorder = (x == left || x == right || y == top || y == bottom);
+
+                                if (isBorder && x >= 0 && x < Context.canvasSize && y >= 0 && y < Context.canvasSize)
                                 {
-                                    // Determinar si estamos en el borde del rectángulo
-                                    bool isBorder = (x >= left - halfBrush && x <= left + halfBrush) ||  (x >= right - halfBrush && x <= right + halfBrush) || (y >= top - halfBrush && y <= top + halfBrush) || (y >= bottom - halfBrush && y <= bottom + halfBrush);
-                                    if (isBorder) Context.Paint(x, y);
+                                    // Aplicar grosor del pincel
+                                    for (int bx = -halfBrush; bx <= halfBrush; bx++)
+                                    {
+                                        for (int by = -halfBrush; by <= halfBrush; by++)
+                                        {
+                                            int px = x + bx;
+                                            int py = y + by;
+                                            if (px >= 0 && px < Context.canvasSize && py >= 0 && py < Context.canvasSize)
+                                            {
+                                                Context.Paint(px, py);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
