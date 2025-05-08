@@ -125,7 +125,7 @@ class Cover : MonoBehaviour
 
 
  
-// Spawn(3 + 2 * 3 / 6 + 1 % 4 , 4)
+// Spawn(100, 100)
 // Color("Black")
 
 // n <- 5
@@ -138,6 +138,9 @@ class Cover : MonoBehaviour
 // DrawLine(1, 0, actual-x)
 // DrawLine(0, 1, 12)
 // Color("Red")
+// Size(3)
+// DrawRectangle(1, 0, 50, 80, 40)
+
 // Fill()
 // DrawLine(1, 1, GetColorCount("Red" , 5 , 4 , 5 , 4))
 // Color("Yellow")
@@ -146,11 +149,16 @@ class Cover : MonoBehaviour
 // DrawLine(1,1,40)
 // Color("Purple")
 // DrawCircle(0 , 0, 7)
+// DrawLine( 0 - 1 , 0,12)
+// Color("Green")
+// DrawRectangle( 1, 1, 3, 7, 10)
+ 
 
 
-// Spawn(540, 540)
-// Color("Yellow")
-// Size(1079)     
+
+
+// Spawn(128, 128)
+// Color("Yellow")    
 // Fill()         
 
 // Color("Black")
@@ -169,3 +177,34 @@ class Cover : MonoBehaviour
 // DrawLine(1, 1, 100) 
 // DrawLine(1, 0, 200) 
 // DrawLine(0 - 1, 0, 200)
+
+
+
+
+// Spawn(100, 100);         
+// Color("Blue");           
+// Size(3);                 
+// DrawRectangle(1, 0, 50, 80, 40);
+
+
+
+// Spawn(540, 540)
+// Color("Black")   
+// Size(30)         
+
+
+// DrawLine(0 - 1,0 - 1, 100) 
+// DrawCircle(0, 0, 30)    
+
+// DrawLine(1,0 - 1, 200)   
+// DrawCircle(0, 0, 30)   
+
+
+// DrawLine(0 - 1, 1, 100)   
+// Color("Black")
+// Size(15)               
+
+
+// DrawLine(1,0 - 1, 50)    
+// DrawLine(1, 0, 200)     
+// DrawLine(1, 1, 50)    

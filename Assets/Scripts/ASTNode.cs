@@ -69,35 +69,54 @@ public class FunctionNode : ASTNode
                 else
                 {
                     var a = Params[0].Evaluate();
+                    System.Drawing.Color color;
                     if(a is not string aValue) Error.errors.Add((ErrorType.Run_Time_Error, "Color() parameter must be String Type"));
                     switch (a)
                     {
                         case "Red":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.Red;
+                            Context.brushColorColor = color;
                             break;
                         case "Blue":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.Blue;
+                            Context.brushColorColor = color;
                             break;
                         case "Green":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.Green;
+                            Context.brushColorColor = color;
                             break;
                         case "Yellow":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.Yellow;
+                            Context.brushColorColor = color;
                             break;
                         case "Orange":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.Orange;
+                            Context.brushColorColor = color;
                             break;
                         case "Purple":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.Purple;
+                            Context.brushColorColor = color;
                             break;
                         case "Black":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.Black;
+                            Context.brushColorColor = color;
                             break;
                         case "White":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.White;
+                            Context.brushColorColor = color;
                             break;
                         case "Transparent":
                             Context.brushColor = a.ToString();
+                            color = System.Drawing.Color.White;
+                            Context.brushColorColor = color;
                             break;
                         default:
                             Error.errors.Add((ErrorType.Run_Time_Error, "Current expresion is not valid like a Color Type"));
@@ -205,31 +224,44 @@ public class FunctionNode : ASTNode
                     else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe String's Type"));
                 }
                 break;
+                #region  Culo Roto
             case "Fill":
                 if(this.Params.Count != 0) Error.errors.Add((ErrorType.Run_Time_Error,"Fill's Method does not contains params"));
                 else
                 {
-                    List<(int x , int y)> values = new List<(int x , int y)> ();
-                    values.Add((Context.wallEPosition.x,Context.wallEPosition.y));
                     string color = ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(Context.wallEPosition.x,Context.wallEPosition.y));
+                    Queue<(int x , int y)> values = new Queue<(int x , int y)> ();
+                    values.Enqueue((Context.wallEPosition.x,Context.wallEPosition.y));
+                 
                     Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
-                    for (var i = 0; i < values.Count ; i++)
+                    // Debug.Log(values.Count + " siiiiii");
+                    bool [,] bools = new bool[Context.canvasSize,Context.canvasSize];
+                    while (values.Count > 0)
                     {
+                        (int , int ) auxi = values.Dequeue();
+                        // if(bools[auxi.Item1,auxi.Item2]) continue;
+                        bools[auxi.Item1,auxi.Item2] = true;
+
                         int [] dirx = { 1 , -1 , 0 , 0 , -1 ,-1 , 1 , 1 };
                         int [] diry = { 0 ,  0 , 1 ,-1 , -1 , 1 , 1 ,-1 };
                         for (var j = 1 ; j < dirx.Length ; j++)
                         {
-                            int newX = values[i].x + dirx[j];
-                            int newY = values[i].y + diry[j];
-                            if(newX >= 0 && newX < Context.canvasSize && newY >= 0 && newY < Context.canvasSize && color == ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(newX,newY)) && !values.Contains((newX,newY)))
+                            int newX = auxi.Item1 + dirx[j];
+                            int newY = auxi.Item2 + diry[j];
+                            if(newX >= 0 && newX < Context.canvasSize && newY >= 0 && newY < Context.canvasSize && color == ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(newX,newY)))
                             {
-                                values.Add((newX,newY));
-                                Context.Paint(newX,newY);
+                                if(!bools[newX,newY])
+                                {
+                                    values.Enqueue((newX,newY));
+                                    Context.Paint(newX,newY);
+                                }
+                                
                             }
                         }
                     }
                 } 
                 break;
+                #endregion
             case "GetColorCount" :
                 if(this.Params.Count != 5) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of GetColorCount()"));
                 else
@@ -348,42 +380,35 @@ public class FunctionNode : ASTNode
                     var radius = Params[2].Evaluate();
                     if(x is int xValue && y is int yValue && radius is int radiusValue && (int)radius > 0)
                     { 
-                        int radio = (int)radius;
-                        while(radio > 0)
+                        // Posición inicial de Wall-E (centro del círculo)
+                        int xc = Context.wallEPosition.x;
+                        int yc = Context.wallEPosition.y;
+                        
+                        int xPos = 0;
+                        int yPos = (int)radius;
+                        int d = 3 - 2 * (int)radius;
+                        
+                        // Dibujar los puntos iniciales
+                        DrawCirclePoints(xc, yc, xPos, yPos);
+                        
+                        while (yPos >= xPos)
                         {
+                            xPos++;
                             
-                            // Posición inicial de Wall-E (centro del círculo)
-                            int xc = Context.wallEPosition.x;
-                            int yc = Context.wallEPosition.y;
-                            
-                            int xPos = 0;
-                            int yPos = (int)radius;
-                            int d = 3 - 2 * (int)radius;
-                            
-                            // Dibujar los puntos iniciales
-                            DrawCirclePoints(xc, yc, xPos, yPos);
-                            
-                            while (yPos >= xPos)
+                            // Aplicar el algoritmo del punto medio
+                            if (d > 0)
                             {
-                                xPos++;
-                                
-                                // Aplicar el algoritmo del punto medio
-                                if (d > 0)
-                                {
-                                    yPos--;
-                                    d = d + 4 * (xPos - yPos) + 10;
-                                }
-                                else d = d + 4 * xPos + 6;
-                                DrawCirclePoints(xc, yc, xPos, yPos);
+                                yPos--;
+                                d = d + 4 * (xPos - yPos) + 10;
                             }
-                            
-                            // Mover Wall-E al centro del círculo (según especificación)
-                            Context.wallEPosition.x = xc;
-                            Context.wallEPosition.y = yc;
-                            
-                            radio -= 1;
+                            else d = d + 4 * xPos + 6;
+                            DrawCirclePoints(xc, yc, xPos, yPos);
                         }
-                    }  
+                        
+                        // Mover Wall_E al centro del círculo
+                        Context.wallEPosition.x = xc;
+                        Context.wallEPosition.y = yc;
+                    } 
                     else
                     {
                         string errorMsg = "Invalid types in DrawCircle: ";
@@ -399,7 +424,7 @@ public class FunctionNode : ASTNode
                     }
                 }
                 break;
-            case "DrawRectangule":
+            case "DrawRectangle":
                 if(this.Params.Count != 5) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawRectangule()"));
                 else
                 {
@@ -410,9 +435,43 @@ public class FunctionNode : ASTNode
                     var heigth = Params[2].Evaluate();
                     if(dirX is int dirXValue && dirY is int dirYValue && distance is int distanceValue && width is int widthValue && heigth is int heightValue && (int)distance > 0 && (int)width > 0 && (int)heigth > 0)
                     { 
-                        
-                            
-                            
+                        // Obtener la posición actual de Wall-E
+                        int actualX = Context.wallEPosition.x;
+                        int actualY = Context.wallEPosition.y;
+
+                        int centerX = (int)actualX + (int)dirX * (int)distance;
+                        int centerY = (int)actualY + (int)dirY * (int)distance;
+
+                        // 2. Calcular los límites del rectángulo
+                        int halfWidth = (int)width / 2;
+                        int halfHeight = (int)heigth / 2;
+
+                        int left = centerX - halfWidth;
+                        int right = centerX + halfWidth;
+                        int top = centerY - halfHeight;
+                        int bottom = centerY + halfHeight;
+
+                        // 3. Obtener tamaño del pincel
+                        int brushSize = Context.pincelZize;
+                        int halfBrush = brushSize / 2;
+
+                        // 4. Dibujar el rectángulo considerando el grosor del pincel
+                        for (int x = left - halfBrush; x <= right + halfBrush; x++)
+                        {
+                            for (int y = top - halfBrush; y <= bottom + halfBrush; y++)
+                            {
+                                if (x >= 0 && x < Context.canvasSize && y >= 0 && y < Context.canvasSize)
+                                {
+                                    // Determinar si estamos en el borde del rectángulo
+                                    bool isBorder = (x >= left - halfBrush && x <= left + halfBrush) ||  (x >= right - halfBrush && x <= right + halfBrush) || (y >= top - halfBrush && y <= top + halfBrush) || (y >= bottom - halfBrush && y <= bottom + halfBrush);
+                                    if (isBorder) Context.Paint(x, y);
+                                }
+                            }
+                        }
+
+                        // Actualizar la posición de Wall-E al centro del rectángulo
+                        Context.wallEPosition.x = centerX;
+                        Context.wallEPosition.y = centerY;
                     }  
                     else
                     {
@@ -452,6 +511,33 @@ public class FunctionNode : ASTNode
         Context.Paint(xc - y, yc + x);
         Context.Paint(xc + y, yc - x);
         Context.Paint(xc - y, yc - x);
+    }
+
+     private bool [,] bools = new bool[Context.canvasSize,Context.canvasSize];
+
+
+    private void DFS(int x, int y, string color)
+    {
+        Debug.Log(x + "  " + y);
+        Debug.Log(color);
+        bools[x,y] = true;
+        Context.Paint(x,y);
+        int [] dirx = { 1 , -1 , 0 , 0 , -1 ,-1 , 1 , 1 };
+        int [] diry = { 0 ,  0 , 1 ,-1 , -1 , 1 , 1 ,-1 };
+                        for (var j = 1 ; j < dirx.Length ; j++)
+                        {
+                            int newX = x + dirx[j];
+                            int newY = y + diry[j];
+                            if(newX >= 0 && newX < Context.canvasSize && newY >= 0 && newY < Context.canvasSize && color == ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(newX,newY)))
+                            {
+                                if(!bools[newX,newY])
+                                {
+                                    DFS(newX,newY,color);
+                                }
+                                
+                            }
+                        }
+
     }
 }
 
