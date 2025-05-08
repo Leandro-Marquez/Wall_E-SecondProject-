@@ -140,3 +140,32 @@ class Cover : MonoBehaviour
 // Color("Red")
 // Fill()
 // DrawLine(1, 1, GetColorCount("Red" , 5 , 4 , 5 , 4))
+// Color("Yellow")
+// Fill()
+// Color("Red")
+// DrawLine(1,1,40)
+// Color("Purple")
+// DrawCircle(0 , 0, 7)
+
+
+// Spawn(540, 540)
+// Color("Yellow")
+// Size(1079)     
+// Fill()         
+
+// Color("Black")
+// Size(50)
+
+// DrawLine(0, 0, 0) 
+// DrawCircle(0 - 1,0 - 1, 30)
+
+// DrawLine(0, 0, 0) 
+// DrawCircle(1 , 0 - 1, 30)
+
+// Color("Black")
+// Size(20)
+// DrawLine(0, 0, 0) 
+// DrawLine(0 - 1, 1, 100)
+// DrawLine(1, 1, 100) 
+// DrawLine(1, 0, 200) 
+// DrawLine(0 - 1, 0, 200)

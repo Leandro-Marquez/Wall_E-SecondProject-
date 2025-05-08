@@ -58,10 +58,8 @@ public class FunctionNode : ASTNode
                     {
                         // Mensaje de error detallado
                         string errorMsg = "Invalid types in 'Spawn': ";
-                        if (x is not int) 
-                            errorMsg += $"X must be int, but got '{x?.GetType().Name}'. ";
-                        if (y is not int) 
-                            errorMsg += $"Y must be int, but got '{y?.GetType().Name}'.";
+                        if (x is not int) errorMsg += $"X must be int, but got '{x?.GetType().Name}'. ";
+                        if (y is not int) errorMsg += $"Y must be int, but got '{y?.GetType().Name}'.";
                         Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
                     }
                 }
@@ -148,7 +146,7 @@ public class FunctionNode : ASTNode
                         Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
                     }
                     else break;
-                }
+                } 
                 break;
             case "Size":
                 if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Size()"));
@@ -200,7 +198,7 @@ public class FunctionNode : ASTNode
                             case "Transparent":
                                 return Context.brushColor = (string)a;
                             default:
-                                Error.errors.Add((ErrorType.Run_Time_Error, "IsBrushColor's Method must recibe a valid Color Type"));
+                                Error.errors.Add((ErrorType.Run_Time_Error, $"{a} is not a valid Color Type"));
                                 break;
                         }
                     }
@@ -341,8 +339,119 @@ public class FunctionNode : ASTNode
                     }
                 }
                 break;
+            case "DrawCircle":
+                if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawCircle()"));
+                else
+                {
+                    var x = Params[0].Evaluate();
+                    var y = Params[1].Evaluate();
+                    var radius = Params[2].Evaluate();
+                    if(x is int xValue && y is int yValue && radius is int radiusValue && (int)radius > 0)
+                    { 
+                        int radio = (int)radius;
+                        while(radio > 0)
+                        {
+                            
+                            // Posición inicial de Wall-E (centro del círculo)
+                            int xc = Context.wallEPosition.x;
+                            int yc = Context.wallEPosition.y;
+                            
+                            int xPos = 0;
+                            int yPos = (int)radius;
+                            int d = 3 - 2 * (int)radius;
+                            
+                            // Dibujar los puntos iniciales
+                            DrawCirclePoints(xc, yc, xPos, yPos);
+                            
+                            while (yPos >= xPos)
+                            {
+                                xPos++;
+                                
+                                // Aplicar el algoritmo del punto medio
+                                if (d > 0)
+                                {
+                                    yPos--;
+                                    d = d + 4 * (xPos - yPos) + 10;
+                                }
+                                else d = d + 4 * xPos + 6;
+                                DrawCirclePoints(xc, yc, xPos, yPos);
+                            }
+                            
+                            // Mover Wall-E al centro del círculo (según especificación)
+                            Context.wallEPosition.x = xc;
+                            Context.wallEPosition.y = yc;
+                            
+                            radio -= 1;
+                        }
+                    }  
+                    else
+                    {
+                        string errorMsg = "Invalid types in DrawCircle: ";
+                        if (x is not int) 
+                            errorMsg += $"dirX must be int, but got '{x?.GetType().Name}'. ";
+                        if (y is not int) 
+                            errorMsg += $"dirY must be int, but got '{y?.GetType().Name}'.";
+                        if (radius is not int) 
+                            errorMsg += $"radius must be int, but got '{radius?.GetType().Name}'. ";
+                        if (radius is int && (int)radius < 0)
+                            errorMsg += "radius must be positive and less than Canvas's Size";
+                        Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
+                    }
+                }
+                break;
+            case "DrawRectangule":
+                if(this.Params.Count != 5) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawRectangule()"));
+                else
+                {
+                    var dirX = Params[0].Evaluate();
+                    var dirY = Params[1].Evaluate();
+                    var distance = Params[2].Evaluate();
+                    var width = Params[2].Evaluate();
+                    var heigth = Params[2].Evaluate();
+                    if(dirX is int dirXValue && dirY is int dirYValue && distance is int distanceValue && width is int widthValue && heigth is int heightValue && (int)distance > 0 && (int)width > 0 && (int)heigth > 0)
+                    { 
+                        
+                            
+                            
+                    }  
+                    else
+                    {
+                        string errorMsg = "Invalid types in DrawCircle: ";
+                        if (dirX is not int) 
+                            errorMsg += $"dirX must be int, but got '{dirX?.GetType().Name}'. ";
+                        if (dirY is not int) 
+                            errorMsg += $"dirY must be int, but got '{dirY?.GetType().Name}'.";
+                        if (distance is not int) 
+                            errorMsg += $"Distance must be int, but got '{distance?.GetType().Name}'. ";
+                        if(distance is int && (int)distance < 0)
+                            errorMsg += "Distance must be positive and less than Canvas's Size";
+                        if (width is not int) 
+                            errorMsg += $"Width must be int, but got '{width?.GetType().Name}'. ";
+                        if(width is int && (int)width < 0)
+                            errorMsg += "Widht must be positive and less than Canvas's Size";
+                        if (heigth is not int) 
+                            errorMsg += $"Height must be int, but got '{heigth?.GetType().Name}'. ";
+                        if(heigth is int && (int)heigth < 0)
+                            errorMsg += "Heigth must be positive and less than Canvas's Size";
+                        Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
+                    }
+                }
+                break;
         }
+
         return null;
+    }
+    private void DrawCirclePoints(int xc, int yc, int x, int y)
+    {
+        // Dibujar los 8 puntos simétricos del círculo
+        Context.Paint(xc + x, yc + y);
+        Context.Paint(xc - x, yc + y);
+        Context.Paint(xc + x, yc - y);
+        Context.Paint(xc - x, yc - y);
+        Context.Paint(xc + y, yc + x);
+        Context.Paint(xc - y, yc + x);
+        Context.Paint(xc + y, yc - x);
+        Context.Paint(xc - y, yc - x);
     }
 }
 

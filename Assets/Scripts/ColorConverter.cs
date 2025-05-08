@@ -4,12 +4,11 @@ using System.Collections.Generic;
 
 public class ColorConverter
 {
-    // Convierte System.Drawing.Color -> UnityEngine.Color
+    // Convierte System.Drawing.Color a UnityEngine.Color
     public static UnityEngine.Color ToUnityColor(System.Drawing.Color drawingColor) => new UnityEngine.Color(drawingColor.R / 255f,drawingColor.G / 255f,drawingColor.B / 255f,drawingColor.A / 255f);
-    public static string ToDrawingColor(UnityEngine.Color unityColor)
-    {
-        return GetColorName(System.Drawing.Color.FromArgb((int)(unityColor.a * 255), (int)(unityColor.r * 255),(int)(unityColor.g * 255),(int)(unityColor.b * 255)));
-    }
+    // Convierte de UnityEngine.Color a System.Drawing.Color
+    public static string ToDrawingColor(UnityEngine.Color unityColor) => GetColorName(System.Drawing.Color.FromArgb((int)(unityColor.a * 255), (int)(unityColor.r * 255),(int)(unityColor.g * 255),(int)(unityColor.b * 255)));
+    
     public static string GetColorName(System.Drawing.Color color)
     {
         // Comparar con colores conocidos (usando ToArgb para simplificar)
@@ -23,7 +22,6 @@ public class ColorConverter
         if (color.ToArgb() == System.Drawing.Color.White.ToArgb()) return "White";
         if (color.A == 0) return "Transparent"; // Cualquier color con Alpha=0 es transparente
 
-        // Si no coincide con ninguno, devolver el código ARGB en formato hexadecimal
-        return $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}";
+        return $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}"; // Si no coincide con ninguno, devolver el código ARGB en formato hexadecimal
     }
 }
