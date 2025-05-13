@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PixelCanvasController : MonoBehaviour
@@ -23,23 +24,20 @@ public class PixelCanvasController : MonoBehaviour
         }
         else Destroy(gameObject); // Destruir el duplicado
     }
+    public static bool gotoBoolean = false;
     void Start()
     {
         grid = Cover.canvasSize;
         InitializeCanvas();
-        for (int i = 0; i < parser.aSTNodes.Count; i++)
+        while(Context.indexOfEvaluation < parser.aSTNodes.Count)
         {
-            // parser.aSTNodes[i].Print();
-
-            parser.aSTNodes[i].Evaluate();
-            // Debug.Log(i);
+            parser.aSTNodes[Context.indexOfEvaluation].Print();
+            parser.aSTNodes[Context.indexOfEvaluation].Evaluate();
+            if(!gotoBoolean)Context.indexOfEvaluation += 1;
         }
 
         Debug.Log(Context.brushColor);
-        // Debug.Log(GetPixel())
-        // DrawPerfectSmiley();
-        // Paint();
-    }
+    } 
 
     void InitializeCanvas()
     {
@@ -77,60 +75,16 @@ public class PixelCanvasController : MonoBehaviour
         spriteRenderer.sprite = Sprite.Create(texture,new Rect(0, 0, grid, grid),Vector2.one * 0.5f,pixelsPerUnit);
     }
 
-public void SetPixel(int x, int y, Color color)
-{
-    if (x >= 0 && x < grid && y >= 0 && y < grid)
+    public void SetPixel(int x, int y, Color color)
     {
-        // (0,0) = esquina superior izquierda
-        texture.SetPixel(x, grid - 1 - y, color);  // Invierte Y para que el (0,0) esté arriba
-        texture.Apply();
-    }
-}
-
-    void DrawPerfectSmiley()
-    {
-        Color faceColor = Color.yellow;
-        Color eyeColor = Color.black;
-        Color mouthColor = Color.black;
-
-        // Cara (centro en X=32 filas, Y=32 columnas)
-        for (int fila = 10; fila < 54; fila++) // Filas (X)
+        if (x >= 0 && x < grid && y >= 0 && y < grid)
         {
-            for (int col = 10; col < 54; col++) // Columnas (Y)
-            {
-                if (Mathf.Pow(fila - 32, 2) + Mathf.Pow(col - 32, 2) <= 22 * 22)
-                {
-                    SetPixel(fila, col, faceColor);
-                }
-            }
-        }
-
-        // Ojos (X=20 filas, Y=20 y 44 columnas)
-        DrawCircle(20, 20, 4, eyeColor);  // Ojo izquierdo
-        DrawCircle(20, 44, 4, eyeColor);  // Ojo derecho
-
-        // Boca (X=40 filas, curva en columnas)
-        for (int col = 16; col < 48; col++)
-        {
-            int fila = (int)(32 + 8 * Mathf.Sin((col - 16) * Mathf.PI / 32));
-            SetPixel(fila, col, mouthColor);
-            SetPixel(fila + 1, col, mouthColor);
+            // (0,0) = esquina superior izquierda
+            texture.SetPixel(x, grid - 1 - y, color);  // Invierte Y para que el (0,0) esté arriba
+            texture.Apply();
         }
     }
 
-    void DrawCircle(int centerX, int centerY, int radius, Color color)
-    {
-        for (int fila = centerX - radius; fila <= centerX + radius; fila++)
-        {
-            for (int col = centerY - radius; col <= centerY + radius; col++)
-            {
-                if (Mathf.Pow(fila - centerX, 2) + Mathf.Pow(col - centerY, 2) <= radius * radius)
-                {
-                    SetPixel(fila, col, color);
-                }
-            }
-        }
-    }
     public Color GetPixel(int x, int y)
     {
         if (x >= 0 && x < grid && y >= 0 && y < grid) return texture.GetPixel(x, grid - 1 - y);

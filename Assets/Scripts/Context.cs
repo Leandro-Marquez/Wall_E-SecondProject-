@@ -14,6 +14,7 @@ class Context
     public static System.Drawing.Color brushColorColor = System.Drawing.Color.White;
     public static int pincelZize = 1; //ancho actual del pincel , iniciarlo con 1 por defecto
     public static int canvasSize; //tamano actual del canvas
+    public  static int indexOfEvaluation = 0;
     public static void Paint(int x , int y)
     {
         // System.Drawing.Color color1 = System.Drawing.Color.White;

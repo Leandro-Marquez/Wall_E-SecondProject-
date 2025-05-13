@@ -125,24 +125,25 @@ class Cover : MonoBehaviour
 
 
  
-// Spawn(100, 100)
+// Spawn(0, 0)
 // Color("Black")
 
 // n <- 5
 // k <- 3 + 3 * 10
-// n <- k * 2
+// n <- 3
 
-// actual-x <- GetActualX() + GetActualY()
-// i <- 0
 // loop-1
-// DrawLine(1, 0, actual-x)
-// DrawLine(0, 1, 12)
-// Color("Red")
-// Size(3)
-// DrawRectangle(1, 0, 50, 80, 40)
 
-// Fill()
-// DrawLine(1, 1, GetColorCount("Red" , 5 , 4 , 5 , 4))
+// DrawLine(0, 1, 12)
+
+// DrawLine(1, 0, 12)
+
+// n <- n - 1
+
+// GoTo[loop-1](n <= 0)
+
+
+
 // Color("Yellow")
 // Fill()
 // Color("Red")
@@ -162,17 +163,7 @@ class Cover : MonoBehaviour
 // Fill()         
 
 // Color("Black")
-// Size(50)
 
-// DrawLine(0, 0, 0) 
-// DrawCircle(0 - 1,0 - 1, 30)
-
-// DrawLine(0, 0, 0) 
-// DrawCircle(1 , 0 - 1, 30)
-
-// Color("Black")
-// Size(20)
-// DrawLine(0, 0, 0) 
 // DrawLine(0 - 1, 1, 100)
 // DrawLine(1, 1, 100) 
 // DrawLine(1, 0, 200) 
@@ -181,10 +172,18 @@ class Cover : MonoBehaviour
 
 
 
-// Spawn(100, 100);         
-// Color("Blue");           
-// Size(3);                 
-// DrawRectangle(1, 0, 50, 80, 40);
+// Spawn(0, 0)         
+// Color("Blue")        
+// DrawLine(1,0,100)
+// DrawLine(0,1,100)
+// DrawLine(0 - 1,0,100)
+// DrawLine(0,0- 1,100)
+// DrawLine(1,1,100)
+// DrawLine(0 - 1,0,100)
+// DrawLine(1,0 - 1,100)
+
+
+
 
 
 
@@ -215,3 +214,24 @@ class Cover : MonoBehaviour
 // Spawn(31,31)
 // Color("Purple")
 // DrawRectangle( 1, 1, 3, 12, 10)
+
+
+
+
+
+// Spawn(128, 128)
+// Color("Yellow")
+// Size(100)
+// Fill()
+// Color("Black")
+// DrawCircle(0, 0, 100)
+// Size(6)
+// DrawLine(0 - 1,0 - 1,35)
+// DrawCircle(0,0,6) 
+// Color("Purple")
+// Fill()
+// DrawLine(1,0 - 1,70)
+// DrawCircle(0,0,6)
+// DrawLine(0,1,40)
+// DrawLine(0 - 1,0,25)
+// DrawLine(1,1,12)

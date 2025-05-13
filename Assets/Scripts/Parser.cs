@@ -238,7 +238,11 @@ public class Parser
             List<object> postFix = ConvertPostFix(infix); //guardar los elementos convertidos a notacion postfija
             variableNode.Value = ParsePostFix(postFix); //asignarle el valor del resultado de parsear la notacion postfija al nodo de variable  
         }
-        return variableNode; //retoirnar correctamente el nodo de variable 
+    
+        //agregadooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+        // if(Context.variablesValues.ContainsKey(variableName)) Context.variablesValues[variableName] = variableNode.Value;///////////////////////////////////////////////
+        // else Context.variablesValues.Add(variableName, variableNode.Value);
+        return variableNode; //retoirnar correctamente el nodo de variable  
     }
 
     private GoToNode ParseGoTo()

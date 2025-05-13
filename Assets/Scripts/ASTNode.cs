@@ -152,8 +152,8 @@ public class FunctionNode : ASTNode
                     else ints.Add((int)a);
                 }
                 (int x , int y) dir;
-                dir.y = ints[0];
-                dir.x = ints[1];
+                dir.y = ints[1];
+                dir.x = ints[0];
                 for (var i = 1 ; i <= ints[2] ; i++)
                 {
                     int newX = Context.wallEPosition.x + dir.x;
@@ -224,7 +224,6 @@ public class FunctionNode : ASTNode
                     else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe String's Type"));
                 }
                 break;
-                #region  Culo Roto
             case "Fill":
                 if(this.Params.Count != 0) Error.errors.Add((ErrorType.Run_Time_Error,"Fill's Method does not contains params"));
                 else
@@ -242,8 +241,8 @@ public class FunctionNode : ASTNode
                         // if(bools[auxi.Item1,auxi.Item2]) continue;
                         bools[auxi.Item1,auxi.Item2] = true;
 
-                        int [] dirx = { 1 , -1 , 0 , 0 , -1 ,-1 , 1 , 1 };
-                        int [] diry = { 0 ,  0 , 1 ,-1 , -1 , 1 , 1 ,-1 };
+                        int [] dirx = { 1 , -1 , 0 , 0 };
+                        int [] diry = { 0 ,  0 , 1 ,-1 };
                         for (var j = 1 ; j < dirx.Length ; j++)
                         {
                             int newX = auxi.Item1 + dirx[j];
@@ -261,7 +260,6 @@ public class FunctionNode : ASTNode
                     }
                 } 
                 break;
-                #endregion
             case "GetColorCount" :
                 if(this.Params.Count != 5) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of GetColorCount()"));
                 else
@@ -330,15 +328,15 @@ public class FunctionNode : ASTNode
                         if (x1 is not int) 
                             errorMsg += $"X1 must be int, but got '{x1?.GetType().Name}'. ";
                         if (y1 is not int) 
-                            errorMsg += $"Y1 must be int, but got '{y1?.GetType().Name}'.";
+                            errorMsg += $"Y1 must be int, but got '{y1?.GetType().Name}'. ";
                         if (x2 is not int) 
                             errorMsg += $"X2 must be int, but got '{x2?.GetType().Name}'. ";
                         if (y2 is not int) 
-                            errorMsg += $"Y2 must be int, but got '{y2?.GetType().Name}'.";
+                            errorMsg += $"Y2 must be int, but got '{y2?.GetType().Name}'. ";
                         if (color is not string) 
                             errorMsg += $"Color must be String, but got '{color?.GetType().Name}'.";
                         Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
-                    }
+                    } 
                 }
                 break;
             case "IsCanvasColor": 
@@ -508,7 +506,6 @@ public class FunctionNode : ASTNode
                 }
                 break;
         }
-
         return null;
     }
     private void DrawCirclePoints(int xc, int yc, int x, int y)
@@ -575,7 +572,7 @@ public class VariableNode : ASTNode
         
        return Context.variablesValues[Name].Evaluate();
     }
-}
+} 
 
 public class NumberLiteralNode : ASTNode
 {
@@ -690,8 +687,22 @@ public class GoToNode : ASTNode
 
     public override object Evaluate()
     {
-        throw new System.NotImplementedException();//implementarrrrrrrrrrrrrrrrrr
-    }
+        PixelCanvasController.gotoBoolean = true;
+        var condition = Condition.Evaluate();
+        if(condition is bool)
+        {
+            if((bool)condition)
+            {
+                Context.indexOfEvaluation = Context.labels[Label.Label];
+            }
+            else
+            {
+                Context.indexOfEvaluation += 1;
+            }
+        }
+        else Error.errors.Add((ErrorType.Run_Time_Error ,"GoTo's Condition must evaluate a boolean value"));
+        return null;
+    } 
 }
 
 public class BinaryOperationNode : ASTNode
@@ -717,6 +728,7 @@ public class BinaryOperationNode : ASTNode
 
     public override object Evaluate()
     {
+        // Debug.Log(Operator.Value + " siiii");
         return Operator.Value switch
         {
             //hacer chequeo de tipoossssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
