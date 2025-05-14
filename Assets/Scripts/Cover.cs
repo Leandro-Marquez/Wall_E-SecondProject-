@@ -126,11 +126,9 @@ class Cover : MonoBehaviour
 
  
 // Spawn(0, 0)
-// Color("Black")
-
+// Color("Purple")
+// Fill()
 // n <- 5
-// k <- 3 + 3 * 10
-// n <- 3
 
 // loop-1
 
@@ -140,7 +138,7 @@ class Cover : MonoBehaviour
 
 // n <- n - 1
 
-// GoTo[loop-1](n <= 0)
+// GoTo[loop-1](n >= 0)
 
 
 
@@ -187,12 +185,9 @@ class Cover : MonoBehaviour
 
 
 
-// Spawn(540, 540)
-// Color("Black")   
-// Size(30)         
-
-
-// DrawLine(0 - 1,0 - 1, 100) 
+// Spawn(31, 31)
+// Color("Green")   
+// Size(15)         
 // DrawCircle(0, 0, 30)    
 
 // DrawLine(1,0 - 1, 200)   

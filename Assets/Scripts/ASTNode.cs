@@ -154,6 +154,7 @@ public class FunctionNode : ASTNode
                 (int x , int y) dir;
                 dir.y = ints[1];
                 dir.x = ints[0];
+                Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
                 for (var i = 1 ; i <= ints[2] ; i++)
                 {
                     int newX = Context.wallEPosition.x + dir.x;
@@ -224,7 +225,7 @@ public class FunctionNode : ASTNode
                     else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe String's Type"));
                 }
                 break;
-            case "Fill":
+            case "Fill": //corregirrrr que no se pinte la parte interior al circuloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
                 if(this.Params.Count != 0) Error.errors.Add((ErrorType.Run_Time_Error,"Fill's Method does not contains params"));
                 else
                 {
@@ -233,16 +234,18 @@ public class FunctionNode : ASTNode
                     values.Enqueue((Context.wallEPosition.x,Context.wallEPosition.y));
                  
                     Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
-                    // Debug.Log(values.Count + " siiiiii");
                     bool [,] bools = new bool[Context.canvasSize,Context.canvasSize];
                     while (values.Count > 0)
                     {
                         (int , int ) auxi = values.Dequeue();
-                        // if(bools[auxi.Item1,auxi.Item2]) continue;
+                        if(bools[auxi.Item1,auxi.Item2]) continue;
                         bools[auxi.Item1,auxi.Item2] = true;
 
-                        int [] dirx = { 1 , -1 , 0 , 0 };
-                        int [] diry = { 0 ,  0 , 1 ,-1 };
+                        // int [] dirx = { 1 , -1 , 0 , 0 };
+                        // int [] diry = { 0 ,  0 , 1 ,-1 };
+
+                        int [] dirx = { 1 , -1 , 0 , 0 , -1 ,-1 , 1 , 1 };
+                        int [] diry = { 0 ,  0 , 1 ,-1 , -1 , 1 , 1 ,-1 };
                         for (var j = 1 ; j < dirx.Length ; j++)
                         {
                             int newX = auxi.Item1 + dirx[j];
@@ -373,39 +376,41 @@ public class FunctionNode : ASTNode
                 if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawCircle()"));
                 else
                 {
+                    int auxiliar = Context.pincelZize;
                     var x = Params[0].Evaluate();
                     var y = Params[1].Evaluate();
                     var radius = Params[2].Evaluate();
                     if(x is int xValue && y is int yValue && radius is int radiusValue && (int)radius > 0)
                     { 
-                        // Posición inicial de Wall-E (centro del círculo)
-                        int xc = Context.wallEPosition.x;
-                        int yc = Context.wallEPosition.y;
-                        
-                        int xPos = 0;
-                        int yPos = (int)radius;
-                        int d = 3 - 2 * (int)radius;
-                        
-                        // Dibujar los puntos iniciales
-                        DrawCirclePoints(xc, yc, xPos, yPos);
-                        
-                        while (yPos >= xPos)
+                        int radio = (int)radius;
+                        while(auxiliar > 1)
                         {
-                            xPos++;
-                            
-                            // Aplicar el algoritmo del punto medio
-                            if (d > 0)
-                            {
-                                yPos--;
-                                d = d + 4 * (xPos - yPos) + 10;
-                            }
-                            else d = d + 4 * xPos + 6;
+                            // Posición inicial de Wall-E (centro del círculo)
+                            int xc = Context.wallEPosition.x;
+                            int yc = Context.wallEPosition.y;
+                            int xPos = 0;
+                            int yPos = (int)radio;
+                            int d = 3 - 2 * (int)radio;
+                            // Dibujar los puntos iniciales
                             DrawCirclePoints(xc, yc, xPos, yPos);
+                            while (yPos >= xPos)
+                            {
+                                xPos++;
+                                // Aplicar el algoritmo del punto medio
+                                if (d > 0)
+                                {
+                                    yPos--;
+                                    d = d + 4 * (xPos - yPos) + 10;
+                                }
+                                else d = d + 4 * xPos + 6;
+                                DrawCirclePoints(xc, yc, xPos, yPos);
+                            }
+                            // Mover Wall_E al centro del círculo
+                            Context.wallEPosition.x = xc;
+                            Context.wallEPosition.y = yc;
+                            auxiliar -= 1;
+                            radio += 1;
                         }
-                        
-                        // Mover Wall_E al centro del círculo
-                        Context.wallEPosition.x = xc;
-                        Context.wallEPosition.y = yc;
                     } 
                     else
                     {
@@ -420,6 +425,7 @@ public class FunctionNode : ASTNode
                             errorMsg += "radius must be positive and less than Canvas's Size";
                         Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
                     }
+                    
                 }
                 break;
             case "DrawRectangle":
@@ -569,8 +575,9 @@ public class VariableNode : ASTNode
 
     public override object Evaluate()
     {
-        
+       
        return Context.variablesValues[Name].Evaluate();
+
     }
 } 
 
@@ -693,11 +700,14 @@ public class GoToNode : ASTNode
         {
             if((bool)condition)
             {
+                Debug.Log("Siiiiiiiiiiiiiiiiii " + condition);
                 Context.indexOfEvaluation = Context.labels[Label.Label];
             }
             else
             {
-                Context.indexOfEvaluation += 1;
+                PixelCanvasController.gotoBoolean = false;
+                Debug.Log("No evaluoooo la condicion " + condition);
+                // Context.indexOfEvaluation += 1;
             }
         }
         else Error.errors.Add((ErrorType.Run_Time_Error ,"GoTo's Condition must evaluate a boolean value"));

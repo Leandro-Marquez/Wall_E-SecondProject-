@@ -61,6 +61,8 @@ public class Parser
             else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
             {
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
+                Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count-1);
+                UnityEngine.Debug.Log(tokens[currentIndex].Value + " etiquetaaaa " + Context.labels[tokens[currentIndex].Value].ToString());
                 currentIndex += 1;
             }
             //si se trata de un GoTo
@@ -134,7 +136,7 @@ public class Parser
             if(inFix[i] is Token) aux = (Token)inFix[i];
             if(aux is null) 
             {
-                FunctionNode a = (FunctionNode)inFix[i];
+                var a = inFix[i];
                 outPut.Add(a); //mientras que no sea un operador aritmetico significa que puede ser una variable o una llamada a un metodo 
             }
             else if(aux is not null && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.LogicOperator && aux.Type != TokenType.ComparisonOperator)
@@ -176,12 +178,17 @@ public class Parser
             else if(aux is not null && aux.Type == TokenType.Identifier)
             {
                 // UnityEngine.Debug.Log(aux.Value + " siii");
-                nodes.Add(new VariableNode(aux.Value, Context.variablesValues[aux.Value])); //manejar nodos de variablessssssssssssssssssssssssssssssssssssss
+                // var auxiliar = Context.variablesValues[aux.Value];
+                // if(auxiliar is not null && auxiliar is string) nodes.Add(new StringLiteralNode((string)auxiliar));
+                // if(auxiliar is not null && auxiliar is int) nodes.Add(new NumberLiteralNode((int)auxiliar));
+                // if(auxiliar is not null && auxiliar is bool) nodes.Add(new BooleanLiteralNode((bool)auxiliar));
+                nodes.Add(new VariableNode(aux.Value, (ASTNode)Context.variablesValues[aux.Value])); //manejar nodos de variablessssssssssssssssssssssssssssssssssssss
             }
             else if(aux is null)
             {
-                FunctionNode a = (FunctionNode)postFix[i];
-                nodes.Add(a);
+                var a = postFix[i];
+                // FunctionNode a = (FunctionNode)postFix[i];
+                nodes.Add((ASTNode)a);
             } 
             //si el tipo de token actual es un operador aritmetico o logico se debe crear un nodo de operacion bineria con el los ultimos dos nodos como hijos derecho e izquierdo   
             else if(aux is not null && (aux.Type == TokenType.ArithmeticOperator || aux.Type == TokenType.LogicOperator || aux.Type == TokenType.ComparisonOperator))
@@ -218,17 +225,19 @@ public class Parser
             {
                 infix.Add(tokens[currentIndex]); //agregar a la lista en notacion infija 
                 currentIndex++; //aumentar el indice
-            }
+            } 
             //variables
             else if (tokens[currentIndex].Type == TokenType.Identifier && (currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator) )
             {
-                infix.Add(tokens[currentIndex]);
+                if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
+                else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
                 currentIndex ++;
             }
             //variables
             else if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex - 1 >= 0 && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator)
             {
-                infix.Add(tokens[currentIndex]);
+                if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
+                else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
                 currentIndex ++;
             }
             else break; // Si no es parte de la expresión, salir

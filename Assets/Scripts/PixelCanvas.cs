@@ -31,12 +31,12 @@ public class PixelCanvasController : MonoBehaviour
         InitializeCanvas();
         while(Context.indexOfEvaluation < parser.aSTNodes.Count)
         {
-            parser.aSTNodes[Context.indexOfEvaluation].Print();
+            // parser.aSTNodes[Context.indexOfEvaluation].Print();
             parser.aSTNodes[Context.indexOfEvaluation].Evaluate();
             if(!gotoBoolean)Context.indexOfEvaluation += 1;
         }
-
-        Debug.Log(Context.brushColor);
+        // Debug.Log(parser.aSTNodes[parser.aSTNodes.Count-1].Evaluate() + " siiiii");
+        // Debug.Log(Context.brushColor);
     } 
 
     void InitializeCanvas()
