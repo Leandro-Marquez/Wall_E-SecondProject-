@@ -143,30 +143,54 @@ public class FunctionNode : ASTNode
                 else return Context.wallEPosition.y;
                 break;
             case "DrawLine":
-                if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawLine()"));
+                if (this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error, "There is no argument given that corresponds to the required parameter of DrawLine()"));
                 List<int> ints = new List<int>();
-                for (var i = 0; i < this.Params.Count ; i++)
+                for (var i = 0; i < this.Params.Count; i++)
                 {
                     var a = this.Params[i].Evaluate();
-                    if(a is not int) Error.errors.Add((ErrorType.Run_Time_Error,"DrawLine's Method must recibe Int's Type"));
+                    if (a is not int) Error.errors.Add((ErrorType.Run_Time_Error, "DrawLine's Method must receive Int's Type"));
                     else ints.Add((int)a);
                 }
-                (int x , int y) dir;
-                dir.y = ints[1];
-                dir.x = ints[0];
-                Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
-                for (var i = 1 ; i <= ints[2] ; i++)
+
+                (int dx, int dy) direction = (ints[0], ints[1]);
+                int distances = ints[2]; // Cantidad de píxeles a pintar en esa dirección
+                int brushSizes = Context.pincelZize; // Grosor del pincel
+
+                // Validar que el grosor y la distancia sean positivos
+                if (distances <= 0 || brushSizes <= 0) Error.errors.Add((ErrorType.Run_Time_Error, "Distance and brush size must be positive integers"));
+
+                int halfBrushs = brushSizes / 2;
+
+                // Pintar cada píxel en la dirección dada, con el grosor del pincel
+                for (int step = 0; step < distances; step++)
                 {
-                    int newX = Context.wallEPosition.x + dir.x;
-                    int newY = Context.wallEPosition.y + dir.y;
-                    if(newX >= 0 && newY >= 0 && newX < Context.canvasSize && newY < Context.canvasSize)
+                    // Calcular la nueva posición en la dirección dada
+                    int newX = Context.wallEPosition.x + direction.dx;
+                    int newY = Context.wallEPosition.y + direction.dy;
+
+                    // Verificar límites del canvas
+                    if (newX < 0 || newY < 0 || newX >= Context.canvasSize || newY >= Context.canvasSize) break; // Si se sale del canvas, terminar
+
+                    // Actualizar posición del robot
+                    Context.wallEPosition.x = newX;
+                    Context.wallEPosition.y = newY;
+
+                    // Pintar un área cuadrada alrededor del punto central (según brushSize)
+                    for (int offsetX = -halfBrushs; offsetX <= halfBrushs; offsetX++)
                     {
-                        Context.wallEPosition.x = newX;
-                        Context.wallEPosition.y = newY;
-                        Context.Paint(Context.wallEPosition.x,Context.wallEPosition.y);
+                        for (int offsetY = -halfBrushs; offsetY <= halfBrushs; offsetY++)
+                        {
+                            int paintX = Context.wallEPosition.x + offsetX;
+                            int paintY = Context.wallEPosition.y + offsetY;
+
+                            // Verificar que el píxel a pintar esté dentro del canvas
+                            if (paintX >= 0 && paintY >= 0 && paintX < Context.canvasSize && paintY < Context.canvasSize)
+                            {
+                                Context.Paint(paintX, paintY);
+                            }
+                        }
                     }
-                    else break;
-                } 
+                }
                 break;
             case "Size":
                 if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Size()"));
