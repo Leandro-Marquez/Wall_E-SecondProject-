@@ -187,8 +187,11 @@ class Cover : MonoBehaviour
 
 // Spawn(31, 31)
 // Color("Green")   
-// Size(15)         
-// DrawCircle(0, 0, 30)    
+// Size(10)         
+// DrawCircle(0, 0, 10)
+// DrawLine(1,0,25)
+// Color("Red")
+// Fill()
 
 // DrawLine(1,0 - 1, 200)   
 // DrawCircle(0, 0, 30)   
@@ -208,7 +211,8 @@ class Cover : MonoBehaviour
 
 // Spawn(31,31)
 // Color("Purple")
-// DrawRectangle( 1, 1, 3, 12, 10)
+// Size(15)
+// DrawRectangle( 0, 0, 0, 20, 25)
 
 
 

@@ -383,7 +383,7 @@ public class FunctionNode : ASTNode
                     if(x is int xValue && y is int yValue && radius is int radiusValue && (int)radius > 0)
                     { 
                         int radio = (int)radius;
-                        while(auxiliar > 1)
+                        while(auxiliar >= 1)
                         {
                             // Posición inicial de Wall-E (centro del círculo)
                             int xc = Context.wallEPosition.x;
@@ -437,56 +437,66 @@ public class FunctionNode : ASTNode
                     var distance = Params[2].Evaluate();
                     var width = Params[3].Evaluate();
                     var heigth = Params[4].Evaluate();
-                    if(dirX is int dirXValue && dirY is int dirYValue && distance is int distanceValue && width is int widthValue && heigth is int heightValue && (int)distance > 0 && (int)width > 0 && (int)heigth > 0)
+                    if(dirX is int dirXValue && dirY is int dirYValue && distance is int distanceValue && width is int widthValue && heigth is int heightValue && (int)distance >= 0 && (int)width > 0 && (int)heigth > 0)
                     { 
-                        // Obtener la posición actual de Wall-E
+                        //Obtener la posición actual de Wall-E
                         int actualX = Context.wallEPosition.x;
                         int actualY = Context.wallEPosition.y;
 
-                        // 2. Calcular centro del rectángulo
+                        //Calcular centro del rectángulo
                         int centerX = actualX + (int)dirX * (int)distance;
                         int centerY = actualY + (int)dirY * (int)distance;
-
-                        // 3. Calcular bordes absolutos (corregido)
-                        int left = centerX - (int)width / 2;
-                        int right = left + (int)width - 1;  // -1 para mantener dimensiones exactas
-                        int top = centerY - (int)heigth / 2;
-                        int bottom = top + (int)heigth - 1;
-
-                        // 4. Obtener tamaño del pincel
-                        int brushSize = Context.pincelZize;
-                        int halfBrush = brushSize / 2;
-
-                        // 5. Dibujar rectángulo (versión corregida)
-                        for (int x = left; x <= right; x++)
+                        
+                        int auxiliar = Context.pincelZize;
+                        int widthh = (int)width;
+                        int heigthh = (int)heigth;
+                        while(auxiliar >= 1)
                         {
-                            for (int y = top; y <= bottom; y++)
-                            {
-                                // Dibujar solo los bordes
-                                bool isBorder = (x == left || x == right || y == top || y == bottom);
+                            //Calcular bordes absolutos
+                            int left = centerX - widthh / 2;
+                            int right = left + widthh - 1;  // -1 para mantener dimensiones exactas
+                            int top = centerY - heigthh / 2;
+                            int bottom = top + heigthh - 1;
 
-                                if (isBorder && x >= 0 && x < Context.canvasSize && y >= 0 && y < Context.canvasSize)
+                            //Obtener tamaño del pincel
+                            int brushSize = Context.pincelZize;
+                            int halfBrush = brushSize / 2;
+
+                            //Dibujar rectángulo
+                            for (int x = left; x <= right; x++)
+                            {
+                                for (int y = top; y <= bottom; y++)
                                 {
-                                    // Aplicar grosor del pincel
-                                    for (int bx = -halfBrush; bx <= halfBrush; bx++)
+                                    // Dibujar solo los bordes
+                                    bool isBorder = (x == left || x == right || y == top || y == bottom);
+
+                                    if (isBorder && x >= 0 && x < Context.canvasSize && y >= 0 && y < Context.canvasSize)
                                     {
-                                        for (int by = -halfBrush; by <= halfBrush; by++)
+                                        // Aplicar grosor del pincel
+                                        for (int bx = -halfBrush; bx <= halfBrush; bx++)
                                         {
-                                            int px = x + bx;
-                                            int py = y + by;
-                                            if (px >= 0 && px < Context.canvasSize && py >= 0 && py < Context.canvasSize)
+                                            for (int by = -halfBrush; by <= halfBrush; by++)
                                             {
-                                                Context.Paint(px, py);
+                                                int px = x + bx;
+                                                int py = y + by;
+                                                if (px >= 0 && px < Context.canvasSize && py >= 0 && py < Context.canvasSize)
+                                                {
+                                                    Context.Paint(px, py);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        // Actualizar la posición de Wall-E al centro del rectángulo
-                        Context.wallEPosition.x = centerX;
-                        Context.wallEPosition.y = centerY;
+                            // Actualizar la posición de Wall-E al centro del rectángulo
+                            Context.wallEPosition.x = centerX;
+                            Context.wallEPosition.y = centerY;
+
+                            auxiliar -= 1;
+                            widthh += 1;
+                            heigthh += 1;
+                        }
                     }  
                     else
                     {
