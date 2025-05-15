@@ -8,118 +8,105 @@ using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 class Cover : MonoBehaviour
 {
-    public GameObject runButton,exportButton;
-    public static string input;
-    public TMP_InputField usersInput;
-    public AudioSource errorSound;
-    public GameObject editor;
-    public GameObject errorsPanel;
-    public GameObject runAndImportButtons;
-    public GameObject backButton;
-    public GameObject canvasSizeInputEntireObject;
-    public TMP_InputField canvasSizeInputField;
-    public GameObject logWarningObject;
-    public static int canvasSize;
-    public void Start()
+    public GameObject runButton,exportButton;//botones de acción Correr y Exportar
+    public static string input;//referencia estatica al texto de entrada del usuario
+    public TMP_InputField usersInput;//referencia al campo de entrada en la escena
+    public AudioSource errorSound;//sonido de error para reproducir cuando no haya dimension alguna
+    public GameObject editor;//referencia al panel del editor en la escena
+    public GameObject errorsPanel;//referencia al panel de errores en la escena 
+    public GameObject runAndImportButtons;//referencia al objeto q los contiene para q mientras no se haya introducido las dimensiones del canvas no se encienda nada en la escena 
+    public GameObject backButton;//referencia al botón de retroceso de la escena de Wall_E a la escena del editor
+    public GameObject canvasSizeInputEntireObject;//referencia al objeto para tamaño del canvas en la escena
+    public TMP_InputField canvasSizeInputField;//referencia al campo de entrada para el tamaño del canvas en la escena
+    public GameObject logWarningObject;//referencia al objeto q contiene el texto con la advertencia en la escena
+    public static int canvasSize;//referencia estatica al tamaño actual del canvas
+
+    public void Start()//en el primer momento inicializar el canvas con valor 0
     {
-        canvasSize = 0;
+        canvasSize = 0;//valor por defecto
     }
-    public void OnOKKButtonIsPressed()
+
+    public void OnOKKButtonIsPressed()//al confirmar tamaño
     {
         string text = canvasSizeInputField.text;
-        if(text == "")
+        if(text == "")//si no hay texto
         {
-            errorSound.Play();
-            return;
+            errorSound.Play();//reproducir sonido de error
+            return; //parar la ejecucion del programa
         }
-        else canvasSize = int.Parse(text.ToString());
-        logWarningObject.SetActive(true);
-        canvasSizeInputEntireObject.SetActive(false);
+        else canvasSize = int.Parse(text.ToString());//asignar tamaño
+        logWarningObject.SetActive(true);//mostrar advertencia
+        canvasSizeInputEntireObject.SetActive(false);//ocultar el input en la escena
     }
-    public void OnAcceptButtonIsPressed()
+
+    public void OnAcceptButtonIsPressed()//al aceptar advertencia
     {
-        logWarningObject.SetActive(false);
-        editor.SetActive(true);
-        errorsPanel.SetActive(true);
-        runAndImportButtons.SetActive(true);
-        backButton.SetActive(true);
+        logWarningObject.SetActive(false);//descativar objeto de advertencia
+        editor.SetActive(true);//activar editor
+        errorsPanel.SetActive(true);//activar panel de errores
+        runAndImportButtons.SetActive(true);//activar los botones
+        backButton.SetActive(true);//activar el boton retroceso
     }
-    public void OnCancelButtonIsPressed()
+
+    public void OnCancelButtonIsPressed()//al cancelar advertencia
     {
-        logWarningObject.SetActive(false);
-        canvasSizeInputEntireObject.SetActive(true);
+        logWarningObject.SetActive(false); //apagar el objeto de advertencia
+        canvasSizeInputEntireObject.SetActive(true);//volver a activar el input
     }
-    public void OnBackButtonIsPressed()
+
+    public void OnBackButtonIsPressed()//al retroceder
     {
-        canvasSizeInputEntireObject.SetActive(true);
-        editor.SetActive(false);
-        errorsPanel.SetActive(false);
-        runAndImportButtons.SetActive(false);
+        canvasSizeInputEntireObject.SetActive(true);//volver a activar el input
+        editor.SetActive(false);//ocultar editor
+        errorsPanel.SetActive(false);//ocultar panel de errores
+        runAndImportButtons.SetActive(false);//ocultar botones
     }
-    public void OnRunButtonIsPressed()
+
+    public void OnRunButtonIsPressed()//al ejecutar
     {
-        if(canvasSize == 0)
+        if(canvasSize == 0)//validar el tamaño
         {
             Error.errors.Add((ErrorType.Semantic_Error,"Any valid Canvas's Size must be positive "));
-            return;
+            return; //detener el flujo de ejecucion
         }
-        else Context.canvasSize = canvasSize;
-        PixelCanvasController.grid = canvasSize;
-        input = usersInput.text;
-        Lexer lexer = new Lexer(input);
-        lexer.Tokenize();
-        List<Token> tokens = lexer.tokens;
-        //imprimirrrrrr
-        // for (int i = 0; i < tokens.Count ; i++) Debug.Log(tokens[i].Type + " : " + tokens[i].Value);   
+        else Context.canvasSize = canvasSize;//actualizar las dimensiones del canvas en el contexto
+        PixelCanvasController.grid = canvasSize;//configurar el grid del canvas su respectiva clase
         
-        Parser parser = new Parser(tokens);
-        parser.Parse();
+        input = usersInput.text; //obtener la input y actualizar el campo estatico para posterior procesamiento
+        Lexer lexer = new Lexer(input); //crear una instancia de la clase lexer con la entrada actual
+        lexer.Tokenize(); //tokenizar la entrada a traves de la instancia
+        List<Token> tokens = lexer.tokens; //obtener la lista de tokens despues de tokenizar a travez de la lista de tokens 
+ 
+        Parser parser = new Parser(tokens);//crear una nueva instancia de la clase Parser 
+        parser.Parse(); //parsear a traves de la instancia de la clase parser
         
+        //si el primer nodo no es un nodo funcion y es la funcion Spawn, se tiene un error de sintaxis
         if(parser.aSTNodes[0] is not FunctionNode) Error.errors.Add((ErrorType.Syntax_Error,"Any valid expression must begin with the Spawn(x,y) command"));
-        
-        if(Error.errors.Count == 0)
+        else if(parser.aSTNodes[0] is FunctionNode) //si es funcion 
         {
-            // Debug.Log("Siiii");
-            SceneManager.LoadScene(1);
+            var aux = parser.aSTNodes[0]; //guardar el nodo
+            FunctionNode auxx = (FunctionNode)aux; //tratarlo como funcion
+            if(auxx.Name != "Spawn") Error.errors.Add((ErrorType.Syntax_Error,"Any valid expression must begin with the Spawn(x,y) command")); //si no tiene nombre Spawn se tiene un error de sintaxis
         }
-        PixelCanvasController.parser = parser;
-        // for (int i = 0; i < parser.aSTNodes.Count; i++)
-        // {
-        //     // parser.aSTNodes[i].Print();
-
-        //     parser.aSTNodes[i].Evaluate();
-        //     // Debug.Log(i);
-        // }
-
-
-        // Debug.Log("Brush Color : " + Context.brushColor);
-        // Debug.Log("Pincel Zize : " + Context.pincelZize);
-        // Debug.Log("Canvas Zize : " + Context.canvasSize);
-        // Debug.Log("X: " + Context.wallEPosition.x + " , Y: " + Context.wallEPosition.y);
-        
-        // Debug.Log("======================================" + Context.variablesValues.Count);
-        // foreach (var item in Context.variablesValues)
-        // {
-        //     Debug.Log(item.Key + ": " + item.Value.Evaluate());
-        // } 
+        if(Error.errors.Count == 0) SceneManager.LoadScene(1);//cargar la escena si no hay errores
+        PixelCanvasController.parser = parser;//asignar parser para posterior evaluacion de los nodos
     }
     
     void Update()
     {   
-        if(usersInput is not null ) input = usersInput.text;
-        if(string.IsNullOrEmpty(input))
+        if(usersInput is not null ) input = usersInput.text;//actualizar la input
+        if(string.IsNullOrEmpty(input))//si no hay entrada 
         {
-            runButton.SetActive(false);
-            exportButton.SetActive(false);
+            runButton.SetActive(false);//descativar boton de correr
+            exportButton.SetActive(false);//descativar boton de exportar
         }
-        else
+        else //en caso contrario
         {
-            runButton.SetActive(true);
-            exportButton.SetActive(true);
+            runButton.SetActive(true);//activar boton de correr
+            exportButton.SetActive(true);//activar boton de exportar
         }
     }
 }
-
 
 
 

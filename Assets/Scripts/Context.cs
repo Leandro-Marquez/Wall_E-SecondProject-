@@ -6,6 +6,7 @@ using Unity.VisualScripting; // Alias para evitar conflicto
 
 class Context
 {
+    //todos los metodos y propiedades de esta clase son estaticos para q sin importar la instancia el contexto permanezca intacto
     public static Dictionary<string , ASTNode > variablesValues = new Dictionary<string , ASTNode >(); //diccionario para guardar cada variable con su respectivo valor 
     public static Dictionary<string , int > labels = new Dictionary<string,int> (); //lista de tuplas donde se tendra la etiqueta y su indice para cuando se evalue llegar volver a donde se estaba evaluando 
     public static (int x , int y) wallEPosition; //posicion actual de Wall_E (X,Y)
@@ -14,13 +15,11 @@ class Context
     public static System.Drawing.Color brushColorColor = System.Drawing.Color.White;
     public static int pincelZize = 1; //ancho actual del pincel , iniciarlo con 1 por defecto
     public static int canvasSize; //tamano actual del canvas
-    public  static int indexOfEvaluation = 0;
-    public static void Paint(int x , int y)
+    public  static int indexOfEvaluation = 0; //indice de evaluacion para con el GoTo
+    public static void Paint(int x , int y) //metodo estatico para poder pintar a traves de cualquier instancia
     {
-        // System.Drawing.Color color1 = System.Drawing.Color.White;
-
-        PixelCanvasController.instance.SetPixel(x , y , ColorConverter.ToUnityColor(brushColorColor));
-        // Debug.Log($"X: {x} ,Y: {y} = {ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(x, y))}");
+        //                                     <<<<<<<<<<<<<convertir color a de System.Color a RGB de UnityEngine.Color>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        PixelCanvasController.instance.SetPixel(x , y , ColorConverter.ToUnityColor(brushColorColor)); //pintar pixel especifico a traves del metodo de pintar 
     }
 
 }

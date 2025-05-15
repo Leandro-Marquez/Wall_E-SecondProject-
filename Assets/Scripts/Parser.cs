@@ -175,15 +175,7 @@ public class Parser
             if(aux is not null && aux.Type == TokenType.Number) nodes.Add(new NumberLiteralNode(int.Parse(aux.Value)));//si el tipo de token actual es un numero agregar a la lista de nodos un nodo literal numerico 
             else if(aux is not null && aux.Type == TokenType.String) nodes.Add(new StringLiteralNode(aux.Value));//si el tipo de token actual es un string agregar a la lista de nodos un nodo literal de string  
             else if(aux is not null && aux.Type == TokenType.Bool) nodes.Add(new BooleanLiteralNode(bool.Parse(aux.Value)));//si el tipo de token actual es un booleano agregar a la lista de nodos un nodo literal booleano
-            else if(aux is not null && aux.Type == TokenType.Identifier)
-            {
-                // UnityEngine.Debug.Log(aux.Value + " siii");
-                // var auxiliar = Context.variablesValues[aux.Value];
-                // if(auxiliar is not null && auxiliar is string) nodes.Add(new StringLiteralNode((string)auxiliar));
-                // if(auxiliar is not null && auxiliar is int) nodes.Add(new NumberLiteralNode((int)auxiliar));
-                // if(auxiliar is not null && auxiliar is bool) nodes.Add(new BooleanLiteralNode((bool)auxiliar));
-                nodes.Add(new VariableNode(aux.Value, (ASTNode)Context.variablesValues[aux.Value])); //manejar nodos de variablessssssssssssssssssssssssssssssssssssss
-            }
+            else if(aux is not null && aux.Type == TokenType.Identifier) nodes.Add(new VariableNode(aux.Value, (ASTNode)Context.variablesValues[aux.Value])); //manejar nodos de variablessssssssssssssssssssssssssssssssssssss
             else if(aux is null)
             {
                 var a = postFix[i];
@@ -247,11 +239,7 @@ public class Parser
             List<object> postFix = ConvertPostFix(infix); //guardar los elementos convertidos a notacion postfija
             variableNode.Value = ParsePostFix(postFix); //asignarle el valor del resultado de parsear la notacion postfija al nodo de variable  
         }
-    
-        //agregadooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-        // if(Context.variablesValues.ContainsKey(variableName)) Context.variablesValues[variableName] = variableNode.Value;///////////////////////////////////////////////
-        // else Context.variablesValues.Add(variableName, variableNode.Value);
-        return variableNode; //retoirnar correctamente el nodo de variable  
+        return variableNode; //retornar correctamente el nodo de variable  
     }
 
     private GoToNode ParseGoTo()

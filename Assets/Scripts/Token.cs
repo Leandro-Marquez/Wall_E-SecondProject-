@@ -4,6 +4,7 @@ public class Token //clase token para poder guardar organizadamente todos los pe
     public TokenType Type {get ;} //tipo de token
     public Token(TokenType type ,string value) //constructor de la clase 
     {
+        //iniciarlizar el Token con su valor y su tipo
         Value = value;
         Type = type;
     }

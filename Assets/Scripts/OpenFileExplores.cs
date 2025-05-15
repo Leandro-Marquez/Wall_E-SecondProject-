@@ -11,21 +11,22 @@ public class WindowsFileExplorer : MonoBehaviour
     public string loadedFileContent { get; private set; } //cadena de texto del archivo cargado 
 
     public TMP_InputField textFileContent; //inputField en la escena en Unity 
-    public void OpenFileDialog() // Método para abrir el explorador y seleccionar un archivo
+    public void OpenFileDialog() //metodo para abrir el explorador y seleccionar un archivo
     {
         OpenFileDialog fileDialog = new OpenFileDialog();
         
-        // Configurar el filtro de extensiones (ej: .txt, .pw)
+        //configura el diálogo para mostrar solo archivos con extensiones específicas
         fileDialog.Filter = "Archivos de texto (*.txt)|*.txt|Archivos PW (*.pw)|*.pw|Todos los archivos (*.*)|*.*";
-        fileDialog.FilterIndex = 1; // Filtro predeterminado
+        //establece el primer filtro como predeterminado
+        fileDialog.FilterIndex = 1;
         
         if (fileDialog.ShowDialog() == DialogResult.OK) //abrir el cuadro de dialogo 
         {
-            loadedFilePath = fileDialog.FileName;
-            loadedFileContent = File.ReadAllText(loadedFilePath);
+            loadedFilePath = fileDialog.FileName;//almacenar la ruta completa del archivo seleccionado
+            loadedFileContent = File.ReadAllText(loadedFilePath);//leer todo el contenido del archivo como texto
 
-            textFileContent.text = loadedFileContent;
-            Cover.input += textFileContent.text;
+            textFileContent.text = loadedFileContent;//imprimir el contenido en el inputField de la UI
+            Cover.input += textFileContent.text; //concatenar el contenido al input global
         }
     }
 }

@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 public class ColorConverter
 {
-    // Convierte System.Drawing.Color a UnityEngine.Color
+    // convertir de System.Drawing.Color a UnityEngine.Color
     public static UnityEngine.Color ToUnityColor(System.Drawing.Color drawingColor) => new UnityEngine.Color(drawingColor.R / 255f,drawingColor.G / 255f,drawingColor.B / 255f,drawingColor.A / 255f);
-    // Convierte de UnityEngine.Color a System.Drawing.Color
+    // convertir de UnityEngine.Color a System.Drawing.Color
     public static string ToDrawingColor(UnityEngine.Color unityColor) => GetColorName(System.Drawing.Color.FromArgb((int)(unityColor.a * 255), (int)(unityColor.r * 255),(int)(unityColor.g * 255),(int)(unityColor.b * 255)));
     
     public static string GetColorName(System.Drawing.Color color)
     {
-        // Comparar con colores conocidos (usando ToArgb para simplificar)
+        // Comparar con colores conocidos -> ToArgb para simplificar
         if (color.ToArgb() == System.Drawing.Color.Red.ToArgb()) return "Red";
         if (color.ToArgb() == System.Drawing.Color.Blue.ToArgb()) return "Blue";
         if (color.ToArgb() == System.Drawing.Color.Green.ToArgb()) return "Green";
