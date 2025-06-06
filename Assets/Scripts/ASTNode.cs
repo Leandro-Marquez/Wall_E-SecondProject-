@@ -6,7 +6,7 @@ using System;
 public abstract class ASTNode
 {
     public abstract void Print(string indent = "", bool last = true);
-    public abstract object Evaluate();
+    public abstract object Evaluate(bool booleano);
 }
 
 public class FunctionNode : ASTNode
@@ -32,18 +32,20 @@ public class FunctionNode : ASTNode
         }
     }
 
-    public override object Evaluate()
+    public override object Evaluate(bool booleano)
     {
         //manejas los casos de funciones especiales
         string aux = this.Name;
         switch (aux)
         {
             case "Spawn":
+                Debug.Log("Se llamo a evaluar Spawn");
+
                 if(this.Params.Count != 2) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Spawn()"));
                 else 
                 {
-                    var x = Params[0].Evaluate();
-                    var y = Params[1].Evaluate();
+                    var x = Params[0].Evaluate(false);
+                    var y = Params[1].Evaluate(false);
                     if(x is int xValue && y is int yValue)
                     {
                         if(xValue >= 0 && xValue < Context.canvasSize && yValue >= 0 && yValue < Context.canvasSize)
@@ -65,10 +67,12 @@ public class FunctionNode : ASTNode
                 }
                 break;
             case "Color":
+                Debug.Log("Se llamo a evaluar Color");
+
                 if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Color()"));
                 else
                 {
-                    var a = Params[0].Evaluate();
+                    var a = Params[0].Evaluate(false);
                     System.Drawing.Color color;
                     if(a is not string aValue) Error.errors.Add((ErrorType.Run_Time_Error, "Color() parameter must be String Type"));
                     switch (a)
@@ -125,6 +129,7 @@ public class FunctionNode : ASTNode
                 }
                 break;
             case "GetCanvasZize":  
+                Debug.Log("Se llamo a evaluar GetCanvasZize");
                 if(this.Params.Count > 0)
                 {
                     Error.errors.Add((ErrorType.Run_Time_Error , "GetCanvasZize() does not contains parameters"));
@@ -132,25 +137,29 @@ public class FunctionNode : ASTNode
                 }
                 else return Context.canvasSize;
             case "GetActualX":
+                Debug.Log("Se llamo a evaluar GetActualX");
                 if(this.Params.Count > 0)
                 {
                     Error.errors.Add((ErrorType.Run_Time_Error, "GetActualX() does not contains parameters"));
                     return null;
                 }
                 else return Context.wallEPosition.x;
-            case "GetActualY":    
+            case "GetActualY":  
+                Debug.Log("Se llamo a evaluar GetActualY");
                 if(this.Params.Count > 0) Error.errors.Add((ErrorType.Run_Time_Error, "GetActualY() does not contains parameters"));
                 else return Context.wallEPosition.y;
                 break;
             case "DrawLine":
+                Debug.Log("Se llamo a evaluar DrawLine");
                 if (this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error, "There is no argument given that corresponds to the required parameter of DrawLine()"));
                 List<int> ints = new List<int>();
                 for (var i = 0; i < this.Params.Count; i++)
                 {
-                    var a = this.Params[i].Evaluate();
+                    var a = this.Params[i].Evaluate(false);
+                    Debug.Log(a + " params");
                     if (a is not int) Error.errors.Add((ErrorType.Run_Time_Error, "DrawLine's Method must receive Int's Type"));
                     else ints.Add((int)a);
-                }
+                } 
 
                 (int dx, int dy) direction = (ints[0], ints[1]);
                 int distances = ints[2]; // Cantidad de píxeles a pintar en esa dirección
@@ -187,25 +196,28 @@ public class FunctionNode : ASTNode
                             if (paintX >= 0 && paintY >= 0 && paintX < Context.canvasSize && paintY < Context.canvasSize)
                             {
                                 Context.Paint(paintX, paintY);
+                                Debug.Log("se llamo a pintar");
                             }
                         }
                     }
                 }
                 break;
             case "Size":
+                Debug.Log("Se llamo a evaluar Size");
                 if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Size()"));
                 else
                 {
-                    var a = Params[0].Evaluate();
+                    var a = Params[0].Evaluate(false);
                     if(a is int) Context.pincelZize = (int)a;    
                     else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe Int's Type"));
                 }
                 break;
             case "IsBrushSize":
+                Debug.Log("Se llamo a evaluar IsBrushSize");
                 if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsBrushSize()"));
                 else
                 {
-                    var a = Params[0].Evaluate();
+                    var a = Params[0].Evaluate(false);
                     if(a is int)
                     {
                         if(Context.pincelZize == (int)a) return 1;
@@ -215,10 +227,11 @@ public class FunctionNode : ASTNode
                 }
                 break;
             case "IsBrushColor":
+                Debug.Log("Se llamo a evaluar IsBrushColor");
                 if(this.Params.Count != 1) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsBrushColor()"));
                 else
                 {
-                    var a = Params[0].Evaluate();
+                    var a = Params[0].Evaluate(false);
                     if(a is string)
                     {
                         switch (a)
@@ -250,6 +263,7 @@ public class FunctionNode : ASTNode
                 }
                 break;
             case "Fill": //corregirrrr que no se pinte la parte interior al circuloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+                Debug.Log("Se llamo a evaluar Fill");
                 if(this.Params.Count != 0) Error.errors.Add((ErrorType.Run_Time_Error,"Fill's Method does not contains params"));
                 else
                 {
@@ -288,14 +302,16 @@ public class FunctionNode : ASTNode
                 } 
                 break;
             case "GetColorCount" :
+                Debug.Log("Se llamo a evaluar GetColorCount");
+
                 if(this.Params.Count != 5) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of GetColorCount()"));
                 else
                 {
-                    var color = Params[0].Evaluate();
-                    var x1 = Params[1].Evaluate();
-                    var y1 = Params[2].Evaluate();
-                    var x2 = Params[3].Evaluate();
-                    var y2 = Params[4].Evaluate();
+                    var color = Params[0].Evaluate(false);
+                    var x1 = Params[1].Evaluate(false);
+                    var y1 = Params[2].Evaluate(false);
+                    var x2 = Params[3].Evaluate(false);
+                    var y2 = Params[4].Evaluate(false);
                     if(x1 is int x1Value && y1 is int y1Value && x2 is int x2Value && y2 is int y2Value && color is string colorValue)
                     {
                         if(x1Value >= 0 && x1Value < Context.canvasSize && y1Value >= 0 && y1Value < Context.canvasSize && x2Value >= 0 && x2Value < Context.canvasSize && y2Value >= 0 && y2Value < Context.canvasSize)
@@ -367,12 +383,14 @@ public class FunctionNode : ASTNode
                 }
                 break;
             case "IsCanvasColor": 
+                Debug.Log("Se llamo a evaluar IsCanvasColor");
+
                 if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsCanvasColor()"));
                 else
                 {
-                    var color = Params[0].Evaluate();
-                    var x = Params[1].Evaluate();
-                    var y = Params[2].Evaluate();
+                    var color = Params[0].Evaluate(false);
+                    var x = Params[1].Evaluate(false);
+                    var y = Params[2].Evaluate(false);
                     if(color is string colorValue && x is int xValue && y is int yValue)
                     {
                         if((int)x >= 0 && (int)x < Context.canvasSize && (int)y >= 0 && (int)y < Context.canvasSize)
@@ -397,13 +415,15 @@ public class FunctionNode : ASTNode
                 }
                 break;
             case "DrawCircle":
+                Debug.Log("Se llamo a evaluar DrawCircle");
+
                 if(this.Params.Count != 3) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawCircle()"));
                 else
                 {
                     int auxiliar = Context.pincelZize;
-                    var x = Params[0].Evaluate();
-                    var y = Params[1].Evaluate();
-                    var radius = Params[2].Evaluate();
+                    var x = Params[0].Evaluate(false);
+                    var y = Params[1].Evaluate(false);
+                    var radius = Params[2].Evaluate(false);
                     if(x is int xValue && y is int yValue && radius is int radiusValue && (int)radius > 0)
                     { 
                         int radio = (int)radius;
@@ -453,14 +473,16 @@ public class FunctionNode : ASTNode
                 }
                 break;
             case "DrawRectangle":
+                Debug.Log("Se llamo a evaluar DrawRectangle");
+
                 if(this.Params.Count != 5) Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawRectangule()"));
                 else
                 {
-                    var dirX = Params[0].Evaluate();
-                    var dirY = Params[1].Evaluate();
-                    var distance = Params[2].Evaluate();
-                    var width = Params[3].Evaluate();
-                    var heigth = Params[4].Evaluate();
+                    var dirX = Params[0].Evaluate(false);
+                    var dirY = Params[1].Evaluate(false);
+                    var distance = Params[2].Evaluate(false);
+                    var width = Params[3].Evaluate(false);
+                    var heigth = Params[4].Evaluate(false);
                     if(dirX is int dirXValue && dirY is int dirYValue && distance is int distanceValue && width is int widthValue && heigth is int heightValue && (int)distance >= 0 && (int)width > 0 && (int)heigth > 0)
                     { 
                         //Obtener la posición actual de Wall-E
@@ -607,11 +629,11 @@ public class VariableNode : ASTNode
         Value?.Print(indent + (last ? "   " : "│  "), true);
     }
 
-    public override object Evaluate()
+    public override object Evaluate(bool booleano)
     {
-       
-       return Context.variablesValues[Name].Evaluate();
-
+        if(booleano) Context.variablesValues[Name] = Value.Evaluate(false);
+        else return Context.variablesValues[Name];
+        return null;
     }
 } 
 
@@ -629,7 +651,7 @@ public class NumberLiteralNode : ASTNode
         Debug.Log(indent + (last ? "└──" : "├──") + $"Number: {Value}");
     }
 
-    public override object Evaluate()
+    public override object Evaluate(bool booleano)
     {
         return Value;
     }
@@ -637,7 +659,7 @@ public class NumberLiteralNode : ASTNode
 
 public class StringLiteralNode : ASTNode
 {
-    public object Value { get; set; }
+    public string Value { get; set; }
 
     public StringLiteralNode(string value)
     {
@@ -649,7 +671,7 @@ public class StringLiteralNode : ASTNode
         Debug.Log(indent + (last ? "└──" : "├──") + $"String: \"{Value}\"");
     }
 
-    public override object Evaluate()
+    public override object Evaluate(bool booleano)
     {
         return Value;
     }
@@ -669,7 +691,7 @@ public class BooleanLiteralNode : ASTNode
         Debug.Log(indent + (last ? "└──" : "├──") + $"Boolean: {Value}");
     }
 
-    public override object Evaluate()
+    public override object Evaluate(bool booleano)
     {
         return Value;
     }
@@ -689,8 +711,9 @@ public class LabelNode : ASTNode
         Debug.Log(indent + (last ? "└──" : "├──") + $"Label: {Label}");
     }
 
-    public override object Evaluate()
+    public override object Evaluate(bool booleano)
     {
+        Debug.Log("Etiqueta: " + Label + " Indice : " + Context.labels[Label]);
         return Label;
     }
 }
@@ -698,9 +721,9 @@ public class LabelNode : ASTNode
 public class GoToNode : ASTNode
 {
     public LabelNode Label { get; set; }
-    public ASTNode Condition { get; set; }
+    public BinaryOperationNode Condition { get; set; }
 
-    public GoToNode(LabelNode label, ASTNode condition)
+    public GoToNode(LabelNode label, BinaryOperationNode condition)
     {
         Label = label;
         Condition = condition;
@@ -726,15 +749,15 @@ public class GoToNode : ASTNode
         Condition?.Print(indent + "   ", true);
     }
 
-    public override object Evaluate()
+    public override object Evaluate(bool booleano)
     {
         PixelCanvasController.gotoBoolean = true;
-        var condition = Condition.Evaluate();
+        var condition = Condition.Evaluate(false);
         if(condition is bool)
         {
             if((bool)condition)
             {
-                Debug.Log("Siiiiiiiiiiiiiiiiii " + condition);
+                Debug.Log($"Siiiiiiiiiiiiiiiiii " + condition + $" {Context.labels[Label.Label]}");
                 Context.indexOfEvaluation = Context.labels[Label.Label];
             }
             else
@@ -770,26 +793,26 @@ public class BinaryOperationNode : ASTNode
         RightMember?.Print(indent + (last ? "   " : "│  "), true);
     }
 
-    public override object Evaluate()
+    public override object Evaluate(bool booleano)
     {
         // Debug.Log(Operator.Value + " siiii");
         return Operator.Value switch
         {
             //hacer chequeo de tipoossssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-            "+"  => (int)LeftMember.Evaluate() + (int)RightMember.Evaluate(),
-            "-"  => (int)LeftMember.Evaluate() - (int)RightMember.Evaluate(),
-            "*"  => (int)LeftMember.Evaluate() * (int)RightMember.Evaluate(),
-            "/"  => (int)LeftMember.Evaluate() / (int)RightMember.Evaluate(),
-            "%"  => (int)LeftMember.Evaluate() % (int)RightMember.Evaluate(),
-            "**" => (int)Math.Pow((int)RightMember.Evaluate(),(int)LeftMember.Evaluate()),
-            "==" => AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
-            "!=" => !AreEqual(LeftMember.Evaluate(), RightMember.Evaluate()),
-            ">=" => (int)LeftMember.Evaluate() >= (int)RightMember.Evaluate(),
-            ">"  => (int)LeftMember.Evaluate() > (int)RightMember.Evaluate(),
-            "<=" => (int)LeftMember.Evaluate() <= (int)RightMember.Evaluate(),
-            "<"  => (int)LeftMember.Evaluate() < (int)RightMember.Evaluate(),
-            "||" => (bool)LeftMember.Evaluate() || (bool)RightMember.Evaluate(),
-            "&&" => (bool)LeftMember.Evaluate() && (bool)RightMember.Evaluate(),
+            "+"  => (int)LeftMember.Evaluate(false) + (int)RightMember.Evaluate(false),
+            "-"  => (int)LeftMember.Evaluate(false) - (int)RightMember.Evaluate(false),
+            "*"  => (int)LeftMember.Evaluate(false) * (int)RightMember.Evaluate(false),
+            "/"  => (int)LeftMember.Evaluate(false) / (int)RightMember.Evaluate(false),
+            "%"  => (int)LeftMember.Evaluate(false) % (int)RightMember.Evaluate(false),
+            "**" => (int)Math.Pow((int)RightMember.Evaluate(false),(int)LeftMember.Evaluate(false)),
+            "==" => AreEqual(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "!=" => !AreEqual(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            ">=" => (int)LeftMember.Evaluate(false) >= (int)RightMember.Evaluate(false),
+            ">"  => (int)LeftMember.Evaluate(false) > (int)RightMember.Evaluate(false),
+            "<=" => (int)LeftMember.Evaluate(false) <= (int)RightMember.Evaluate(false),
+            "<"  => (int)LeftMember.Evaluate(false) < (int)RightMember.Evaluate(false),
+            "||" => (bool)LeftMember.Evaluate(false) || (bool)RightMember.Evaluate(false),
+            "&&" => (bool)LeftMember.Evaluate(false) && (bool)RightMember.Evaluate(false),
         };
     }
     private bool AreEqual(object left, object right) //mejorarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr con los erroressssssssssssss

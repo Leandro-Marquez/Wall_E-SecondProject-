@@ -39,30 +39,33 @@ public class Parser
             {
                 currentIndex += 1;
                 continue;
-            }
+            } 
             //si se trata de una invocacion de funcion 
             if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Value == "(")
             {
                 FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardar el nodo funcion 
-                aSTNodes.Add(functionNode); //agregar a la lista de ASTNodes finales 
-            }
+                aSTNodes.Add(functionNode); //agregar a la lista de ASTNodes finales                              
+            } 
             //si se trataa de una asignacion a Variable 
             else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Value == "<-")
             {
                 VariableNode variableNode = ParseVariable();
                 aSTNodes.Add(variableNode);
-                if(Context.variablesValues.ContainsKey(variableNode.Name))
-                {   
-                    Context.variablesValues[variableNode.Name] = variableNode.Value;
-                }
-                else Context.variablesValues.Add(variableNode.Name,variableNode.Value);
-            }
+                Context.variableNodes.Add(variableNode);
+
+                // if(Context.variablesValues.ContainsKey(variableNode.Name))             
+                // {   
+                //     Context.variablesValues[variableNode.Name] = variableNode.Value;   
+                // }
+                // else Context.variablesValues.Add(variableNode.Name,variableNode.Value);
+                // currentIndex += 1;
+            } 
             //si se trata de una etiqueta 
             else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
             {
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
                 Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count-1);
-                UnityEngine.Debug.Log(tokens[currentIndex].Value + " etiquetaaaa " + Context.labels[tokens[currentIndex].Value].ToString());
+                // UnityEngine.Debug.Log(tokens[currentIndex].Value + " etiquetaaaa " + Context.labels[tokens[currentIndex].Value].ToString());
                 currentIndex += 1;
             }
             //si se trata de un GoTo
@@ -94,12 +97,12 @@ public class Parser
             var param = ParseParams(); //parsear parametros hasta el momento
             //si no es nulo, significa que se tiene parametros, agregar y continuar 
             if(param != null) functionNode.Params.Add(param);
-        }
+        } 
     
         if(currentIndex < tokens.Count && tokens[currentIndex].Value == ")") //si se llega al final de la invocacion, saltar el parentesis 
         {
             currentIndex += 1; // Saltar el ')'
-        }
+        } 
         return functionNode; //retornar el nodo funcion parseado 
     }
     private ASTNode ParseParams() //metodo principal para parsear parametros 
@@ -114,6 +117,26 @@ public class Parser
             {
                 inFix.Add(ParseFunction());
                 //no se incrementa currentIndex aquí porque ParseFunction ya lo hace
+            }
+            //si se trata de una variable 
+            else if(tokens[currentIndex].Type == TokenType.Identifier) //manejar erroresssssssssssssssssssssssssssssss
+            {
+                if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                else
+                {
+                    int auxCounter = 0;
+                    for (int i = Context.variableNodes.Count - 1 ; i >= 0 ; i--)
+                    {
+                        if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
+                        {
+                            inFix.Add(Context.variableNodes[i]);
+                            currentIndex += 1;
+                            break;
+                        }
+                        else auxCounter += 1;
+                    }
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                }
             }
             else
             {
@@ -138,6 +161,7 @@ public class Parser
             {
                 var a = inFix[i];
                 outPut.Add(a); //mientras que no sea un operador aritmetico significa que puede ser una variable o una llamada a un metodo 
+                // else if()
             }
             else if(aux is not null && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.LogicOperator && aux.Type != TokenType.ComparisonOperator)
             {
@@ -175,12 +199,12 @@ public class Parser
             if(aux is not null && aux.Type == TokenType.Number) nodes.Add(new NumberLiteralNode(int.Parse(aux.Value)));//si el tipo de token actual es un numero agregar a la lista de nodos un nodo literal numerico 
             else if(aux is not null && aux.Type == TokenType.String) nodes.Add(new StringLiteralNode(aux.Value));//si el tipo de token actual es un string agregar a la lista de nodos un nodo literal de string  
             else if(aux is not null && aux.Type == TokenType.Bool) nodes.Add(new BooleanLiteralNode(bool.Parse(aux.Value)));//si el tipo de token actual es un booleano agregar a la lista de nodos un nodo literal booleano
-            else if(aux is not null && aux.Type == TokenType.Identifier) nodes.Add(new VariableNode(aux.Value, (ASTNode)Context.variablesValues[aux.Value])); //manejar nodos de variablessssssssssssssssssssssssssssssssssssss
-            else if(aux is null)
+            // else if(aux is not null && aux.Type == TokenType.Identifier) nodes.Add(new VariableNode(aux.Value, (ASTNode)Context.variablesValues[aux.Value])); //manejar nodos de variablessssssssssssssssssssssssssssssssssssss
+            else if(aux is null) //si es una variable o un metodoooooo
             {
-                var a = postFix[i];
+                // var a = postFix[i];
                 // FunctionNode a = (FunctionNode)postFix[i];
-                nodes.Add((ASTNode)a);
+                nodes.Add((ASTNode)postFix[i]);
             } 
             //si el tipo de token actual es un operador aritmetico o logico se debe crear un nodo de operacion bineria con el los ultimos dos nodos como hijos derecho e izquierdo   
             else if(aux is not null && (aux.Type == TokenType.ArithmeticOperator || aux.Type == TokenType.LogicOperator || aux.Type == TokenType.ComparisonOperator))
@@ -193,7 +217,8 @@ public class Parser
             }
         }
         ASTNode [] list = nodes.ToArray();//convertir la lista de nodos a array para poder indexar correctamente sin tener problemas 
-        return list[0]; //retornar el primer nodod y unico
+        if(list.Length > 0)return list[0]; //retornar el primer nodo y unico
+        else return null;
     }
     private VariableNode ParseVariable() //metodo prinicpla para parsear asignaciones de variable 
     {
@@ -208,7 +233,7 @@ public class Parser
         while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump) //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
         {
             //si se trata de una de una funcion 
-            if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(")
+            if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(" && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex-1].Type == TokenType.LogicOperator ||  tokens[currentIndex-1].Type == TokenType.ComparisonOperator)
             {
                 infix.Add(ParseFunction()); //agregar el nodo funcion paraseado correctamente 
             }
@@ -221,16 +246,48 @@ public class Parser
             //variables
             else if (tokens[currentIndex].Type == TokenType.Identifier && (currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator) )
             {
-                if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
-                else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
-                currentIndex ++;
+                // if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
+                // else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
+                if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                else
+                {
+                    int auxCounter = 0;
+                    for (int i = Context.variableNodes.Count - 1 ; i >= 0 ; i--)
+                    {
+                        if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
+                        {
+                            infix.Add(Context.variableNodes[i]);
+                            currentIndex += 1;
+                            break;
+                        }
+                        else auxCounter += 1;
+                    }
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                } 
+                // currentIndex ++;
             }
             //variables
             else if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex - 1 >= 0 && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator)
             {
-                if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
-                else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
-                currentIndex ++;
+                // if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
+                // else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
+                if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                else
+                {
+                    int auxCounter = 0;
+                    for (int i = Context.variableNodes.Count - 1 ; i >= 0 ; i--)
+                    {
+                        if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
+                        {
+                            infix.Add(Context.variableNodes[i]);
+                            currentIndex += 1;
+                            break;
+                        }
+                        else auxCounter += 1;
+                    }
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                } 
+                // currentIndex ++;
             }
             else break; // Si no es parte de la expresión, salir
         }
@@ -256,6 +313,52 @@ public class Parser
             {
                 infix.Add(ParseFunction()); //agregar el nodo funcion paraseado correctamente 
             }
+            //variables
+            else if (tokens[currentIndex].Type == TokenType.Identifier && (currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator) )
+            {
+                // if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
+                // else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
+                if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                else
+                {
+                    int auxCounter = 0;
+                    for (int i = Context.variableNodes.Count - 1 ; i >= 0 ; i--)
+                    {
+                        if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
+                        {
+                            infix.Add(Context.variableNodes[i]);
+                            currentIndex += 1;
+                            break;
+                        }
+                        else auxCounter += 1;
+                    }
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                } 
+                // currentIndex ++;
+            }
+            //variables
+            else if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex - 1 >= 0 && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator)
+            {
+                // if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
+                // else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
+                if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                else
+                {
+                    int auxCounter = 0;
+                    for (int i = Context.variableNodes.Count - 1 ; i >= 0 ; i--)
+                    {
+                        if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
+                        {
+                            infix.Add(Context.variableNodes[i]);
+                            currentIndex += 1;
+                            break;
+                        }
+                        else auxCounter += 1;
+                    }
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                } 
+                // currentIndex ++;
+            }
             else //en cualquier otro caso agregar a la lista en notacion infija 
             {
                 infix.Add(tokens[currentIndex]); //agregar a la lista en notacion infija 
@@ -265,7 +368,7 @@ public class Parser
         if (infix.Count > 0) //si se tiene al menos un elemento en notacion infija 
         {
             List<object> postFix = ConvertPostFix(infix); //guardar los elementos convertidos a notacion postfija
-            goToNode.Condition = ParsePostFix(postFix); //asignarle el valor del resultado de parsear la notacion postfija al nodo de variable  
+            goToNode.Condition = (BinaryOperationNode)ParsePostFix(postFix); //asignarle el valor del resultado de parsear la notacion postfija al nodo de variable  
         }
 
         return goToNode;

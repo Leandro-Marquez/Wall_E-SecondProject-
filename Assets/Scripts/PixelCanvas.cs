@@ -26,17 +26,24 @@ public class PixelCanvasController : MonoBehaviour
         else Destroy(gameObject); //eliminar duplicados 
     }
 
-    public static bool gotoBoolean = false; // bandera para control de flujo (goto)
+    public static bool gotoBoolean; // bandera para control de flujo (goto)
 
     void Start()
     {
+        gotoBoolean = false;
         grid = Cover.canvasSize; // obtiene el tamaño del grid a partir del dato entrado en escena 
         InitializeCanvas();
 
-        while(Context.indexOfEvaluation < parser.aSTNodes.Count) // evaluar todos los nodos AST en orden a partir del indice de evaluacion del contexto 
+        // Debug.Log(parser.aSTNodes.Count + " siiii");
+        int counter = 0 ;
+        while(Context.indexOfEvaluation < parser.aSTNodes.Count && counter < 50) // evaluar todos los nodos AST en orden a partir del indice de evaluacion del contexto 
         {
-            parser.aSTNodes[Context.indexOfEvaluation].Evaluate(); //evaluacion
-            if(!gotoBoolean) Context.indexOfEvaluation += 1; // incrementa el índice a menos que haya un goto
+            // if(parser.aSTNodes[Context.indexOfEvaluation] is LabelNode) Context.indexOfEvaluation += 1;
+            Debug.Log($"Indiceee : {Context.indexOfEvaluation}");
+            // parser.aSTNodes[Context.indexOfEvaluation].Print();
+            parser.aSTNodes[Context.indexOfEvaluation].Evaluate(true); //evaluacion
+            Context.indexOfEvaluation += 1; // incrementa el índice a menos que haya un goto
+            counter += 1;
         }
     }
 

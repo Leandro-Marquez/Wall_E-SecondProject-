@@ -4371,8 +4371,6 @@ GameObject:
   - component: {fileID: 951432822}
   - component: {fileID: 951432821}
   - component: {fileID: 951432820}
-  - component: {fileID: 951432819}
-  - component: {fileID: 951432818}
   m_Layer: 5
   m_Name: InputField (TMP)
   m_TagString: Untagged
@@ -4400,35 +4398,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &951432818
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 951432816}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 726ab6e6de4b01e4d9e622bc73d0e405, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inputField: {fileID: 951432820}
-  lineNumbersText: {fileID: 0}
---- !u!114 &951432819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 951432816}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa98c04af8fc99a4c84c5e97b7f5b290, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tmpInputField: {fileID: 951432820}
-  positionDisplayl: {fileID: 0}
-  positionDisplayc: {fileID: 0}
 --- !u!114 &951432820
 MonoBehaviour:
   m_ObjectHideFlags: 0

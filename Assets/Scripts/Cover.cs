@@ -7,7 +7,7 @@ using UnityEditor;
 using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 class Cover : MonoBehaviour
-{
+{ 
     public GameObject runButton,exportButton;//botones de acción Correr y Exportar
     public static string input;//referencia estatica al texto de entrada del usuario
     public TMP_InputField usersInput;//referencia al campo de entrada en la escena
@@ -88,8 +88,11 @@ class Cover : MonoBehaviour
             FunctionNode auxx = (FunctionNode)aux; //tratarlo como funcion
             if(auxx.Name != "Spawn") Error.errors.Add((ErrorType.Syntax_Error,"Any valid expression must begin with the Spawn(x,y) command")); //si no tiene nombre Spawn se tiene un error de sintaxis
         }
-        if(Error.errors.Count == 0) SceneManager.LoadScene(1);//cargar la escena si no hay errores
-        PixelCanvasController.parser = parser;//asignar parser para posterior evaluacion de los nodos
+        if(Error.errors.Count == 0)
+        {
+            SceneManager.LoadScene(1);//cargar la escena si no hay errores
+            PixelCanvasController.parser = parser;//asignar parser para posterior evaluacion de los nodos
+        }
     }
     
     void Update()
@@ -106,15 +109,35 @@ class Cover : MonoBehaviour
             exportButton.SetActive(true);//activar boton de exportar
         }
     }
-}
+} 
+
+// Spawn(0, 0)
+// n <- 6
+// Color("Blue")
+// Leo
+// DrawLine(1,0,n)
+// DrawLine(0,1,n)
+// n <- n - 1
+// GoTo[Leo](n > 1)
+// Color("Green")
+// DrawLine(1,n,10)
+
+
+//  Spawn(0, 0)
+// n <- 6 
+// Color("Blue")
+// Leo
+// DrawLine(1,0,n)
+// DrawLine(0,1,n)
+// n <- n - 1
+// GoTo[Leo](n > 1)
+// Color("Green")
+// DrawLine(1,n,10)
 
 
 
-
- 
 // Spawn(0, 0)
 // Color("Purple")
-// Fill()
 // n <- 5
 
 // loop-1
@@ -125,7 +148,7 @@ class Cover : MonoBehaviour
 
 // n <- n - 1
 
-// GoTo[loop-1](n >= 0)
+// GoTo[loop-1](n > 0)
 
 
 
