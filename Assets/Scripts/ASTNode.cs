@@ -156,7 +156,6 @@ public class FunctionNode : ASTNode
                 for (var i = 0; i < this.Params.Count; i++)
                 {
                     var a = this.Params[i].Evaluate(false);
-                    Debug.Log(a + " params");
                     if (a is not int) Error.errors.Add((ErrorType.Run_Time_Error, "DrawLine's Method must receive Int's Type"));
                     else ints.Add((int)a);
                 } 
@@ -278,9 +277,6 @@ public class FunctionNode : ASTNode
                         (int , int ) auxi = values.Dequeue();
                         if(bools[auxi.Item1,auxi.Item2]) continue;
                         bools[auxi.Item1,auxi.Item2] = true;
-
-                        // int [] dirx = { 1 , -1 , 0 , 0 };
-                        // int [] diry = { 0 ,  0 , 1 ,-1 };
 
                         int [] dirx = { 1 , -1 , 0 , 0 , -1 ,-1 , 1 , 1 };
                         int [] diry = { 0 ,  0 , 1 ,-1 , -1 , 1 , 1 ,-1 };
@@ -588,8 +584,6 @@ public class FunctionNode : ASTNode
 
     private void DFS(int x, int y, string color)
     {
-        Debug.Log(x + "  " + y);
-        Debug.Log(color);
         bools[x,y] = true;
         Context.Paint(x,y);
         int [] dirx = { 1 , -1 , 0 , 0 , -1 ,-1 , 1 , 1 };
@@ -755,17 +749,8 @@ public class GoToNode : ASTNode
         var condition = Condition.Evaluate(false);
         if(condition is bool)
         {
-            if((bool)condition)
-            {
-                Debug.Log($"Siiiiiiiiiiiiiiiiii " + condition + $" {Context.labels[Label.Label]}");
-                Context.indexOfEvaluation = Context.labels[Label.Label];
-            }
-            else
-            {
-                PixelCanvasController.gotoBoolean = false;
-                Debug.Log("No evaluoooo la condicion " + condition);
-                // Context.indexOfEvaluation += 1;
-            }
+            if((bool)condition) Context.indexOfEvaluation = Context.labels[Label.Label];
+            else PixelCanvasController.gotoBoolean = false;
         }
         else Error.errors.Add((ErrorType.Run_Time_Error ,"GoTo's Condition must evaluate a boolean value"));
         return null;
@@ -795,7 +780,6 @@ public class BinaryOperationNode : ASTNode
 
     public override object Evaluate(bool booleano)
     {
-        // Debug.Log(Operator.Value + " siiii");
         return Operator.Value switch
         {
             //hacer chequeo de tipoossssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss

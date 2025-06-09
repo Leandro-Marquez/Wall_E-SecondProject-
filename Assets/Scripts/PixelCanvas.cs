@@ -1,5 +1,8 @@
+using TMPro;
 using Unity.VisualScripting;
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PixelCanvasController : MonoBehaviour
 {
@@ -13,6 +16,7 @@ public class PixelCanvasController : MonoBehaviour
     private SpriteRenderer spriteRenderer;//...
     private float pixelsPerUnit;//...
     public static Parser parser;  // referencia estatica a Parser para evaluar nodos
+    public TextMeshProUGUI errorText; //referencia al texto de error de la escena en el panel
 
     private void Awake()
     {
@@ -34,16 +38,22 @@ public class PixelCanvasController : MonoBehaviour
         grid = Cover.canvasSize; // obtiene el tamaño del grid a partir del dato entrado en escena 
         InitializeCanvas();
 
-        // Debug.Log(parser.aSTNodes.Count + " siiii");
-        int counter = 0 ;
-        while(Context.indexOfEvaluation < parser.aSTNodes.Count && counter < 50) // evaluar todos los nodos AST en orden a partir del indice de evaluacion del contexto 
+        while(Context.indexOfEvaluation < parser.aSTNodes.Count && Error.errors.Count == 0) // evaluar todos los nodos AST en orden a partir del indice de evaluacion del contexto 
         {
-            // if(parser.aSTNodes[Context.indexOfEvaluation] is LabelNode) Context.indexOfEvaluation += 1;
-            Debug.Log($"Indiceee : {Context.indexOfEvaluation}");
-            // parser.aSTNodes[Context.indexOfEvaluation].Print();
             parser.aSTNodes[Context.indexOfEvaluation].Evaluate(true); //evaluacion
             Context.indexOfEvaluation += 1; // incrementa el índice a menos que haya un goto
-            counter += 1;
+        }
+        if(Error.errors.Count != 0)
+        {
+            SceneManager.LoadScene(0);
+            string aux = "";
+            for (var i = 0; i < Error.errors.Count ; i++)
+            {
+                aux += "~~";
+                aux += Error.errors[i].Item1.ToString();
+                aux += Error.errors[i].Item2;
+            }
+            errorText.text = aux;
         }
     }
 

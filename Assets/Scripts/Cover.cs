@@ -142,14 +142,15 @@ class Cover : MonoBehaviour
 
 // loop-1
 
-// DrawLine(0, 1, 12)
+// DrawLine(0, 1, 4)
 
-// DrawLine(1, 0, 12)
+// DrawLine(1, 0, 4)
 
 // n <- n - 1
 
 // GoTo[loop-1](n > 0)
-
+// Color("Green")
+// DrawCircle(1,1,15)
 
 
 // Color("Yellow")

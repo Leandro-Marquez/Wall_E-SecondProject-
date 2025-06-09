@@ -52,20 +52,12 @@ public class Parser
                 VariableNode variableNode = ParseVariable();
                 aSTNodes.Add(variableNode);
                 Context.variableNodes.Add(variableNode);
-
-                // if(Context.variablesValues.ContainsKey(variableNode.Name))             
-                // {   
-                //     Context.variablesValues[variableNode.Name] = variableNode.Value;   
-                // }
-                // else Context.variablesValues.Add(variableNode.Name,variableNode.Value);
-                // currentIndex += 1;
             } 
             //si se trata de una etiqueta 
             else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
             {
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
                 Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count-1);
-                // UnityEngine.Debug.Log(tokens[currentIndex].Value + " etiquetaaaa " + Context.labels[tokens[currentIndex].Value].ToString());
                 currentIndex += 1;
             }
             //si se trata de un GoTo
