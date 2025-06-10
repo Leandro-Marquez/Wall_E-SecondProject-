@@ -33,7 +33,7 @@ public class Parser
     }
     public void Parse() //metodo principal que lo parsea todo 
     {
-        while(currentIndex < tokens.Count) //mientras haya tokens por analizar se continua parseando
+        while(currentIndex < tokens.Count && Error.errors.Count == 0) //mientras haya tokens por analizar se continua parseando
         {
             if(tokens[currentIndex].Type == TokenType.LineJump) //si se tiene un salto de linea continuar parseando lo proximo 
             {

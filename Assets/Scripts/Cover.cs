@@ -10,7 +10,9 @@ class Cover : MonoBehaviour
 { 
     public GameObject runButton,exportButton;//botones de acción Correr y Exportar
     public static string input;//referencia estatica al texto de entrada del usuario
+    public static string errors;
     public TMP_InputField usersInput;//referencia al campo de entrada en la escena
+    public TMP_InputField errorsInPanel;//referencia al campo de entrada en la escena
     public AudioSource errorSound;//sonido de error para reproducir cuando no haya dimension alguna
     public GameObject editor;//referencia al panel del editor en la escena
     public GameObject errorsPanel;//referencia al panel de errores en la escena 
@@ -90,8 +92,20 @@ class Cover : MonoBehaviour
         }
         if(Error.errors.Count == 0)
         {
-            SceneManager.LoadScene(1);//cargar la escena si no hay errores
+            SceneManager.LoadScene(1);//cargar la escena si no hay errores                               
             PixelCanvasController.parser = parser;//asignar parser para posterior evaluacion de los nodos
+        }
+        else
+        {
+            string aux = "";
+            for (var i = 0; i < Error.errors.Count ; i++)
+            {
+                aux += "~~";
+                aux += Error.errors[i].Item1.ToString();
+                aux += " : ";
+                aux += Error.errors[i].Item2;
+            }
+            errors = aux;
         }
     }
     
@@ -108,6 +122,7 @@ class Cover : MonoBehaviour
             runButton.SetActive(true);//activar boton de correr
             exportButton.SetActive(true);//activar boton de exportar
         }
+        if(errors != errorsInPanel.text) errorsInPanel.text = errors;
     }
 } 
 

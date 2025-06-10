@@ -16,8 +16,6 @@ public class PixelCanvasController : MonoBehaviour
     private SpriteRenderer spriteRenderer;//...
     private float pixelsPerUnit;//...
     public static Parser parser;  // referencia estatica a Parser para evaluar nodos
-    public TextMeshProUGUI errorText; //referencia al texto de error de la escena en el panel
-
     private void Awake()
     {
         // implementación del patrón singleton
@@ -51,9 +49,10 @@ public class PixelCanvasController : MonoBehaviour
             {
                 aux += "~~";
                 aux += Error.errors[i].Item1.ToString();
+                aux += " : ";
                 aux += Error.errors[i].Item2;
             }
-            errorText.text = aux;
+            Cover.errors = aux;
         }
     }
 

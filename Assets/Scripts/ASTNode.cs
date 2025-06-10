@@ -207,7 +207,13 @@ public class FunctionNode : ASTNode
                 else
                 {
                     var a = Params[0].Evaluate(false);
-                    if(a is int) Context.pincelZize = (int)a;    
+                    if(a is int)
+                    {
+                        int auxiliar = 0;
+                        if((int)a % 2 == 0) auxiliar = (int)a - 1;
+                        else auxiliar = (int)a;
+                        Context.pincelZize = auxiliar;  
+                    }  
                     else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe Int's Type"));
                 }
                 break;
@@ -581,26 +587,25 @@ public class FunctionNode : ASTNode
 
      private bool [,] bools = new bool[Context.canvasSize,Context.canvasSize];
 
-
     private void DFS(int x, int y, string color)
     {
         bools[x,y] = true;
         Context.Paint(x,y);
         int [] dirx = { 1 , -1 , 0 , 0 , -1 ,-1 , 1 , 1 };
         int [] diry = { 0 ,  0 , 1 ,-1 , -1 , 1 , 1 ,-1 };
-                        for (var j = 1 ; j < dirx.Length ; j++)
-                        {
-                            int newX = x + dirx[j];
-                            int newY = y + diry[j];
-                            if(newX >= 0 && newX < Context.canvasSize && newY >= 0 && newY < Context.canvasSize && color == ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(newX,newY)))
-                            {
-                                if(!bools[newX,newY])
-                                {
-                                    DFS(newX,newY,color);
-                                }
-                                
-                            }
-                        }
+        for (var j = 1 ; j < dirx.Length ; j++)
+        {
+            int newX = x + dirx[j];
+            int newY = y + diry[j];
+            if(newX >= 0 && newX < Context.canvasSize && newY >= 0 && newY < Context.canvasSize && color == ColorConverter.ToDrawingColor(PixelCanvasController.instance.GetPixel(newX,newY)))
+            {
+                if(!bools[newX,newY])
+                {
+                    DFS(newX,newY,color);
+                }
+
+            }
+        }
 
     }
 }
@@ -752,7 +757,7 @@ public class GoToNode : ASTNode
             if((bool)condition) Context.indexOfEvaluation = Context.labels[Label.Label];
             else PixelCanvasController.gotoBoolean = false;
         }
-        else Error.errors.Add((ErrorType.Run_Time_Error ,"GoTo's Condition must evaluate a boolean value"));
+        else Error.errors.Add((ErrorType.Run_Time_Error ,"GoTo's Condition must evaluate a Boolean Value"));
         return null;
     } 
 }
@@ -780,26 +785,61 @@ public class BinaryOperationNode : ASTNode
 
     public override object Evaluate(bool booleano)
     {
-        return Operator.Value switch
+        if( Operator.Value == "+" ||Operator.Value == "-" ||  Operator.Value == "*" ||Operator.Value == "/" ||Operator.Value == "%" ||Operator.Value == "**" ||Operator.Value == ">=" ||Operator.Value == ">" ||Operator.Value == "<=" ||Operator.Value == "<")
         {
-            //hacer chequeo de tipoossssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-            "+"  => (int)LeftMember.Evaluate(false) + (int)RightMember.Evaluate(false),
-            "-"  => (int)LeftMember.Evaluate(false) - (int)RightMember.Evaluate(false),
-            "*"  => (int)LeftMember.Evaluate(false) * (int)RightMember.Evaluate(false),
-            "/"  => (int)LeftMember.Evaluate(false) / (int)RightMember.Evaluate(false),
-            "%"  => (int)LeftMember.Evaluate(false) % (int)RightMember.Evaluate(false),
-            "**" => (int)Math.Pow((int)RightMember.Evaluate(false),(int)LeftMember.Evaluate(false)),
-            "==" => AreEqual(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
-            "!=" => !AreEqual(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
-            ">=" => (int)LeftMember.Evaluate(false) >= (int)RightMember.Evaluate(false),
-            ">"  => (int)LeftMember.Evaluate(false) > (int)RightMember.Evaluate(false),
-            "<=" => (int)LeftMember.Evaluate(false) <= (int)RightMember.Evaluate(false),
-            "<"  => (int)LeftMember.Evaluate(false) < (int)RightMember.Evaluate(false),
-            "||" => (bool)LeftMember.Evaluate(false) || (bool)RightMember.Evaluate(false),
-            "&&" => (bool)LeftMember.Evaluate(false) && (bool)RightMember.Evaluate(false),
-        };
+            var a = LeftMember.Evaluate(false);
+            var b = RightMember.Evaluate(false);
+            if(a.GetType() != typeof(int) || b.GetType() != typeof(int))
+            {
+                Error.errors.Add((ErrorType.Run_Time_Error,$"Cannot be aplied an operator {Operator.Value} to operands of type {a.GetType()} and {b.GetType()}"));
+            }
+            else
+            {
+                switch (Operator.Value)
+                {
+                    case "+" :
+                        return (int)a + (int)b;
+                    case "-" :
+                        return (int)a - (int)b;
+                    case "*" : 
+                        return (int)a * (int)b;
+                    case "/" :
+                        return (int)a / (int)b;
+                    case "%" : 
+                        return (int)a % (int)b;
+                    case "**": 
+                        return (int)Math.Pow((int)a,(int)b);
+                }
+            }
+        }
+        else if( Operator.Value == "==" || Operator.Value == "!=")
+        {
+            var a = LeftMember.Evaluate(false);
+            var b = RightMember.Evaluate(false);
+            if(a.GetType() == b.GetType())
+            {
+                if(Operator.Value == "==") return AreEqual(a, b);
+                else if(Operator.Value == "!=") return !AreEqual(a, b);
+            }
+            else Error.errors.Add((ErrorType.Run_Time_Error,$"Cannot be aplied an operator {Operator.Value} to operands of type {a.GetType()} and {b.GetType()}"));  
+        }
+        else if(Operator.Value == "||" || Operator.Value == "&&")
+        {
+            var a = LeftMember.Evaluate(false);
+            var b = RightMember.Evaluate(false);
+            if(a.GetType() != typeof(bool) || b.GetType() != typeof(bool))
+            {
+                Error.errors.Add((ErrorType.Run_Time_Error,$"Cannot be aplied an operator {Operator.Value} to operands of type {a.GetType()} and {b.GetType()}"));
+            }
+            else
+            {
+                if(Operator.Value == "||") return (bool)a || (bool)b;
+                else if(Operator.Value == "&&") return (bool)a && (bool)b;
+            }
+        }
+        return null;
     }
-    private bool AreEqual(object left, object right) //mejorarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr con los erroressssssssssssss
+    private bool AreEqual(object left, object right)
     {
         if (left.GetType() != right.GetType())
             throw new InvalidOperationException($"No se pueden comparar {left.GetType().Name} y {right.GetType().Name}");
