@@ -125,6 +125,16 @@ class Cover : MonoBehaviour
         if(errors != errorsInPanel.text) errorsInPanel.text = errors;
     }
 } 
+// Spawn(0,0)
+// Color("Black")
+// DrawLine(0,1,50)
+// Color("White")
+// DrawLine(1,0 - 1,25)
+// Color("Orange")
+// DrawCircle(1,1,10)
+// Color("Red")
+// Fill()
+
 
 // Spawn(0, 0)
 // n <- 6
@@ -148,117 +158,3 @@ class Cover : MonoBehaviour
 // GoTo[Leo](n > 1)
 // Color("Green")
 // DrawLine(1,n,10)
-
-
-
-// Spawn(0, 0)
-// Color("Purple")
-// n <- 5
-
-// loop-1
-
-// DrawLine(0, 1, 4)
-
-// DrawLine(1, 0, 4)
-
-// n <- n - 1
-
-// GoTo[loop-1](n > 0)
-// Color("Green")
-// DrawCircle(1,1,15)
-
-
-// Color("Yellow")
-// Fill()
-// Color("Red")
-// DrawLine(1,1,40)
-// Color("Purple")
-// DrawCircle(0 , 0, 7)
-// DrawLine( 0 - 1 , 0,12)
-// Color("Green")
-// DrawRectangle( 1, 1, 3, 7, 10)
- 
-
-
-
-
-// Spawn(128, 128)
-// Color("Yellow")    
-// Fill()         
-
-// Color("Black")
-
-// DrawLine(0 - 1, 1, 100)
-// DrawLine(1, 1, 100) 
-// DrawLine(1, 0, 200) 
-// DrawLine(0 - 1, 0, 200)
-
-
-
-
-// Spawn(0, 0)         
-// Color("Blue")        
-// DrawLine(1,0,100)
-// DrawLine(0,1,100)
-// DrawLine(0 - 1,0,100)
-// DrawLine(0,0- 1,100)
-// DrawLine(1,1,100)
-// DrawLine(0 - 1,0,100)
-// DrawLine(1,0 - 1,100)
-
-
-
-
-
-
-// Spawn(31, 31)
-// Color("Green")   
-// Size(10)         
-// DrawCircle(0, 0, 10)
-// DrawLine(1,0,25)
-// Color("Red")
-// Fill()
-
-// DrawLine(1,0 - 1, 200)   
-// DrawCircle(0, 0, 30)   
-
-
-// DrawLine(0 - 1, 1, 100)   
-// Color("Black")
-// Size(15)               
-
-
-// DrawLine(1,0 - 1, 50)    
-// DrawLine(1, 0, 200)     
-// DrawLine(1, 1, 50)    
-
-
-
-
-// Spawn(31,31)
-// Color("Purple")
-// Size(4)
-// DrawLine(1 ,1,23)
-
-// DrawRectangle( 0, 0, 0, 20, 25)
-
-
-
-
-
-// Spawn(128, 128)
-// Color("Yellow")
-// Size(100)
-// Fill()
-// Color("Black")
-// DrawCircle(0, 0, 100)
-// Size(6)
-// DrawLine(0 - 1,0 - 1,35)
-// DrawCircle(0,0,6) 
-// Color("Purple")
-// Fill()
-// DrawLine(1,0 - 1,70)
-// DrawCircle(0,0,6)
-// DrawLine(0,1,40)
-// DrawLine(0 - 1,0,25)
-// DrawLine(1,1,12)
