@@ -43,7 +43,7 @@ public class PixelCanvasController : MonoBehaviour
         }
         if(Error.errors.Count != 0)
         {
-            SceneManager.LoadScene(0);
+            // Cover.Initialize()
             string aux = "";
             for (var i = 0; i < Error.errors.Count ; i++)
             {
@@ -53,6 +53,9 @@ public class PixelCanvasController : MonoBehaviour
                 aux += Error.errors[i].Item2;
             }
             Cover.errors = aux;
+            Cover.turnBack = true;
+            SceneManager.LoadScene(0);
+            // Debug.Log(aux);
         }
     }
 

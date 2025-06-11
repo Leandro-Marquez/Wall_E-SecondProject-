@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 class Cover : MonoBehaviour
 { 
+    public static bool turnBack = false;
     public GameObject runButton,exportButton;//botones de acción Correr y Exportar
     public static string input;//referencia estatica al texto de entrada del usuario
     public static string errors;
@@ -26,6 +27,7 @@ class Cover : MonoBehaviour
     public void Start()//en el primer momento inicializar el canvas con valor 0
     {
         canvasSize = 0;//valor por defecto
+        Debug.Log(errors);
     }
 
     public void OnOKKButtonIsPressed()//al confirmar tamaño
@@ -123,6 +125,15 @@ class Cover : MonoBehaviour
             exportButton.SetActive(true);//activar boton de exportar
         }
         if(errors != errorsInPanel.text) errorsInPanel.text = errors;
+        if(turnBack)
+        {
+            editor.SetActive(true);//activar editor
+            errorsPanel.SetActive(true);//activar panel de errores
+            canvasSizeInputEntireObject.SetActive(false);//ocultar el input en la escena
+            runAndImportButtons.SetActive(true);//activar los botones
+            backButton.SetActive(true);//activar el boton retroceso
+            turnBack = false;
+        }
     }
 } 
 // Spawn(0,0)

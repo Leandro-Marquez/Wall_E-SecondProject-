@@ -167,7 +167,7 @@ class Assistant
                     if (paintX >= 0 && paintY >= 0 && paintX < Context.canvasSize && paintY < Context.canvasSize)
                     {
                         Context.Paint(paintX, paintY);
-                        Debug.Log("se llamo a pintar");
+                        // Debug.Log("se llamo a pintar");
                     }
                 }
             }
@@ -570,64 +570,178 @@ class Assistant
     }
     public static object EvaluateBinaryOperationNode(ASTNode LeftMember , Token Operator , ASTNode RightMember)
     {
-                if( Operator.Value == "+" ||Operator.Value == "-" ||  Operator.Value == "*" ||Operator.Value == "/" ||Operator.Value == "%" ||Operator.Value == "**" ||Operator.Value == ">=" ||Operator.Value == ">" ||Operator.Value == "<=" ||Operator.Value == "<")
+        return Operator.Value switch
         {
-            var a = LeftMember.Evaluate(false);
-            var b = RightMember.Evaluate(false);
-            if(a.GetType() != typeof(int) || b.GetType() != typeof(int))
-            {
-                Error.errors.Add((ErrorType.Run_Time_Error,$"Cannot be aplied an operator {Operator.Value} to operands of type {a.GetType()} and {b.GetType()}"));
-            }
-            else
-            {
-                switch (Operator.Value)
-                {
-                    case "+" :
-                        return (int)a + (int)b;
-                    case "-" :
-                        return (int)a - (int)b;
-                    case "*" : 
-                        return (int)a * (int)b;
-                    case "/" :
-                        return (int)a / (int)b;
-                    case "%" : 
-                        return (int)a % (int)b;
-                    case "**": 
-                        return (int)Math.Pow((int)a,(int)b);
-                }
-            }
-        }
-        else if( Operator.Value == "==" || Operator.Value == "!=")
-        {
-            var a = LeftMember.Evaluate(false);
-            var b = RightMember.Evaluate(false);
-            if(a.GetType() == b.GetType())
-            {
-                if(Operator.Value == "==") return AreEqual(a, b);
-                else if(Operator.Value == "!=") return !AreEqual(a, b);
-            }
-            else Error.errors.Add((ErrorType.Run_Time_Error,$"Cannot be aplied an operator {Operator.Value} to operands of type {a.GetType()} and {b.GetType()}"));  
-        }
-        else if(Operator.Value == "||" || Operator.Value == "&&")
-        {
-            var a = LeftMember.Evaluate(false);
-            var b = RightMember.Evaluate(false);
-            if(a.GetType() != typeof(bool) || b.GetType() != typeof(bool))
-            {
-                Error.errors.Add((ErrorType.Run_Time_Error,$"Cannot be aplied an operator {Operator.Value} to operands of type {a.GetType()} and {b.GetType()}"));
-            }
-            else
-            {
-                if(Operator.Value == "||") return (bool)a || (bool)b;
-                else if(Operator.Value == "&&") return (bool)a && (bool)b;
-            }
-        }
-        return null;
+            "+" => Add(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "-" => Subtract(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "*" => Multiply(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "/" => Divide(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "%" => Modulo(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "**" => Power(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "==" => AreEqual(LeftMember.Evaluate(false), RightMember.Evaluate(false),Operator),
+            "!=" => !AreEqual(LeftMember.Evaluate(false), RightMember.Evaluate(false),Operator),
+            ">=" => GreaterOrEqual(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            ">" => GreaterThan(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "<=" => LessOrEqual(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "<" => LessThan(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "||" => Or(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            "&&" => And(LeftMember.Evaluate(false), RightMember.Evaluate(false)),
+            _ => throw new Exception($"Unknown operator: {Operator.Value}")
+        };
     }
-    private static bool AreEqual(object left, object right)
+    // Métodos de operaciones aritméticas
+private static object Add(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return aInt + bInt;
+    if (a is double aDouble && b is double bDouble) return aDouble + bDouble;
+    if (a is string || b is string) return $"{a}{b}";
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '+' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return 0;
+}
+
+private static object Subtract(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return aInt - bInt;
+    if (a is double aDouble && b is double bDouble) return aDouble - bDouble;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '-' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return 0;
+}
+
+private static object Multiply(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return aInt * bInt;
+    if (a is double aDouble && b is double bDouble) return aDouble * bDouble;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '*' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return 0;
+}
+
+private static object Divide(object a, object b)
+{
+    if (a is int aInt && b is int bInt) 
+    {
+        if (bInt == 0)
+        {
+            Error.errors.Add((ErrorType.Run_Time_Error, "Division by zero"));
+            return 0;
+        }
+        return aInt / bInt;
+    }
+    if (a is double aDouble && b is double bDouble)
+    {
+        if (bDouble == 0)
+        {
+            Error.errors.Add((ErrorType.Run_Time_Error, "Division by zero"));
+            return 0;
+        }
+        return aDouble / bDouble;
+    }
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '/' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return 0;
+}
+
+private static object Modulo(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return aInt % bInt;
+    if (a is double aDouble && b is double bDouble) return aDouble % bDouble;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '%' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return 0;
+}
+
+private static object Power(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return (int)Math.Pow(aInt, bInt);
+    if (a is double aDouble && b is double bDouble) return Math.Pow(aDouble, bDouble);
+    if (a is double aD && b is int bI) return Math.Pow(aD, bI);
+    if (a is int aI && b is double bD) return Math.Pow(aI, bD);
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '**' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return 0;
+}
+
+private static bool GreaterThan(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return aInt > bInt;
+    if (a is double aDouble && b is double bDouble) return aDouble > bDouble;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '>' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return false;
+}
+
+private static bool GreaterOrEqual(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return aInt >= bInt;
+    if (a is double aDouble && b is double bDouble) return aDouble >= bDouble;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '>=' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return false;
+}
+
+private static bool LessThan(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return aInt < bInt;
+    if (a is double aDouble && b is double bDouble) return aDouble < bDouble;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '<' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return false;
+}
+
+private static bool LessOrEqual(object a, object b)
+{
+    if (a is int aInt && b is int bInt) return aInt <= bInt;
+    if (a is double aDouble && b is double bDouble) return aDouble <= bDouble;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '<=' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return false;
+}
+
+// Métodos de operaciones lógicas
+private static bool And(object a, object b)
+{
+    if (a is bool aBool && b is bool bBool) return aBool && bBool;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '&&' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return false;
+}
+
+private static bool Or(object a, object b)
+{
+    if (a is bool aBool && b is bool bBool) return aBool || bBool;
+    
+    Error.errors.Add((ErrorType.Run_Time_Error, 
+        $"Operator '||' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+    return false;
+}
+
+// Método auxiliar para nombres de tipos más legibles
+private static string GetTypeName(object obj)
+{
+    if (obj == null) return "null";
+    return obj.GetType().Name;
+}
+    private static bool AreEqual(object left, object right , Token Operator)
     {
         if (left.GetType() != right.GetType())
-            throw new InvalidOperationException($"No se pueden comparar {left.GetType().Name} y {right.GetType().Name}");
+        {
+            Error.errors.Add((ErrorType.Run_Time_Error, 
+                $"Operator '{Operator.Value}' cannot be applied to operands of type {GetTypeName(left)} and {GetTypeName(right)}"));
+
+        }
         return object.Equals(left, right);
     }
 }
