@@ -83,6 +83,7 @@ class Cover : MonoBehaviour
 
     public void OnRunButtonIsPressed()//al ejecutar
     {
+        Error.errors = new List<(ErrorType, string)>();
         // Guarda el input en PixelCanvasController.usersInput (que persiste por ser estático y DontDestroyOnLoad)
         input = usersInput.text;
         PixelCanvasController.usersInput = input; // <- Aquí se guarda para persistir durante la ejecución
@@ -91,16 +92,30 @@ class Cover : MonoBehaviour
         {
             Error.errors.Add((ErrorType.Semantic_Error,"Any valid Canvas's Size must be positive "));
             return; //detener el flujo de ejecucion
-        }
+        } 
         else Context.canvasSize = canvasSize;//actualizar las dimensiones del canvas en el contexto
         PixelCanvasController.grid = canvasSize;//configurar el grid del canvas su respectiva clase
         
         input = usersInput.text; //obtener la input y actualizar el campo estatico para posterior procesamiento
-        PixelCanvasController.usersInput = input;
-        Lexer lexer = new Lexer(input); //crear una instancia de la clase lexer con la entrada actual
-        lexer.Tokenize(); //tokenizar la entrada a traves de la instancia
-        List<Token> tokens = lexer.tokens; //obtener la lista de tokens despues de tokenizar a travez de la lista de tokens 
- 
+
+        // Dividir el texto por saltos de línea
+        string[] lines = input.Split(new[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+        List<Token> tokens = new List<Token>();
+        for (var i = 0; i < lines.Length ; i++)
+        { 
+            Lexer aux = new Lexer(lines[i]);
+            aux.Tokenize();
+            tokens.AddRange(aux.tokens);
+        } 
+        // Lexer lexer = new Lexer(input); //crear una instancia de la clase lexer con la entrada actual
+        // lexer.Tokenize(); //tokenizar la entrada a traves de la instancia
+        // List<Token> tokens = lexer.tokens; //obtener la lista de tokens despues de tokenizar a travez de la lista de tokens 
+
+        // for (var i = 0; i < tokens.Count ; i++)
+        // {
+        //     Debug.Log(tokens[i].Type + " : " + tokens[i].Value);
+        // }
+
         Parser parser = new Parser(tokens);//crear una nueva instancia de la clase Parser 
         parser.Parse(); //parsear a traves de la instancia de la clase parser
         
@@ -111,12 +126,12 @@ class Cover : MonoBehaviour
             var aux = parser.aSTNodes[0]; //guardar el nodo
             FunctionNode auxx = (FunctionNode)aux; //tratarlo como funcion
             if(auxx.Name != "Spawn") Error.errors.Add((ErrorType.Syntax_Error,"Any valid expression must begin with the Spawn(x,y) command")); //si no tiene nombre Spawn se tiene un error de sintaxis
-        }
+        } 
         if(Error.errors.Count == 0)
-        {
+        { 
             SceneManager.LoadScene(1);//cargar la escena si no hay errores                               
             PixelCanvasController.parser = parser;//asignar parser para posterior evaluacion de los nodos
-        }
+        } 
         else
         {
             string aux = "";

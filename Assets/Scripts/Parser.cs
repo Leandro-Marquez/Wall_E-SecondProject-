@@ -61,7 +61,7 @@ public class Parser
                 FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardar el nodo funcion 
                 aSTNodes.Add(functionNode); //agregar a la lista de ASTNodes finales                              
             } 
-            //si se trataa de una asignacion a Variable 
+            //si se trataa de una asignacion a Variable, se manejan los operadores de asignacion de cualquier tipo para hacerlo mas extensible
             else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Type == TokenType.AssignmentOperator)
             {
                 VariableNode variableNode = ParseVariable();
@@ -69,7 +69,7 @@ public class Parser
                 Context.variableNodes.Add(variableNode);
             } 
             //si se trata de una etiqueta 
-            else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.Identifier && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
+            else if(tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Type == TokenType.LineJump)
             {
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
                 Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count-1);
@@ -94,7 +94,7 @@ public class Parser
     
         var functionNode = new FunctionNode(functionName, new List<ASTNode>());//inicializar el nodo de funcion
     
-        while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.Delimiter) //mientras se este en rango y no se tenga delimitador 
+        while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.Delimiter && tokens[currentIndex].Type != TokenType.LineJump) //mientras se este en rango y no se tenga delimitador ni salto de linea se parsea la expresion 
         {
             if(tokens[currentIndex].Value == ",") //si es una coma 
             {
@@ -116,20 +116,20 @@ public class Parser
         //si se esta en rango, no es una coma, ni un parentesis cerrado ni un salto de linea 
         while (currentIndex < tokens.Count && tokens[currentIndex].Value != "," && tokens[currentIndex].Type != TokenType.Delimiter && tokens[currentIndex].Type != TokenType.LineJump)
         {
-            //si trata de una invocacion de funcion, parsear la funcion anidada
-            if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter)
-            {
-                if(inFix.Count == 0) inFix.Add(ParseFunction());
-                else if(inFix.Count != 0 && (string)inFix[inFix.Count - 1] != "+" && (string)inFix[inFix.Count - 1] != "-" && (string)inFix[inFix.Count - 1] != "*" && (string)inFix[inFix.Count - 1] != "/" && (string)inFix[inFix.Count - 1] != "%" && (string)inFix[inFix.Count - 1] != "**")
-                {
-                    Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
-                    inFix.Add(ParseFunction());
-                }
-                else inFix.Add(ParseFunction()); //si se tiene operador antes se agrega y listo
-                //no se incrementa currentIndex aquí porque ParseFunction ya lo hace
-            }
+            // //si trata de una invocacion de funcion, parsear la funcion anidada
+            // if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter)
+            // {
+            //     if(inFix.Count == 0) inFix.Add(ParseFunction());
+            //     else if(inFix.Count != 0 && (string)inFix[inFix.Count - 1] != "+" && (string)inFix[inFix.Count - 1] != "-" && (string)inFix[inFix.Count - 1] != "*" && (string)inFix[inFix.Count - 1] != "/" && (string)inFix[inFix.Count - 1] != "%" && (string)inFix[inFix.Count - 1] != "**")
+            //     {
+            //         Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+            //         inFix.Add(ParseFunction());
+            //     }
+            //     else inFix.Add(ParseFunction()); //si se tiene operador antes se agrega y listo
+            //     //no se incrementa currentIndex aquí porque ParseFunction ya lo hace
+            // }
             //si se trata de una variable    
-            else if(tokens[currentIndex].Type == TokenType.Identifier) //manejar erroresssssssssssssssssssssssssssssss
+             if(tokens[currentIndex].Type == TokenType.Identifier) //manejar erroresssssssssssssssssssssssssssssss
             {
                 if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
                 else
@@ -247,7 +247,7 @@ public class Parser
         while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump) //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
         {
             //si se trata de una de una funcion 
-            if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(" && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex-1].Type == TokenType.LogicOperator ||  tokens[currentIndex-1].Type == TokenType.ComparisonOperator)
+            if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex-1].Type == TokenType.LogicOperator ||  tokens[currentIndex-1].Type == TokenType.ComparisonOperator)
             {
                 if(infix.Count == 0) infix.Add(ParseFunction());
                 else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
