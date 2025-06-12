@@ -29,11 +29,26 @@ public class Parser
     {
         currentIndex = 0; //inicializar el indice en cero como es logico se comienza por la primera posicion 
         this.tokens = tokens; //inicializar la lista de tokens con la que se le pasa al constructor 
-        currentToken = tokens[currentIndex];
+        currentToken = tokens[currentIndex];//inicializar con el primer token el token actual
+    }
+
+    private void Expect(string expected)
+    {
+        if(tokens[currentIndex].Value == expected)
+        {
+            currentIndex += 1;
+            return;
+        }
+        else
+        {
+            Error.errors.Add((ErrorType.Syntax_Error,$"Invalid token {tokens[currentIndex].Value}, token have been expected is {expected}"));
+            currentIndex += 1;
+            return;
+        }
     }
     public void Parse() //metodo principal que lo parsea todo 
     {
-        while(currentIndex < tokens.Count && Error.errors.Count == 0) //mientras haya tokens por analizar se continua parseando
+        while(currentIndex < tokens.Count) //mientras haya tokens por analizar se continua parseando
         {
             if(tokens[currentIndex].Type == TokenType.LineJump) //si se tiene un salto de linea continuar parseando lo proximo 
             {
@@ -41,30 +56,30 @@ public class Parser
                 continue;
             } 
             //si se trata de una invocacion de funcion 
-            if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Value == "(")
+            if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Type == TokenType.Delimiter)
             {
                 FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardar el nodo funcion 
                 aSTNodes.Add(functionNode); //agregar a la lista de ASTNodes finales                              
             } 
             //si se trataa de una asignacion a Variable 
-            else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Value == "<-")
+            else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Type == TokenType.AssignmentOperator)
             {
                 VariableNode variableNode = ParseVariable();
                 aSTNodes.Add(variableNode);
                 Context.variableNodes.Add(variableNode);
             } 
             //si se trata de una etiqueta 
-            else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
+            else if(tokens[currentIndex].Type == TokenType.Identifier && ((currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type != TokenType.ComparisonOperator && tokens[currentIndex + 1].Type != TokenType.Identifier && tokens[currentIndex + 1].Type != TokenType.ArithmeticOperator && tokens[currentIndex + 1].Type != TokenType.LogicOperator) || tokens[currentIndex+1].Type == TokenType.LineJump))
             {
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
                 Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count-1);
                 currentIndex += 1;
             }
             //si se trata de un GoTo
-            else if(tokens[currentIndex].Type == TokenType.ReservedKeyword && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "[")
+            else if(tokens[currentIndex].Type == TokenType.ReservedKeyword && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter)
             {
                 aSTNodes.Add(ParseGoTo());
-                currentIndex += 1;
+                // currentIndex += 1;
             }
             else currentIndex += 1; //si no es una funcion ni salto de linea, se avanza
         }
@@ -74,11 +89,12 @@ public class Parser
         if(currentIndex >= tokens.Count) return new FunctionNode("",new List<ASTNode>());//en caso de que se salga de los limites de la lista de tokens(extremo)
         
         string functionName = tokens[currentIndex].Value; //guardar el nombre de la funcion 
-        currentIndex += 2; // Saltar nombre de función y '('
+        currentIndex += 1;//saltar el nombre
+        Expect("(");//verificar que se tenga parentesis abierto
     
         var functionNode = new FunctionNode(functionName, new List<ASTNode>());//inicializar el nodo de funcion
     
-        while (currentIndex < tokens.Count && tokens[currentIndex].Value != ")") //mientras se este en rango y no se tenga parentesis cerrado 
+        while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.Delimiter) //mientras se este en rango y no se tenga delimitador 
         {
             if(tokens[currentIndex].Value == ",") //si es una coma 
             {
@@ -90,11 +106,7 @@ public class Parser
             //si no es nulo, significa que se tiene parametros, agregar y continuar 
             if(param != null) functionNode.Params.Add(param);
         } 
-    
-        if(currentIndex < tokens.Count && tokens[currentIndex].Value == ")") //si se llega al final de la invocacion, saltar el parentesis 
-        {
-            currentIndex += 1; // Saltar el ')'
-        } 
+        Expect(")"); //saltar el ultimo parentesis del llamado de metodo
         return functionNode; //retornar el nodo funcion parseado 
     }
     private ASTNode ParseParams() //metodo principal para parsear parametros 
@@ -102,15 +114,21 @@ public class Parser
         List<object> inFix = new List<object>(); //lista de elementos en notacion infija 
         if(tokens[currentIndex].Value == ",") currentIndex += 1; //si llega encima de una coma, saltarla 
         //si se esta en rango, no es una coma, ni un parentesis cerrado ni un salto de linea 
-        while (currentIndex < tokens.Count && tokens[currentIndex].Value != "," && tokens[currentIndex].Value != ")" && tokens[currentIndex].Type != TokenType.LineJump)
+        while (currentIndex < tokens.Count && tokens[currentIndex].Value != "," && tokens[currentIndex].Type != TokenType.Delimiter && tokens[currentIndex].Type != TokenType.LineJump)
         {
             //si trata de una invocacion de funcion, parsear la funcion anidada
-            if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(")
+            if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter)
             {
-                inFix.Add(ParseFunction());
+                if(inFix.Count == 0) inFix.Add(ParseFunction());
+                else if(inFix.Count != 0 && (string)inFix[inFix.Count - 1] != "+" && (string)inFix[inFix.Count - 1] != "-" && (string)inFix[inFix.Count - 1] != "*" && (string)inFix[inFix.Count - 1] != "/" && (string)inFix[inFix.Count - 1] != "%" && (string)inFix[inFix.Count - 1] != "**")
+                {
+                    Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                    inFix.Add(ParseFunction());
+                }
+                else inFix.Add(ParseFunction()); //si se tiene operador antes se agrega y listo
                 //no se incrementa currentIndex aquí porque ParseFunction ya lo hace
             }
-            //si se trata de una variable 
+            //si se trata de una variable    
             else if(tokens[currentIndex].Type == TokenType.Identifier) //manejar erroresssssssssssssssssssssssssssssss
             {
                 if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
@@ -121,7 +139,13 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            inFix.Add(Context.variableNodes[i]);
+                            if(inFix.Count == 0) inFix.Add(Context.variableNodes[i]);
+                            else if(inFix.Count != 0 && (string)inFix[inFix.Count - 1] != "+" && (string)inFix[inFix.Count - 1] != "-" && (string)inFix[inFix.Count - 1] != "*" && (string)inFix[inFix.Count - 1] != "/" && (string)inFix[inFix.Count - 1] != "%" && (string)inFix[inFix.Count - 1] != "**")
+                            {
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                inFix.Add(Context.variableNodes[i]);
+                            }
+                            else inFix.Add(Context.variableNodes[i]);
                             currentIndex += 1;
                             break;
                         }
@@ -136,7 +160,6 @@ public class Parser
                 currentIndex += 1; //aumentar el indice para continuar con el proximo elemento 
             }
         }
-        
         List<object> postFix = ConvertPostFix(inFix); //convertir a notacion postfija todo lo que se tenia en notacion infija 
         return ParsePostFix(postFix); //retornar el nodo que se obtiene a partir de parsear la notacion postfija
     }
@@ -215,7 +238,8 @@ public class Parser
         if (currentIndex >= tokens.Count) return new VariableNode("", null); //si no se esta en rangos salir, se llego aqui por error(extremo)
 
         string variableName = tokens[currentIndex].Value; //guardar el nombre correctamente para asignarselo al nodo variable correctamete 
-        currentIndex += 2; // Saltar nombre y '<-'
+        currentIndex += 1; // Saltar nombre
+        Expect("<-"); //esperar operador de asignacion
         var variableNode = new VariableNode(variableName, null); //crear el nodo variable con nombre ya 
 
         List<object> infix = new List<object>();//lista de elementos en notacion infija 
@@ -225,7 +249,13 @@ public class Parser
             //si se trata de una de una funcion 
             if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(" && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex-1].Type == TokenType.LogicOperator ||  tokens[currentIndex-1].Type == TokenType.ComparisonOperator)
             {
-                infix.Add(ParseFunction()); //agregar el nodo funcion paraseado correctamente 
+                if(infix.Count == 0) infix.Add(ParseFunction());
+                else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                {
+                    Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                    infix.Add(ParseFunction());//agregar el nodo funcion paraseado correctamente 
+                }
+                else infix.Add(ParseFunction());
             }
             //en cualquier otro caso agregar a la lista en notacion infija 
             else if (tokens[currentIndex].Type == TokenType.String ||tokens[currentIndex].Type == TokenType.Bool ||tokens[currentIndex].Type == TokenType.Number || tokens[currentIndex].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex].Type == TokenType.LogicOperator ||  tokens[currentIndex].Type == TokenType.ComparisonOperator) // <- Incluye Arithmetic, Logic, Comparison
@@ -244,7 +274,13 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            infix.Add(Context.variableNodes[i]);
+                            if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
+                            else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                            {
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                infix.Add(Context.variableNodes[i]);
+                            }
+                            else infix.Add(Context.variableNodes[i]);
                             currentIndex += 1;
                             break;
                         }
@@ -264,7 +300,13 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            infix.Add(Context.variableNodes[i]);
+                            if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
+                            else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                            {
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                infix.Add(Context.variableNodes[i]);
+                            }
+                            else infix.Add(Context.variableNodes[i]);
                             currentIndex += 1;
                             break;
                         }
@@ -285,12 +327,16 @@ public class Parser
 
     private GoToNode ParseGoTo()
     {
-        var goToNode = new GoToNode(new LabelNode(tokens[currentIndex + 2].Value ),null);
-        currentIndex += 5; //se posiciona sobre el primer item de la condicion 
+        currentIndex += 1;
+        Expect("[");
+        var goToNode = new GoToNode(new LabelNode(tokens[currentIndex].Value ),null);
+        currentIndex += 1;
+        Expect("]");
+        Expect("(");
 
         List<object> infix = new List<object>();//lista de elementos en notacion infija 
 
-        while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump && tokens[currentIndex].Type != TokenType.ReservedKeyword && tokens[currentIndex].Value != ")") //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
+        while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump && tokens[currentIndex].Type != TokenType.ReservedKeyword && tokens[currentIndex].Type != TokenType.Delimiter) //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
         {
             //si se trata de una de una funcion 
             if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Value == "(")
@@ -300,8 +346,6 @@ public class Parser
             //variables
             else if (tokens[currentIndex].Type == TokenType.Identifier && (currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator) )
             {
-                // if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
-                // else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
                 if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
                 else
                 {
@@ -310,7 +354,13 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            infix.Add(Context.variableNodes[i]);
+                            if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
+                            else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                            {
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                infix.Add(Context.variableNodes[i]);
+                            }
+                            else infix.Add(Context.variableNodes[i]);
                             currentIndex += 1;
                             break;
                         }
@@ -318,13 +368,10 @@ public class Parser
                     }
                     if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
                 } 
-                // currentIndex ++;
             }
             //variables
             else if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex - 1 >= 0 && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex + 1].Type == TokenType.LogicOperator || tokens[currentIndex + 1].Type == TokenType.ComparisonOperator)
             {
-                // if(Context.variablesValues.ContainsKey(tokens[currentIndex].Value)) infix.Add(Context.variablesValues[tokens[currentIndex].Value]);
-                // else Error.errors.Add((ErrorType.Semantic_Error , $"Current variable [ {tokens[currentIndex].Value} ] does not existe in the current context "));
                 if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
                 else
                 {
@@ -333,7 +380,13 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            infix.Add(Context.variableNodes[i]);
+                            if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
+                            else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                            {
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                infix.Add(Context.variableNodes[i]);
+                            }
+                            else infix.Add(Context.variableNodes[i]);
                             currentIndex += 1;
                             break;
                         }
@@ -341,7 +394,6 @@ public class Parser
                     }
                     if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
                 } 
-                // currentIndex ++;
             }
             else //en cualquier otro caso agregar a la lista en notacion infija 
             {
@@ -349,6 +401,7 @@ public class Parser
                 currentIndex++; //aumentar el indice
             }
         }
+        Expect(")");
         if (infix.Count > 0) //si se tiene al menos un elemento en notacion infija 
         {
             List<object> postFix = ConvertPostFix(infix); //guardar los elementos convertidos a notacion postfija

@@ -6,9 +6,12 @@ using UnityEngine.SceneManagement;
 
 public class PixelCanvasController : MonoBehaviour
 {
+    public static string usersInput;
     [SerializeField] private int targetResolution = 1080;  // configuración de la resolución objetivo para el canvas 
     public static int grid;  // tamaño de la grilla (público estático para acceso externo)
 
+    // Bandera para controlar si ya se inicializó
+    private static bool isInitialized = false;
     public static PixelCanvasController instance; // instancia estática para acceso global a los métodos
 
     // variables internas para manejar la textura y renderizado
@@ -32,6 +35,7 @@ public class PixelCanvasController : MonoBehaviour
 
     void Start()
     {
+        if (isInitialized) return;
         gotoBoolean = false;
         grid = Cover.canvasSize; // obtiene el tamaño del grid a partir del dato entrado en escena 
         InitializeCanvas();
@@ -51,12 +55,17 @@ public class PixelCanvasController : MonoBehaviour
                 aux += Error.errors[i].Item1.ToString();
                 aux += " : ";
                 aux += Error.errors[i].Item2;
+                aux += "\n";
             }
             Cover.errors = aux;
             Cover.turnBack = true;
+            Debug.Log(Cover.input);
+            Debug.Log(usersInput);
+            Cover.input = usersInput;
             SceneManager.LoadScene(0);
             // Debug.Log(aux);
         }
+        isInitialized = true;
     }
 
     void InitializeCanvas()// inicializar el canvas con la configuración adecuada

@@ -19,15 +19,26 @@ class Cover : MonoBehaviour
     public GameObject errorsPanel;//referencia al panel de errores en la escena 
     public GameObject runAndImportButtons;//referencia al objeto q los contiene para q mientras no se haya introducido las dimensiones del canvas no se encienda nada en la escena 
     public GameObject backButton;//referencia al botón de retroceso de la escena de Wall_E a la escena del editor
+    public GameObject backToSceneButton;//referencia al botón de retroceso de la escena de Wall_E a la escena del editor
     public GameObject canvasSizeInputEntireObject;//referencia al objeto para tamaño del canvas en la escena
     public TMP_InputField canvasSizeInputField;//referencia al campo de entrada para el tamaño del canvas en la escena
     public GameObject logWarningObject;//referencia al objeto q contiene el texto con la advertencia en la escena
     public static int canvasSize;//referencia estatica al tamaño actual del canvas
 
-    public void Start()//en el primer momento inicializar el canvas con valor 0
+    // Recuperar input al cargar la escena (en Start o Awake)
+    void Start()
     {
-        canvasSize = 0;//valor por defecto
-        Debug.Log(errors);
+        // Elimina el código de PlayerPrefs y usa directamente PixelCanvasController.usersInput
+        if (!string.IsNullOrEmpty(PixelCanvasController.usersInput))
+        {
+            input = PixelCanvasController.usersInput;
+            if (usersInput != null) usersInput.text = input;
+        }
+        else
+        {
+            input = "";
+        }
+        canvasSize = 0;
     }
 
     public void OnOKKButtonIsPressed()//al confirmar tamaño
@@ -65,9 +76,17 @@ class Cover : MonoBehaviour
         errorsPanel.SetActive(false);//ocultar panel de errores
         runAndImportButtons.SetActive(false);//ocultar botones
     }
+    public void OnBackButtonToSceneIsPressed()
+    {
+        SceneManager.LoadScene(1);
+    }
 
     public void OnRunButtonIsPressed()//al ejecutar
     {
+        // Guarda el input en PixelCanvasController.usersInput (que persiste por ser estático y DontDestroyOnLoad)
+        input = usersInput.text;
+        PixelCanvasController.usersInput = input; // <- Aquí se guarda para persistir durante la ejecución
+        
         if(canvasSize == 0)//validar el tamaño
         {
             Error.errors.Add((ErrorType.Semantic_Error,"Any valid Canvas's Size must be positive "));
@@ -77,6 +96,7 @@ class Cover : MonoBehaviour
         PixelCanvasController.grid = canvasSize;//configurar el grid del canvas su respectiva clase
         
         input = usersInput.text; //obtener la input y actualizar el campo estatico para posterior procesamiento
+        PixelCanvasController.usersInput = input;
         Lexer lexer = new Lexer(input); //crear una instancia de la clase lexer con la entrada actual
         lexer.Tokenize(); //tokenizar la entrada a traves de la instancia
         List<Token> tokens = lexer.tokens; //obtener la lista de tokens despues de tokenizar a travez de la lista de tokens 
@@ -113,8 +133,24 @@ class Cover : MonoBehaviour
     
     void Update()
     {   
+        if(turnBack)
+        {
+            backToSceneButton.SetActive(true);
+            editor.SetActive(true);//activar editor
+            // usersInput.text = input;
+            // Debug.Log(input);
+            // Debug.Log(usersInput.text);
+            errorsPanel.SetActive(true);//activar panel de errores
+            canvasSizeInputEntireObject.SetActive(false);//ocultar el input en la escena
+            runAndImportButtons.SetActive(true);//activar los botones
+            backButton.SetActive(true);//activar el boton retroceso
+            runButton.SetActive(true);//activar boton de correr
+            exportButton.SetActive(true);//activar boton de exportar
+            turnBack = false;
+            return;
+        }
         if(usersInput is not null ) input = usersInput.text;//actualizar la input
-        if(string.IsNullOrEmpty(input))//si no hay entrada 
+        if(string.IsNullOrEmpty(usersInput.text))//si no hay entrada 
         {
             runButton.SetActive(false);//descativar boton de correr
             exportButton.SetActive(false);//descativar boton de exportar
@@ -123,17 +159,9 @@ class Cover : MonoBehaviour
         {
             runButton.SetActive(true);//activar boton de correr
             exportButton.SetActive(true);//activar boton de exportar
+            // if(turnBack) usersInput.text = input;
         }
         if(errors != errorsInPanel.text) errorsInPanel.text = errors;
-        if(turnBack)
-        {
-            editor.SetActive(true);//activar editor
-            errorsPanel.SetActive(true);//activar panel de errores
-            canvasSizeInputEntireObject.SetActive(false);//ocultar el input en la escena
-            runAndImportButtons.SetActive(true);//activar los botones
-            backButton.SetActive(true);//activar el boton retroceso
-            turnBack = false;
-        }
     }
 } 
 // Spawn(0,0)
@@ -158,6 +186,16 @@ class Cover : MonoBehaviour
 // Color("Green")
 // DrawLine(1,n,10)
 
+// Spawn(0, 0)
+// n <- 6
+// Color("Blue")
+// Leo
+// DrawLine(1,0,n)
+// DrawLine(0,1,n)
+// n <- n - 1
+// GoTo[Leo](n > 1)
+// Color("Green")
+// DrawLine(1,n,10 + true)
 
 //  Spawn(0, 0)
 // n <- 6 
