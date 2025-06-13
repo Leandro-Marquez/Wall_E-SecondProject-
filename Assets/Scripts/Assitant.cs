@@ -174,14 +174,15 @@ class Assistant
         for (var i = 0; i < Params.Count; i++)
         {
             var a = Params[i].Evaluate(false); //guardar el parametro
+            // Debug.Log(a.GetType());
             //chequear si es entero sino se tiene un error en tiempo de ejecucion
-            if (a is not int)
+            if (a is not int && a is not null)
             {
                 Error.errors.Add((ErrorType.Run_Time_Error, $"DrawLine's Method must receive Int's Type and recibe {a.GetType()}"));
                 check += 1;//aumentar cantidad de errores para posterior uso 
                 continue;//continuar la revision de los parametros aunque este no sea valido
             }
-            else ints.Add((int)a); //en caso contrario, osea correcto, agregar el valor del parametro
+            else if (a is not null) ints.Add((int)a); //en caso contrario, osea correcto, agregar el valor del parametro
         } 
         if(check != Error.errors.Count) return null;//si se tuvieron errores de tipo detener la ejecucion
         (int dx, int dy) direction = (ints[0], ints[1]);//guardar en una tupla la direccion que se tiene
@@ -738,8 +739,10 @@ class Assistant
         if (a is int aInt && b is int bInt) return aInt + bInt; //si ambos son enteros retornar la suma 
         if (a is string || b is string) return $"{a}{b}";//si ambos son strings retornar la concatenacion 
         
+        Debug.Log(a.GetType() +  " yyyyyyyyyyyyyy " + b.GetType());
         //cualquier otro caso se tiene un error en tiempo de ejecucion
         Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '+' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Debug.Log("Se retornooo null");
         return null;//si se llega aqui es por error retornar null
     }
 

@@ -105,6 +105,12 @@ class Cover : MonoBehaviour
             tokens.AddRange(aux.tokens);
         } 
 
+        //imprimir los tokenssss
+        for (var i = 0; i < tokens.Count; i++)
+        {
+            Debug.Log(tokens[i].Type + " : " + tokens[i].Value);
+        }
+
         Parser parser = new Parser(tokens);//crear una nueva instancia de la clase Parser 
         parser.Parse(); //parsear a traves de la instancia de la clase parser
         

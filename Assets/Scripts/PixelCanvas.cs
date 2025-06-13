@@ -39,6 +39,7 @@ public class PixelCanvasController : MonoBehaviour
 
         while(Context.indexOfEvaluation < parser.aSTNodes.Count && Error.errors.Count == 0) // evaluar todos los nodos AST en orden a partir del indice de evaluacion del contexto 
         {
+            parser.aSTNodes[Context.indexOfEvaluation].Print();
             parser.aSTNodes[Context.indexOfEvaluation].Evaluate(true); //evaluacion
             Context.indexOfEvaluation += 1; // incrementa el índice a menos que haya un goto
         }
@@ -56,8 +57,8 @@ public class PixelCanvasController : MonoBehaviour
             }
             Cover.errors = aux;
             Cover.turnBack = true;
-            Debug.Log(Cover.input);
-            Debug.Log(usersInput);
+            // Debug.Log(Cover.input);
+            // Debug.Log(usersInput);
             Cover.input = usersInput;
             SceneManager.LoadScene(0);
             // Debug.Log(aux);
