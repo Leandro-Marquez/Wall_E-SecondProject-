@@ -34,10 +34,7 @@ class Cover : MonoBehaviour
             input = PixelCanvasController.usersInput;
             if (usersInput != null) usersInput.text = input;
         }
-        else
-        {
-            input = "";
-        }
+        else input = "";
         canvasSize = 0;
     }
 
@@ -107,14 +104,6 @@ class Cover : MonoBehaviour
             aux.Tokenize();
             tokens.AddRange(aux.tokens);
         } 
-        // Lexer lexer = new Lexer(input); //crear una instancia de la clase lexer con la entrada actual
-        // lexer.Tokenize(); //tokenizar la entrada a traves de la instancia
-        // List<Token> tokens = lexer.tokens; //obtener la lista de tokens despues de tokenizar a travez de la lista de tokens 
-
-        // for (var i = 0; i < tokens.Count ; i++)
-        // {
-        //     Debug.Log(tokens[i].Type + " : " + tokens[i].Value);
-        // }
 
         Parser parser = new Parser(tokens);//crear una nueva instancia de la clase Parser 
         parser.Parse(); //parsear a traves de la instancia de la clase parser

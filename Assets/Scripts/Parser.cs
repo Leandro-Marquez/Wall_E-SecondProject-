@@ -67,7 +67,13 @@ public class Parser
                 VariableNode variableNode = ParseVariable();
                 aSTNodes.Add(variableNode);
                 Context.variableNodes.Add(variableNode);
-            } 
+            }
+            //si se tiene un error en una linea, error a la hora de asignar a una variable o llamar a una funcion
+            else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Type != TokenType.Delimiter && tokens[currentIndex+1].Type != TokenType.AssignmentOperator)
+            {
+                Error.errors.Add((ErrorType.Syntax_Error,$"Unexpected token {tokens[currentIndex + 1]}, token have been expected is a Delimiter or an Assignment_Operator"));
+                while (tokens[currentIndex].Type != TokenType.LineJump) currentIndex += 1; //avanzar hasta el final de la linea
+            }
             //si se trata de una etiqueta 
             else if(tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Type == TokenType.LineJump)
             {
@@ -79,7 +85,6 @@ public class Parser
             else if(tokens[currentIndex].Type == TokenType.ReservedKeyword && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter)
             {
                 aSTNodes.Add(ParseGoTo());
-                // currentIndex += 1;
             }
             else currentIndex += 1; //si no es una funcion ni salto de linea, se avanza
         }
@@ -115,20 +120,7 @@ public class Parser
         if(tokens[currentIndex].Value == ",") currentIndex += 1; //si llega encima de una coma, saltarla 
         //si se esta en rango, no es una coma, ni un parentesis cerrado ni un salto de linea 
         while (currentIndex < tokens.Count && tokens[currentIndex].Value != "," && tokens[currentIndex].Type != TokenType.Delimiter && tokens[currentIndex].Type != TokenType.LineJump)
-        {
-            // //si trata de una invocacion de funcion, parsear la funcion anidada
-            // if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter)
-            // {
-            //     if(inFix.Count == 0) inFix.Add(ParseFunction());
-            //     else if(inFix.Count != 0 && (string)inFix[inFix.Count - 1] != "+" && (string)inFix[inFix.Count - 1] != "-" && (string)inFix[inFix.Count - 1] != "*" && (string)inFix[inFix.Count - 1] != "/" && (string)inFix[inFix.Count - 1] != "%" && (string)inFix[inFix.Count - 1] != "**")
-            //     {
-            //         Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
-            //         inFix.Add(ParseFunction());
-            //     }
-            //     else inFix.Add(ParseFunction()); //si se tiene operador antes se agrega y listo
-            //     //no se incrementa currentIndex aquí porque ParseFunction ya lo hace
-            // }
-            //si se trata de una variable    
+        {  
              if(tokens[currentIndex].Type == TokenType.Identifier) //manejar erroresssssssssssssssssssssssssssssss
             {
                 if(Context.variableNodes.Count == 0) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
@@ -176,7 +168,6 @@ public class Parser
             {
                 var a = inFix[i];
                 outPut.Add(a); //mientras que no sea un operador aritmetico significa que puede ser una variable o una llamada a un metodo 
-                // else if()
             }
             else if(aux is not null && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.LogicOperator && aux.Type != TokenType.ComparisonOperator)
             {
@@ -214,7 +205,6 @@ public class Parser
             if(aux is not null && aux.Type == TokenType.Number) nodes.Add(new NumberLiteralNode(int.Parse(aux.Value)));//si el tipo de token actual es un numero agregar a la lista de nodos un nodo literal numerico 
             else if(aux is not null && aux.Type == TokenType.String) nodes.Add(new StringLiteralNode(aux.Value));//si el tipo de token actual es un string agregar a la lista de nodos un nodo literal de string  
             else if(aux is not null && aux.Type == TokenType.Bool) nodes.Add(new BooleanLiteralNode(bool.Parse(aux.Value)));//si el tipo de token actual es un booleano agregar a la lista de nodos un nodo literal booleano
-            // else if(aux is not null && aux.Type == TokenType.Identifier) nodes.Add(new VariableNode(aux.Value, (ASTNode)Context.variablesValues[aux.Value])); //manejar nodos de variablessssssssssssssssssssssssssssssssssssss
             else if(aux is null) //si es una variable o un metodoooooo
             {
                 nodes.Add((ASTNode)postFix[i]);

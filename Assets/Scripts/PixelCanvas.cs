@@ -31,12 +31,9 @@ public class PixelCanvasController : MonoBehaviour
         else Destroy(gameObject); //eliminar duplicados 
     }
 
-    public static bool gotoBoolean; // bandera para control de flujo (goto)
-
     void Start()
     {
         if (isInitialized) return;
-        gotoBoolean = false;
         grid = Cover.canvasSize; // obtiene el tamaño del grid a partir del dato entrado en escena 
         InitializeCanvas();
 
