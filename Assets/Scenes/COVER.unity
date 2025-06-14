@@ -3277,7 +3277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b331deace6eee3742856b879cd1a5501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textFileContent: {fileID: 0}
+  textFileContent: {fileID: 447132798}
 --- !u!114 &739272381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4580,7 +4580,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 739272380}
         m_TargetAssemblyTypeName: WindowsFileExplorer, Assembly-CSharp
-        m_MethodName: OpenFileDialog
+        m_MethodName: SaveTextToFileExplorer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

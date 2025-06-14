@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using UnityEngine.UI;
 using Unity.VisualScripting;
 using TMPro;
+using UnityEditor;
 
 public class WindowsFileExplorer : MonoBehaviour
 {
@@ -27,6 +28,29 @@ public class WindowsFileExplorer : MonoBehaviour
 
             textFileContent.text = loadedFileContent;//imprimir el contenido en el inputField de la UI
             Cover.input += textFileContent.text; //concatenar el contenido al input global
+        }
+    }
+    public void SaveTextToFileExplorer()
+    {
+        if (textFileContent == null || string.IsNullOrEmpty(textFileContent.text))
+        {
+            Debug.LogError("¡No hay texto para guardar!");
+            return;
+        }
+
+        // Abre el explorador de archivos para guardar
+        string defaultFileName = "archivo.txt";
+        string filePath = EditorUtility.SaveFilePanel(
+            "Guardar como .txt",
+            "", // Directorio inicial (vacío = predeterminado)
+            defaultFileName,
+            "txt");
+
+        if (!string.IsNullOrEmpty(filePath))
+        {
+            // Guarda el texto en el archivo
+            File.WriteAllText(filePath, textFileContent.text);
+            Debug.Log("Archivo guardado en: " + filePath);
         }
     }
 }
