@@ -78,7 +78,7 @@ public class Parser
             {
                 // UnityEngine.Debug.Log("Esta aquii");
                 System.Console.WriteLine("Esta aqui");
-                Error.errors.Add((ErrorType.Syntax_Error,$"Unexpected token {tokens[currentIndex + 1].Value}, token have been expected is a Delimiter or an Assignment_Operator"));
+                Error.errors.Add((ErrorType.Syntax_Error,$"Unexpected token '{tokens[currentIndex + 1].Value}' , Token have been expected is a Delimiter or an Assignment_Operator"));
                 while (tokens[currentIndex].Type != TokenType.LineJump)
                 {
                     currentIndex += 1; //avanzar hasta el final de la linea
@@ -144,7 +144,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0)
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                     error = true;
                     currentIndex += 1;
                 }
@@ -167,7 +167,7 @@ public class Parser
                         }
                         else auxCounter += 1;
                     }
-                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                 }
             }
             else
@@ -288,7 +288,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0)
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                     error = true;
                 
                     currentIndex += 1;
@@ -314,7 +314,7 @@ public class Parser
                     }
                     if(auxCounter == Context.variableNodes.Count)
                     {
-                        Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                        Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                         currentIndex += 1;
                     }
                 } 
@@ -324,7 +324,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0)
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                     error = true;
                     currentIndex += 1;
                 }
@@ -349,7 +349,7 @@ public class Parser
                     }
                     if(auxCounter == Context.variableNodes.Count)
                     {
-                        Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                        Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                         currentIndex += 1;
                     }
                 }
@@ -390,7 +390,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0)
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                     error = true;
                     currentIndex += 1;
                 }
@@ -413,15 +413,15 @@ public class Parser
                         }
                         else auxCounter += 1;
                     }
-                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                 } 
             }
             //variables
-            else if(tokens[currentIndex].Type == TokenType.Identifier && currentIndex - 1 >= 0 && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex - 1].Type == TokenType.LogicOperator || tokens[currentIndex - 1].Type == TokenType.ComparisonOperator || tokens[currentIndex - 1].Type == TokenType.AssignmentOperator)
+            else if(tokens[currentIndex].Type == TokenType.Identifier && (currentIndex - 1 >= 0 && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator|| tokens[currentIndex - 1].Type == TokenType.LogicOperator || tokens[currentIndex - 1].Type == TokenType.ComparisonOperator || tokens[currentIndex - 1].Type == TokenType.AssignmentOperator))
             {
                 if(Context.variableNodes.Count == 0) 
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                     error = true;
                     currentIndex += 1;
                 }
@@ -444,7 +444,7 @@ public class Parser
                         }
                         else auxCounter += 1;
                     }
-                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name {tokens[currentIndex].Value} does not exist in the current context"));
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
                 } 
             }
             else //en cualquier otro caso agregar a la lista en notacion infija 

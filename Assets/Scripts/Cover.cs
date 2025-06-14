@@ -97,24 +97,24 @@ class Cover : MonoBehaviour
 
         // Dividir el texto por saltos de línea
         string[] lines = input.Split(new[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
-        List<Token> tokens = new List<Token>();
-        for (var i = 0; i < lines.Length ; i++)
+        List<Token> tokens = new List<Token>();//lista de tokens final para parsear posteriormente
+        for (var i = 0; i < lines.Length ; i++)//iterar por la lista de lineas
         { 
-            Lexer aux = new Lexer(lines[i]);
-            aux.Tokenize();
-            tokens.AddRange(aux.tokens);
+            Lexer aux = new Lexer(lines[i]);//crear una instancia auxiliar de Token para tokenizar cada linea
+            aux.Tokenize();//tokenizar la linea
+            tokens.AddRange(aux.tokens);//agregar la lista de tokens de la linea a la lista de tokens final
         } 
 
-        //imprimir los tokenssss
+        //imprimir los tokenssss<<<<<<<<<<<<<<<<<<<<<<<<<<<<AUXILIARRR>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         for (var i = 0; i < tokens.Count; i++)
         {
             Debug.Log(tokens[i].Type + " : " + tokens[i].Value);
         }
 
-        Parser parser = new Parser(tokens);//crear una nueva instancia de la clase Parser 
+        Parser parser = new Parser(tokens);//crear una nueva instancia de la clase Parser CON LA LISTA DE tokens q ya se tiene
         parser.Parse(); //parsear a traves de la instancia de la clase parser
         
-        //si el primer nodo no es un nodo funcion y es la funcion Spawn, se tiene un error de sintaxis
+        //si el primer nodo no es un nodo funcion o no es la funcion Spawn, se tiene un error de sintaxis
         if(parser.aSTNodes[0] is not FunctionNode) Error.errors.Add((ErrorType.Syntax_Error,"Any valid expression must begin with the Spawn(x,y) command"));
         else if(parser.aSTNodes[0] is FunctionNode) //si es funcion 
         {
@@ -136,8 +136,13 @@ class Cover : MonoBehaviour
                 aux += Error.errors[i].Item1.ToString();
                 aux += " : ";
                 aux += Error.errors[i].Item2;
+                aux += "\n";
             }
             errors = aux;
+            for (var i = 0; i < parser.aSTNodes.Count ; i++)
+            {
+                parser.aSTNodes[i].Print();
+            }
         }
     }
     
@@ -197,7 +202,7 @@ class Cover : MonoBehaviour
 // DrawLine(1,n,10)
 
 // Spawn(0, 0)
-// n <- 6
+// n  6
 // Color("Blue")
 // Leo
 // DrawLine(1,0,n)

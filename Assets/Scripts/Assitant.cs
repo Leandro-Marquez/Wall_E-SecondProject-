@@ -13,7 +13,7 @@ class Assistant
         //si no se tienen 2 paramentros hay un error en tiempo de ejecucion 
         if(Params.Count != 2)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Spawn()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Spawn()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;
         }
         else //en caso contrario 
@@ -31,14 +31,14 @@ class Assistant
                     Context.wallEPositionChanged = true;
                 }
                 //en caso contrario se lanza un error en tiempo de ejecucion
-                else Error.errors.Add((ErrorType.Run_Time_Error, "Spawn() parameters must be positive and less than Canvas'Size"));
+                else Error.errors.Add((ErrorType.Run_Time_Error, "Spawn() parameters must be positive and less than Canvas'Size" + $" Error_Line : {Context.indexOfEvaluation}"));
             }
             else //si al menos uno no es entero
             {
                 // Mensaje de error detallado
                 string errorMsg = "Invalid types in 'Spawn': ";
-                if (x is not int) errorMsg += $"X must be int, but got '{x?.GetType().Name}'. ";
-                if (y is not int) errorMsg += $"Y must be int, but got '{y?.GetType().Name}'.";
+                if (x is not int) errorMsg += $"X must be int, but got '{x?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
+                if (y is not int) errorMsg += $"Y must be int, but got '{y?.GetType().Name}'." + $" Error_Line : {Context.indexOfEvaluation}";
                 Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
             }
         }
@@ -51,7 +51,7 @@ class Assistant
         //si tiene mas o menos de un parametro se tiene un error en tiempo de ejecucion
         if(Params.Count != 1)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Color()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Color()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;
         }
         else //en caso contrario
@@ -61,7 +61,7 @@ class Assistant
             //si no es una cadena de texto hay un error en tiempo de ejecucion 
             if(a is not string aValue)
             {
-                Error.errors.Add((ErrorType.Run_Time_Error, $"Color's Method must receive Int's Type and recibe {a.GetType()}"));
+                Error.errors.Add((ErrorType.Run_Time_Error, $"Color's Method must receive Int's Type and recibe {a.GetType()}" + $" Error_Line : {Context.indexOfEvaluation}"));
                 return null;
             }
             else //en caso contrario verificar q color es el q se pide para cambiar el color 
@@ -114,7 +114,7 @@ class Assistant
                         Context.brushColorColor = color;   //y finalmente cambiarlo en el contexto
                         break;
                     default: //en otro caso se tiene un error en tiempo de ejecucion, color invalido
-                        Error.errors.Add((ErrorType.Run_Time_Error, $"{a} is not a valid Color Type"));
+                        Error.errors.Add((ErrorType.Run_Time_Error, $"{a} is not a valid Color Type" + $" Error_Line : {Context.indexOfEvaluation}"));
                         break;
                 }
             }
@@ -129,7 +129,7 @@ class Assistant
         //si se tienen parametros se tiene un error en tiempo de ejecucion
         if(Params.Count > 0)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error , "GetCanvasZize() does not contains parameters"));
+            Error.errors.Add((ErrorType.Run_Time_Error , "GetCanvasZize() does not contains parameters" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null; //retornar null ya q hubo error
         }
         else return Context.canvasSize; //en cualquier otro caso retornar las dimensiones originales del canvas 
@@ -141,7 +141,7 @@ class Assistant
         //si se tienen parametros se tiene un error en tiempo de ejecucion
         if(Params.Count > 0)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error, "GetActualX() does not contains parameters"));
+            Error.errors.Add((ErrorType.Run_Time_Error, "GetActualX() does not contains parameters" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else return Context.wallEPosition.x;//en cualquier otro caso retornar la posicion X de Wall_E
@@ -153,7 +153,7 @@ class Assistant
         //si se tienen parametros se tiene un error en tiempo de ejecucion
         if(Params.Count > 0)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error, "GetActualY() does not contains parameters"));
+            Error.errors.Add((ErrorType.Run_Time_Error, "GetActualY() does not contains parameters" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else return Context.wallEPosition.y;//en cualquier otro caso retornar la posicion Y de Wall_E
@@ -165,7 +165,7 @@ class Assistant
         //si se tienen menos o mas de 3 paraemetros se tiene un error en tiempo de ejecucion
         if (Params.Count != 3)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error, "There is no argument given that corresponds to the required parameter of DrawLine()"));
+            Error.errors.Add((ErrorType.Run_Time_Error, "There is no argument given that corresponds to the required parameter of DrawLine()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         //lista de enteros donde se tendran los parametros
@@ -178,7 +178,7 @@ class Assistant
             //chequear si es entero sino se tiene un error en tiempo de ejecucion
             if (a is not int && a is not null)
             {
-                Error.errors.Add((ErrorType.Run_Time_Error, $"DrawLine's Method must receive Int's Type and recibe {a.GetType()}"));
+                Error.errors.Add((ErrorType.Run_Time_Error, $"DrawLine's Method must receive Int's Type and recibe {a.GetType()}" + $" Error_Line : {Context.indexOfEvaluation}"));
                 check += 1;//aumentar cantidad de errores para posterior uso 
                 continue;//continuar la revision de los parametros aunque este no sea valido
             }
@@ -191,7 +191,7 @@ class Assistant
         // Validar que el grosor y la distancia sean positivos si se tiene grosor o distancia invalidos se tiene un error en tiempo de ejecucion
         if (distances <= 0 || brushSizes <= 0)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error, "Distance and brush size must be positive integers"));
+            Error.errors.Add((ErrorType.Run_Time_Error, "Distance and brush size must be positive integers" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         int halfBrushs = brushSizes / 2;
@@ -227,7 +227,7 @@ class Assistant
         //si se tiene mas o menos de unn paraemtro se tiene un error en tiempo de ejecucion
         if(Params.Count != 1)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Size()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of Size()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else //en caso contrario
@@ -237,7 +237,7 @@ class Assistant
             {
                 if((int)a == 0)
                 {
-                    Error.errors.Add((ErrorType.Run_Time_Error, "BrushSize's must be a positive integer"));
+                    Error.errors.Add((ErrorType.Run_Time_Error, "BrushSize's must be a positive integer" + $" Error_Line : {Context.indexOfEvaluation}"));
                     return null;//retornar null ya q hubo error
                 }
                 int auxiliar = 0;
@@ -246,7 +246,7 @@ class Assistant
                 Context.pincelZize = auxiliar;  //cambiar el ancho del pincel en el contexto
             }  
             //en caso contrario se tiene un error en tiempo de ejecucion
-            else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe Int's Type"));
+            else Error.errors.Add((ErrorType.Run_Time_Error,"Size's Method must recibe Int's Type" + $" Error_Line : {Context.indexOfEvaluation}"));
         }
         return null; //retornar null ya q es un metodo void
 
@@ -258,7 +258,7 @@ class Assistant
         //si se tiene mas o menos de un parametro se tiene un error
         if(Params.Count != 1)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsBrushSize()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsBrushSize()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else //en caso contrario
@@ -270,7 +270,7 @@ class Assistant
                 else return 0; //en caso contrario retornar 0
             }  
             //si no es entero se tiene un error en tiempo de ejecucion
-            else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe Int's Type"));
+            else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe Int's Type" + $" Error_Line : {Context.indexOfEvaluation}"));
         }
         return null;//si no retorno nada hasta aqui es porque hubo error, retornar null
     }
@@ -282,7 +282,7 @@ class Assistant
         //si se tiene mas o menos de un parametro se tiene un error en tiempo de ejecucion
         if(Params.Count != 1)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsBrushColor()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsBrushColor()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else //en caso contrario
@@ -320,12 +320,12 @@ class Assistant
                         ret = Context.brushColor == (string)a;///.
                         break;
                     default: //en cualquier otro caso es q se tuvo un color invalido
-                        Error.errors.Add((ErrorType.Run_Time_Error, $"{a} is not a valid Color Type"));
+                        Error.errors.Add((ErrorType.Run_Time_Error, $"{a} is not a valid Color Type" + $" Error_Line : {Context.indexOfEvaluation}"));
                         return null;//retornar null ya q hubo error
                 }
             }
             //si no es una cadena de texto se tiene un error en tiempo de ejecucion 
-            else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe String's Type"));
+            else Error.errors.Add((ErrorType.Run_Time_Error,"IsBrushSize's Method must recibe String's Type" + $" Error_Line : {Context.indexOfEvaluation}"));
         }
         if(ret) return 1; //si se tuvo coincidencia retornar 1
         else return 0; //en caso contrario retornar 0
@@ -337,7 +337,7 @@ class Assistant
         //si se tiene algun paramtro se tiene un error en tiempo de ejecucion
         if(Params.Count != 0)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"Fill's Method does not contains params"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"Fill's Method does not contains params" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else //en caso contrario
@@ -376,7 +376,7 @@ class Assistant
         //si se tienen menos o mas de 6 parametros se tiene un error en tiempo de ejecucion
         if(Params.Count != 5)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of GetColorCount()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of GetColorCount()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else //en caso contrario
@@ -424,7 +424,7 @@ class Assistant
                             validColor = true;
                             break;
                         default: //si se llega aqui es q no se tiene un color valido
-                            Error.errors.Add((ErrorType.Run_Time_Error,$"{color} is not a valid Color Type"));
+                            Error.errors.Add((ErrorType.Run_Time_Error,$"{color} is not a valid Color Type" + $" Error_Line : {Context.indexOfEvaluation}"));
                             return null;//retornar null ya q hubo error
                     }
                     if(validColor) //si se tiene un color valido
@@ -442,21 +442,21 @@ class Assistant
                     }
                 }
                 //en caso de q no esten en rango se tiene un error en tiempo de ejecucion
-                else Error.errors.Add((ErrorType.Run_Time_Error, "GetColorCount() parameters must be positive and less than Canvas'Size"));
+                else Error.errors.Add((ErrorType.Run_Time_Error, "GetColorCount() parameters must be positive and less than Canvas'Size" + $" Error_Line : {Context.indexOfEvaluation}"));
             }
             else //en cualquier otro caso, se tiene un error de tipos
             {
                 string errorMsg = "Invalid types in GetColorCount: ";
                 if (x1 is not int) 
-                    errorMsg += $"X1 must be int, but got '{x1?.GetType().Name}'. ";
+                    errorMsg += $"X1 must be int, but got '{x1?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if (y1 is not int) 
-                    errorMsg += $"Y1 must be int, but got '{y1?.GetType().Name}'. ";
+                    errorMsg += $"Y1 must be int, but got '{y1?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if (x2 is not int) 
-                    errorMsg += $"X2 must be int, but got '{x2?.GetType().Name}'. ";
+                    errorMsg += $"X2 must be int, but got '{x2?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if (y2 is not int) 
-                    errorMsg += $"Y2 must be int, but got '{y2?.GetType().Name}'. ";
+                    errorMsg += $"Y2 must be int, but got '{y2?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if (color is not string) 
-                    errorMsg += $"Color must be String, but got '{color?.GetType().Name}'.";
+                    errorMsg += $"Color must be String, but got '{color?.GetType().Name}'." + $" Error_Line : {Context.indexOfEvaluation}";
                 Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
             } 
         }
@@ -469,7 +469,7 @@ class Assistant
         //si se tienen mas o menos de 3 parametros se tiene un error en tiempo de ejecucion
         if(Params.Count != 3)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsCanvasColor()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of IsCanvasColor()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else //en caso contrario
@@ -490,17 +490,17 @@ class Assistant
                     else return 0; //en caso de q no coincida retornar 0
                 }
                 //en caso contrario se tiene un error en tiempo de ejecucion
-                else Error.errors.Add((ErrorType.Run_Time_Error,"IsCanvasColor() parameters [x,y] must be positive and less than Canvas'Size "));
+                else Error.errors.Add((ErrorType.Run_Time_Error,"IsCanvasColor() parameters [x,y] must be positive and less than Canvas'Size" + $" Error_Line : {Context.indexOfEvaluation}"));
             }
             else //en cualquier otro caso, se tiene un error de tipos
             {
                 string errorMsg = "Invalid types in IsCanvasColor: ";
                 if (x is not int) 
-                    errorMsg += $"X must be int, but got '{x?.GetType().Name}'. ";
+                    errorMsg += $"X must be int, but got '{x?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if (y is not int) 
-                    errorMsg += $"Y must be int, but got '{y?.GetType().Name}'.";
+                    errorMsg += $"Y must be int, but got '{y?.GetType().Name}'." + $" Error_Line : {Context.indexOfEvaluation}";
                 if (color is not string) 
-                    errorMsg += $"Color must be string, but got '{color?.GetType().Name}'. ";
+                    errorMsg += $"Color must be string, but got '{color?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
             }
         }
@@ -513,7 +513,7 @@ class Assistant
         //si se tienen mas o menos de 3 parametros se tiene un error en tiempo de ejecucion
         if(Params.Count != 3)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawCircle()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawCircle()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else //en caso contrario
@@ -541,7 +541,7 @@ class Assistant
                     }
                     else //en caso contrario se tiene un error en tiempo de ejecucion
                     {
-                        Error.errors.Add((ErrorType.Run_Time_Error , $"Wall_E position would be out of range"));
+                        Error.errors.Add((ErrorType.Run_Time_Error , $"Wall_E position would be out of range" + $" Error_Line : {Context.indexOfEvaluation}"));
                         return null;//se tuvo un error retornar desde aqui
                     }
                 }
@@ -577,13 +577,13 @@ class Assistant
             {
                 string errorMsg = "Invalid types in DrawCircle: ";
                 if (x is not int) 
-                    errorMsg += $"dirX must be int, but got '{x?.GetType().Name}'. ";
+                    errorMsg += $"dirX must be int, but got '{x?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if (y is not int) 
-                    errorMsg += $"dirY must be int, but got '{y?.GetType().Name}'.";
+                    errorMsg += $"dirY must be int, but got '{y?.GetType().Name}'." + $" Error_Line : {Context.indexOfEvaluation}";
                 if (radius is not int) 
-                    errorMsg += $"radius must be int, but got '{radius?.GetType().Name}'. ";
+                    errorMsg += $"radius must be int, but got '{radius?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if (radius is int && (int)radius < 0)
-                    errorMsg += "radius must be positive and less than Canvas's Size";
+                    errorMsg += "radius must be positive and less than Canvas's Size" + $" Error_Line : {Context.indexOfEvaluation}";
                 Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
             }
             
@@ -610,7 +610,7 @@ class Assistant
         //si se tienen mas o menos de 5 parametros se tiene un error en tiempo de ejecucion
         if(Params.Count != 5)
         {
-            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawRectangule()"));
+            Error.errors.Add((ErrorType.Run_Time_Error,"There is no argument given that corresponds to the required parameter of DrawRectangule()" + $" Error_Line : {Context.indexOfEvaluation}"));
             return null;//retornar null ya q hubo error
         }
         else //en caso contrario
@@ -686,25 +686,25 @@ class Assistant
             {
                 string errorMsg = "Invalid types in DrawCircle: ";
                 if (dirX is not int) 
-                    errorMsg += $"dirX must be int, but got '{dirX?.GetType().Name}'. ";
+                    errorMsg += $"dirX must be int, but got '{dirX?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if (dirX is int && (int)dirX != 1  && (int)dirX != -1  && (int)dirX != 0 ) 
-                    errorMsg += $"any valid direction value must be 1,-1,0";
+                    errorMsg += $"any valid direction value must be 1,-1,0" + $" Error_Line : {Context.indexOfEvaluation}";
                 if (dirY is not int) 
-                    errorMsg += $"dirY must be int, but got '{dirY?.GetType().Name}'.";
+                    errorMsg += $"dirY must be int, but got '{dirY?.GetType().Name}'." + $" Error_Line : {Context.indexOfEvaluation}";
                 if (dirY is int && (int)dirY != 1  && (int)dirY != -1  && (int)dirY != 0 ) 
-                    errorMsg += $"any valid direction value must be 1,-1,0";
+                    errorMsg += $"any valid direction value must be 1,-1,0" + $" Error_Line : {Context.indexOfEvaluation}";
                 if (distance is not int) 
-                    errorMsg += $"Distance must be int, but got '{distance?.GetType().Name}'. ";
+                    errorMsg += $"Distance must be int, but got '{distance?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if(distance is int && (int)distance < 0)
-                    errorMsg += "Distance must be positive and less than Canvas's Size";
+                    errorMsg += "Distance must be positive and less than Canvas's Size" + $" Error_Line : {Context.indexOfEvaluation}";
                 if (width is not int) 
-                    errorMsg += $"Width must be int, but got '{width?.GetType().Name}'. ";
+                    errorMsg += $"Width must be int, but got '{width?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if(width is int && (int)width < 0)
-                    errorMsg += "Widht must be positive and less than Canvas's Size";
+                    errorMsg += "Widht must be positive and less than Canvas's Size" + $" Error_Line : {Context.indexOfEvaluation}";
                 if (heigth is not int) 
-                    errorMsg += $"Height must be int, but got '{heigth?.GetType().Name}'. ";
+                    errorMsg += $"Height must be int, but got '{heigth?.GetType().Name}'. " + $" Error_Line : {Context.indexOfEvaluation}";
                 if(heigth is int && (int)heigth < 0)
-                    errorMsg += "Heigth must be positive and less than Canvas's Size";
+                    errorMsg += "Heigth must be positive and less than Canvas's Size" + $" Error_Line : {Context.indexOfEvaluation}";
                 Error.errors.Add((ErrorType.Run_Time_Error, errorMsg));
             }
         }
@@ -741,7 +741,7 @@ class Assistant
         
         Debug.Log(a.GetType() +  " yyyyyyyyyyyyyy " + b.GetType());
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '+' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '+' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         Debug.Log("Se retornooo null");
         return null;//si se llega aqui es por error retornar null
     }
@@ -751,7 +751,7 @@ class Assistant
         if (a is int aInt && b is int bInt) return aInt - bInt;//si ambos son enteros retornar la resta 
         
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '-' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '-' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -760,7 +760,7 @@ class Assistant
         if (a is int aInt && b is int bInt) return aInt * bInt;//si ambos son enteros retornar el producto
         
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '*' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '*' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -770,14 +770,14 @@ class Assistant
         {
             if (bInt == 0) //verificar si por quien se quiere dividir es por cero
             {
-                Error.errors.Add((ErrorType.Run_Time_Error, "Division by zero"));
+                Error.errors.Add((ErrorType.Run_Time_Error, "Division by zero" + $" Error_Line : {Context.indexOfEvaluation}"));
                 return null;
             }
             return aInt / bInt;//en el otro caso retornar el cociente
         }
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '/' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '/' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -786,7 +786,7 @@ class Assistant
         if (a is int aInt && b is int bInt) return aInt % bInt;//si ambos son enteros retornar el modulo
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '%' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '%' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -796,7 +796,7 @@ class Assistant
         if (a is int aI && b is double bD) return Math.Pow(aI, bD);//si ambos son enteros retornar la potencia
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '**' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '**' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -805,7 +805,7 @@ class Assistant
         if (a is int aInt && b is int bInt) return aInt > bInt;//si ambos son enteros retornar a > b
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '>' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '>' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -814,7 +814,7 @@ class Assistant
         if (a is int aInt && b is int bInt) return aInt >= bInt;//si ambos son enteros retornar a >= b
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '>=' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '>=' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -823,7 +823,7 @@ class Assistant
         if (a is int aInt && b is int bInt) return aInt < bInt;//si ambos son enteros retornar a < b
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '<' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '<' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -832,7 +832,7 @@ class Assistant
         if (a is int aInt && b is int bInt) return aInt <= bInt;//si ambos son enteros retornar a <= b
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '<=' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '<=' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -842,7 +842,7 @@ class Assistant
         if (a is bool aBool && b is bool bBool) return aBool && bBool;//si ambos son bool retornar a && b
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error,  $"Operator '&&' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error,  $"Operator '&&' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -851,7 +851,7 @@ class Assistant
         if (a is bool aBool && b is bool bBool) return aBool || bBool;//si ambos son bool retornar a || b
 
         //cualquier otro caso se tiene un error en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '||' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}"));
+        Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '||' cannot be applied to operands of type {GetTypeName(a)} and {GetTypeName(b)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return null;//si se llega aqui es por error retornar null
     }
 
@@ -864,7 +864,7 @@ class Assistant
     private static bool AreEqual(object left, object right , Token Operator) //metodo auxiliar para verificar si se tiene los mismos tipos en los operandos
     {
         //si son tipos diferentes se tiene un error en tiempo de ejecucion 
-        if (left.GetType() != right.GetType()) Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '{Operator.Value}' cannot be applied to operands of type {GetTypeName(left)} and {GetTypeName(right)}"));
+        if (left.GetType() != right.GetType()) Error.errors.Add((ErrorType.Run_Time_Error, $"Operator '{Operator.Value}' cannot be applied to operands of type {GetTypeName(left)} and {GetTypeName(right)}" + $" Error_Line : {Context.indexOfEvaluation}"));
         return object.Equals(left, right); //en cualquier caso retornar si son o no sonn iguales
     }
 }
