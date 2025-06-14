@@ -72,6 +72,7 @@ class Cover : MonoBehaviour
         editor.SetActive(false);//ocultar editor
         errorsPanel.SetActive(false);//ocultar panel de errores
         runAndImportButtons.SetActive(false);//ocultar botones
+        backButton.SetActive(false);//ocultar el propio boton de dar atras 
     }
     public void OnBackButtonToSceneIsPressed()
     {
@@ -212,13 +213,13 @@ class Cover : MonoBehaviour
 // Color("Green")
 // DrawLine(1,n,10 + true)
 
-//  Spawn(0, 0)
+// Spawn(50, 50)
 // n <- 6 
 // Color("Blue")
 // Leo
-// DrawLine(1,0,n)
-// DrawLine(0,1,n)
+// DrawLine(0,-1,n)
+// DrawLine(-1,0,n)
 // n <- n - 1
 // GoTo[Leo](n > 1)
 // Color("Green")
-// DrawLine(1,n,10)
+// DrawLine(-1,n,10)

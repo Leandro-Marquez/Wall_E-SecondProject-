@@ -48,6 +48,21 @@ public class Lexer
 
         while (!string.IsNullOrEmpty(input))//procesar mientras la entrada no sea nula ni vacia
         {
+            // --- LÓGICA PARA  MANEJAR LOS NÚMEROS NEGATIVOS
+            bool isNegativeNumber = input.StartsWith("-") && (tokens.Count == 0 || tokens.Last().Type == TokenType.Delimiter || tokens.Last().Type == TokenType.Comma || tokens.Last().Type == TokenType.ArithmeticOperator);
+
+            if (isNegativeNumber) //si se trata de una posibilidad de un numero negativo
+            {
+                var numberMatch = Regex.Match(input, @"^-(\d+)"); //modificar la expresion regex para numeros negaticos
+                if (numberMatch.Success)//si se hace succes es q es un patron de numero negativo
+                {
+                    tokens.Add(new Token(TokenType.Number, "-" + numberMatch.Groups[1].Value));//crear el token 
+                    input = input.Substring(numberMatch.Length).Trim();//saltar lo q consumimos y limpiar valores vacios al inicio
+                    continue; // Saltamos a la siguiente iteracion para evitar duplicados
+                }
+            }
+            // ---
+
             string bestToken = null;//mejor token encontrado
             TokenType bestTokenType = TokenType.ReservedKeyword;//tipo del mejor token encontrado 
             int bestLength = 0;//longitud del mejor match
