@@ -41,13 +41,14 @@ public class Parser
         }
         else
         {
-            Error.errors.Add((ErrorType.Syntax_Error,$"Invalid token {tokens[currentIndex].Value}, token have been expected is {expected}"));
+            Error.errors.Add((ErrorType.Syntax_Error,$"Invalid token {tokens[currentIndex].Value}, token have been expected is {expected}" + $" ErrorLine : {Context.errorLine}"));
             currentIndex += 1;
             return;
         }
     }
     public void Parse() //metodo principal que lo parsea todo 
     {
+        Context.errorLine = 1;
         while(currentIndex < tokens.Count) //mientras haya tokens por analizar se continua parseando
         {
             if(tokens[currentIndex].Type == TokenType.LineJump) //si se tiene un salto de linea continuar parseando lo proximo 
@@ -61,6 +62,7 @@ public class Parser
                 System.Console.WriteLine("Se parseo funcion ");
                 FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardar el nodo funcion 
                 if(functionNode is not null) aSTNodes.Add(functionNode); //agregar a la lista de ASTNodes finales                              
+                Context.errorLine += 1;
             } 
             //si se trataa de una asignacion a Variable, se manejan los operadores de asignacion de cualquier tipo para hacerlo mas extensible
             else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Type == TokenType.AssignmentOperator)
@@ -72,18 +74,20 @@ public class Parser
                     aSTNodes.Add(variableNode);
                     Context.variableNodes.Add(variableNode);
                 }
+                Context.errorLine += 1;
             }
             //si se tiene un error en una linea, error a la hora de asignar a una variable o llamar a una funcion
             else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Type != TokenType.Delimiter && tokens[currentIndex + 1].Type != TokenType.AssignmentOperator && tokens[currentIndex + 1].Type != TokenType.LineJump)
             {
                 // UnityEngine.Debug.Log("Esta aquii");
                 System.Console.WriteLine("Esta aqui");
-                Error.errors.Add((ErrorType.Syntax_Error,$"Unexpected token '{tokens[currentIndex + 1].Value}' , Token have been expected is a Delimiter or an Assignment_Operator"));
+                Error.errors.Add((ErrorType.Syntax_Error,$"Unexpected token '{tokens[currentIndex + 1].Value}' , Token have been expected is a Delimiter or an Assignment_Operator" + $" ErrorLine : {Context.errorLine}"));
                 while (tokens[currentIndex].Type != TokenType.LineJump)
                 {
                     currentIndex += 1; //avanzar hasta el final de la linea
                     System.Console.WriteLine("siiii");
                 }
+                Context.errorLine += 1;
             }
 
             //si se trata de una etiqueta 
@@ -93,6 +97,7 @@ public class Parser
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
                 Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count-1);
                 currentIndex += 1;
+                Context.errorLine += 1;
             }
             //si se trata de un GoTo
             else if(tokens[currentIndex].Type == TokenType.ReservedKeyword && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter)
@@ -100,6 +105,7 @@ public class Parser
                 System.Console.WriteLine("Se parseo goto");
                 GoToNode goToNode = ParseGoTo();
                 if(goToNode is not null) aSTNodes.Add(goToNode);
+                Context.errorLine += 1;
                 // aSTNodes.Add(ParseGoTo());
             }
             else currentIndex += 1; //si no es una funcion ni salto de linea, se avanza
@@ -144,7 +150,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0)
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                     error = true;
                     currentIndex += 1;
                 }
@@ -158,7 +164,7 @@ public class Parser
                             if(inFix.Count == 0) inFix.Add(Context.variableNodes[i]);
                             else if(inFix.Count != 0 && (string)inFix[inFix.Count - 1] != "+" && (string)inFix[inFix.Count - 1] != "-" && (string)inFix[inFix.Count - 1] != "*" && (string)inFix[inFix.Count - 1] != "/" && (string)inFix[inFix.Count - 1] != "%" && (string)inFix[inFix.Count - 1] != "**")
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 inFix.Add(Context.variableNodes[i]);
                             }
                             else inFix.Add(Context.variableNodes[i]);
@@ -167,7 +173,7 @@ public class Parser
                         }
                         else auxCounter += 1;
                     }
-                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                 }
             }
             else
@@ -272,7 +278,7 @@ public class Parser
                 if(infix.Count == 0) infix.Add(ParseFunction());
                 else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
                 {
-                    Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                    Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                     infix.Add(ParseFunction());//agregar el nodo funcion paraseado correctamente 
                 }
                 else infix.Add(ParseFunction());
@@ -288,7 +294,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0)
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                     error = true;
                 
                     currentIndex += 1;
@@ -303,7 +309,7 @@ public class Parser
                             if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
                             else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 infix.Add(Context.variableNodes[i]);
                             }
                             else infix.Add(Context.variableNodes[i]);
@@ -314,7 +320,7 @@ public class Parser
                     }
                     if(auxCounter == Context.variableNodes.Count)
                     {
-                        Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                        Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                         currentIndex += 1;
                     }
                 } 
@@ -324,7 +330,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0)
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                     error = true;
                     currentIndex += 1;
                 }
@@ -338,7 +344,7 @@ public class Parser
                             if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
                             else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 infix.Add(Context.variableNodes[i]);
                             }
                             else infix.Add(Context.variableNodes[i]);
@@ -349,7 +355,7 @@ public class Parser
                     }
                     if(auxCounter == Context.variableNodes.Count)
                     {
-                        Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                        Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                         currentIndex += 1;
                     }
                 }
@@ -390,7 +396,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0)
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                     error = true;
                     currentIndex += 1;
                 }
@@ -404,7 +410,7 @@ public class Parser
                             if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
                             else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 infix.Add(Context.variableNodes[i]);
                             }
                             else infix.Add(Context.variableNodes[i]);
@@ -413,7 +419,7 @@ public class Parser
                         }
                         else auxCounter += 1;
                     }
-                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                 } 
             }
             //variables
@@ -421,7 +427,7 @@ public class Parser
             {
                 if(Context.variableNodes.Count == 0) 
                 {
-                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                     error = true;
                     currentIndex += 1;
                 }
@@ -435,7 +441,7 @@ public class Parser
                             if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
                             else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator"));
+                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 infix.Add(Context.variableNodes[i]);
                             }
                             else infix.Add(Context.variableNodes[i]);
@@ -444,7 +450,7 @@ public class Parser
                         }
                         else auxCounter += 1;
                     }
-                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context"));
+                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                 } 
             }
             else //en cualquier otro caso agregar a la lista en notacion infija 

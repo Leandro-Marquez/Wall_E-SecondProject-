@@ -69,7 +69,7 @@ public class FunctionNode : ASTNode //nodo de funcion
                 return Assistant.EvaluateDrawRectangle(this.Params);
         }
         //si se sale del switch case es q no se tiene un metodo con el nombre, por lo q se tiene un error semantico en tiempo de ejecucion
-        Error.errors.Add((ErrorType.Semantic_Error,$"There is not a definition for method {aux}" + $" Error_Line : {Context.indexOfEvaluation}"));
+        Error.errors.Add((ErrorType.Semantic_Error,$"There is not a definition for method {aux}" + $" Error_Line : {Context.indexOfEvaluation+ 1}"));
         return null; //si se llega aqui se llega por error, osea q no se tenga una funcion definida con el nombre q se puso retornar null
     }
 }
@@ -229,7 +229,7 @@ public class GoToNode : ASTNode //nodo de GOTO
                 if(!Context.labels.ContainsKey(Label.Label)) //verificar si la etiqueta no existe
                 {
                     //en ese caso se tiene un error semantico ya q no se tiene dicha etiqueta en el codigo
-                    Error.errors.Add((ErrorType.Semantic_Error,$"Current Label '{Label.Label}' is not found" + $" Error_Line : {Context.indexOfEvaluation}"));
+                    Error.errors.Add((ErrorType.Semantic_Error,$"Current Label '{Label.Label}' is not found" + $" Error_Line : {Context.indexOfEvaluation+ 1}"));
                     return null; //detener el flujo de evaluacion 
                 }
                 //en el caso en q si se tenga, actualizar el indice de evaluacion con el indice de dicha etiqueta en el contexto 
@@ -237,7 +237,7 @@ public class GoToNode : ASTNode //nodo de GOTO
             }
         }
         //sino se tiene un error de tipo en tiempo de ejecucion
-        else Error.errors.Add((ErrorType.Run_Time_Error ,"GoTo's Condition must evaluate a Boolean Value" + $" Error_Line : {Context.indexOfEvaluation}"));
+        else Error.errors.Add((ErrorType.Run_Time_Error ,"GoTo's Condition must evaluate a Boolean Value" + $" Error_Line : {Context.indexOfEvaluation+ 1}"));
         return null;//retornar null, ya q la evaluacion del GOTO es void
     } 
 }
