@@ -23,7 +23,7 @@ Pixel Wall-E es una aplicación interactiva desarrollada en **Unity** que permit
 ### **Pasos para Ejecutar**  
 1. **Clona el repositorio**:  
    ```bash
-   git clone https://github.com/tu-usuario/pixel-wall-e-unity.git
+   git clone https://github.com/Leandro-Marquez/Wall_E-SecondProject-.git
    ```
 2. **Abre el proyecto en Unity**:  
    - Ve a `File > Open Project` y selecciona la carpeta del proyecto.  
