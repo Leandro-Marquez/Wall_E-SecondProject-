@@ -1,4 +1,5 @@
 # **Pixel Wall-E - Proyecto de Programación en Unity**  
+![un robot pintando píxeles en una pizarra con un pincel, inspirado en la estética de Wall-E (2)](https://github.com/user-attachments/assets/56efdf72-c9e6-4997-ae18-ad933fa8e8ea)
 
 ## **Descripción del Proyecto**  
 Pixel Wall-E es una aplicación interactiva desarrollada en **Unity** que permite crear **arte pixelado** mediante un lenguaje de programación personalizado. El programa simula un robot (Wall-E) que sigue comandos para dibujar en un **canvas cuadrado**. Los usuarios pueden escribir código en un editor de texto integrado, ejecutarlo y ver los resultados en tiempo real.  
@@ -85,9 +86,8 @@ El programa detecta y muestra errores comunes:
 ---
 
 ## **Créditos y Licencia**  
-- **Desarrollado por**: [Tu Nombre]  
-- **Licencia**: MIT (código abierto).  
-- **Repositorio**: [GitHub Link](https://github.com/tu-usuario/pixel-wall-e-unity)  
+- **Desarrollado por**: [Leandro Marquez Blanco]  
+- **Repositorio**: [GitHub Link]([https://github.com/tu-usuario/pixel-wall-e-unity](https://github.com/Leandro-Marquez/Wall_E-SecondProject-))  
 
 ---
 
