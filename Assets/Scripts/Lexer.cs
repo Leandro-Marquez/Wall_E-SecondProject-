@@ -49,8 +49,7 @@ public class Lexer
         while (!string.IsNullOrEmpty(input))//procesar mientras la entrada no sea nula ni vacia
         {
             // --- LÓGICA PARA  MANEJAR LOS NÚMEROS NEGATIVOS
-            bool isNegativeNumber = input.StartsWith("-") && (tokens.Count == 0 || tokens.Last().Type == TokenType.Delimiter || tokens.Last().Type == TokenType.Comma || tokens.Last().Type == TokenType.ArithmeticOperator);
-
+            bool isNegativeNumber = input.StartsWith("-") && (tokens.Count == 0 || tokens.Last().Type == TokenType.Delimiter || tokens.Last().Type == TokenType.Comma || tokens.Last().Type == TokenType.ArithmeticOperator ||tokens.Last().Type == TokenType.AssignmentOperator); 
             if (isNegativeNumber) //si se trata de una posibilidad de un numero negativo
             {
                 var numberMatch = Regex.Match(input, @"^-(\d+)"); //modificar la expresion regex para numeros negaticos

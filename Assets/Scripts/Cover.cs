@@ -115,20 +115,24 @@ class Cover : MonoBehaviour
         Parser parser = new Parser(tokens);//crear una nueva instancia de la clase Parser CON LA LISTA DE tokens q ya se tiene
         parser.Parse(); //parsear a traves de la instancia de la clase parser
         
+        for (var i = 0; i < parser.aSTNodes.Count; i++)
+        {
+            parser.aSTNodes[i].Print();
+        }
         //si el primer nodo no es un nodo funcion o no es la funcion Spawn, se tiene un error de sintaxis
-        if(parser.aSTNodes[0] is not FunctionNode) Error.errors.Add((ErrorType.Syntax_Error,"Any valid expression must begin with the Spawn(x,y) command"));
-        else if(parser.aSTNodes[0] is FunctionNode) //si es funcion 
+        if (parser.aSTNodes[0] is not FunctionNode) Error.errors.Add((ErrorType.Syntax_Error, "Any valid expression must begin with the Spawn(x,y) command"));
+        else if (parser.aSTNodes[0] is FunctionNode) //si es funcion 
         {
             var aux = parser.aSTNodes[0]; //guardar el nodo
             FunctionNode auxx = (FunctionNode)aux; //tratarlo como funcion
-            if(auxx.Name != "Spawn") Error.errors.Add((ErrorType.Syntax_Error,"Any valid expression must begin with the Spawn(x,y) command")); //si no tiene nombre Spawn se tiene un error de sintaxis
+            if (auxx.Name != "Spawn") Error.errors.Add((ErrorType.Syntax_Error, "Any valid expression must begin with the Spawn(x,y) command")); //si no tiene nombre Spawn se tiene un error de sintaxis
         } 
         if(Error.errors.Count == 0)
         { 
             SceneManager.LoadScene(1);//cargar la escena si no hay errores                               
             PixelCanvasController.parser = parser;//asignar parser para posterior evaluacion de los nodos
         } 
-        else
+        else//imprimir mensaje de error detallado
         {
             string aux = "";
             for (var i = 0; i < Error.errors.Count ; i++)
@@ -153,9 +157,6 @@ class Cover : MonoBehaviour
         {
             backToSceneButton.SetActive(true);
             editor.SetActive(true);//activar editor
-            // usersInput.text = input;
-            // Debug.Log(input);
-            // Debug.Log(usersInput.text);
             errorsPanel.SetActive(true);//activar panel de errores
             canvasSizeInputEntireObject.SetActive(false);//ocultar el input en la escena
             runAndImportButtons.SetActive(true);//activar los botones
@@ -175,7 +176,6 @@ class Cover : MonoBehaviour
         {
             runButton.SetActive(true);//activar boton de correr
             exportButton.SetActive(true);//activar boton de exportar
-            // if(turnBack) usersInput.text = input;
         }
         if(errors != errorsInPanel.text) errorsInPanel.text = errors;
     }
@@ -189,7 +189,6 @@ class Cover : MonoBehaviour
 // DrawCircle(1,1,10)
 // Color("Red")
 // Fill()
-
 
 // Spawn(0, 0)
 // n <- 6

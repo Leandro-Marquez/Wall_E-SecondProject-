@@ -57,11 +57,8 @@ public class PixelCanvasController : MonoBehaviour
             }
             Cover.errors = aux;
             Cover.turnBack = true;
-            // Debug.Log(Cover.input);
-            // Debug.Log(usersInput);
             Cover.input = usersInput;
             SceneManager.LoadScene(0);
-            // Debug.Log(aux);
         }
         isInitialized = true;
     }

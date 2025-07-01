@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using Unity.VisualScripting;
+// using Unity.VisualScripting;
 
 public class Parser
 {
@@ -59,15 +59,16 @@ public class Parser
             //si se trata de una invocacion de funcion 
             if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Type == TokenType.Delimiter)
             {
-                System.Console.WriteLine("Se parseo funcion ");
+                // UnityEngine.Debug.Log("Se parseo funcion ");
                 FunctionNode functionNode = ParseFunction(); //llamar a parsear funcion y guardar el nodo funcion 
-                if(functionNode is not null) aSTNodes.Add(functionNode); //agregar a la lista de ASTNodes finales                              
+                if(functionNode is not null) aSTNodes.Add(functionNode); //agregar a la lista de ASTNodes finales
+                Context.functionNodes.Add(functionNode);                              
                 Context.errorLine += 1;
             } 
             //si se trataa de una asignacion a Variable, se manejan los operadores de asignacion de cualquier tipo para hacerlo mas extensible
             else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Type == TokenType.AssignmentOperator)
             {
-                System.Console.WriteLine("Se parseo variable");
+                // UnityEngine.Debug.Log("Se parseo variable");
                 VariableNode variableNode = ParseVariable();
                 if(variableNode is not null)
                 {
@@ -79,13 +80,10 @@ public class Parser
             //si se tiene un error en una linea, error a la hora de asignar a una variable o llamar a una funcion
             else if(currentIndex + 1 < tokens.Count && tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex + 1].Type != TokenType.Delimiter && tokens[currentIndex + 1].Type != TokenType.AssignmentOperator && tokens[currentIndex + 1].Type != TokenType.LineJump)
             {
-                // UnityEngine.Debug.Log("Esta aquii");
-                System.Console.WriteLine("Esta aqui");
                 Error.errors.Add((ErrorType.Syntax_Error,$"Unexpected token '{tokens[currentIndex + 1].Value}' , Token have been expected is a Delimiter or an Assignment_Operator" + $" ErrorLine : {Context.errorLine}"));
                 while (tokens[currentIndex].Type != TokenType.LineJump)
                 {
                     currentIndex += 1; //avanzar hasta el final de la linea
-                    System.Console.WriteLine("siiii");
                 }
                 Context.errorLine += 1;
             }
@@ -93,7 +91,7 @@ public class Parser
             //si se trata de una etiqueta 
             else if(tokens[currentIndex].Type == TokenType.Identifier && tokens[currentIndex+1].Type == TokenType.LineJump)
             {
-                System.Console.WriteLine("Se parseo etiqueta");
+                // UnityEngine.Debug.Log("Se parseo etiqueta");
                 aSTNodes.Add(new LabelNode(tokens[currentIndex].Value));
                 Context.labels.Add(tokens[currentIndex].Value,aSTNodes.Count-1);
                 currentIndex += 1;
@@ -102,7 +100,7 @@ public class Parser
             //si se trata de un GoTo
             else if(tokens[currentIndex].Type == TokenType.ReservedKeyword && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter)
             {
-                System.Console.WriteLine("Se parseo goto");
+                // UnityEngine.Debug.Log("Se parseo goto");
                 GoToNode goToNode = ParseGoTo();
                 if(goToNode is not null) aSTNodes.Add(goToNode);
                 Context.errorLine += 1;
@@ -148,23 +146,26 @@ public class Parser
         {  
             if(tokens[currentIndex].Type == TokenType.Identifier) //manejar erroresssssssssssssssssssssssssssssss
             {
-                if(Context.variableNodes.Count == 0)
+                if(Context.variableNodes.Count == 0) //si no se tienen variables se tiene un error semantico
                 {
                     Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                     error = true;
                     currentIndex += 1;
                 }
-                else
+                else //si se tiene variables buscar la variable para colocar la variable correcta en la notacion infija
                 {
                     int auxCounter = 0;
-                    for (int i = Context.variableNodes.Count - 1 ; i >= 0 ; i--)
+                    for (int i = Context.variableNodes.Count - 1 ; i >= 0 ; i--)//iterar por la lista de variables
                     {
-                        if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
+                        if(Context.variableNodes[i].Name == tokens[currentIndex].Value) //si el nombre coincide 
                         {
-                            if(inFix.Count == 0) inFix.Add(Context.variableNodes[i]);
-                            else if(inFix.Count != 0 && (string)inFix[inFix.Count - 1] != "+" && (string)inFix[inFix.Count - 1] != "-" && (string)inFix[inFix.Count - 1] != "*" && (string)inFix[inFix.Count - 1] != "/" && (string)inFix[inFix.Count - 1] != "%" && (string)inFix[inFix.Count - 1] != "**")
+                            Token aux = null;
+                            if (inFix.Count > 0) aux = (Token)inFix[inFix.Count - 1];
+                            if (inFix.Count == 0) inFix.Add(Context.variableNodes[i]); //colocar la variable correcta
+                            //en cualquier otro caso se tiene un error
+                            else if (inFix.Count != 0 && aux!.Type != TokenType.LogicOperator && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.ComparisonOperator )
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
+                                Error.errors.Add((ErrorType.Syntax_Error, $"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 inFix.Add(Context.variableNodes[i]);
                             }
                             else inFix.Add(Context.variableNodes[i]);
@@ -173,7 +174,8 @@ public class Parser
                         }
                         else auxCounter += 1;
                     }
-                    if(auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error,$"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
+                    //si no se tiene la variable, agregar el error semantico
+                    if (auxCounter == Context.variableNodes.Count) Error.errors.Add((ErrorType.Semantic_Error, $"The name '{tokens[currentIndex].Value}' does not exist in the current context" + $" ErrorLine : {Context.errorLine}"));
                 }
             }
             else
@@ -201,25 +203,26 @@ public class Parser
             if(aux is null) 
             {
                 var a = inFix[i];
-                outPut.Add(a); //mientras que no sea un operador aritmetico significa que puede ser una variable o una llamada a un metodo 
+                outPut.Add(a); //mientras que no sea un operador aritmetico ni cualquier otro token significa que puede ser una variable o una llamada a un metodo 
             }
-            else if(aux is not null && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.LogicOperator && aux.Type != TokenType.ComparisonOperator)
+            //si no es un operaddor
+            else if (aux is not null && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.LogicOperator && aux.Type != TokenType.ComparisonOperator)
             {
                 outPut.Add((Token)aux);
             }
-            else if(aux is not null && stackOperators.Count == 0) stackOperators.Add(aux); //si no se tienen operadores en la pila no es necesario ninguna verificacion 
+            else if (aux is not null && stackOperators.Count == 0) stackOperators.Add(aux); //si no se tienen operadores en la pila no es necesario ninguna verificacion 
             else //si es un operador y ya se tiene operadores 
             {
-                for (int j = stackOperators.Count-1 ; j >= 0 ; j--) //verificar la pila de operadores 
+                for (int j = stackOperators.Count - 1; j >= 0; j--) //verificar la pila de operadores 
                 {
                     //si se tiene alguno con mahyor e igual precedencia que el que se tiene se desapila 
-                    if(aux is not null && operatorPrecedence[stackOperators[j].Value.ToString()] >= operatorPrecedence[aux.Value.ToString()])
+                    if (aux is not null && operatorPrecedence[stackOperators[j].Value.ToString()] >= operatorPrecedence[aux.Value.ToString()])
                     {
                         outPut.Add(stackOperators[j]); //agregar a la salida postfija 
                         stackOperators.Remove(stackOperators[j]); //eliminar el operador agregado 
                     }
                 }
-                if(aux is not null)stackOperators.Add(aux); //una vez se desapilaron los que se tienen que desapilar, agregar el que se tenia a la pila de operadores 
+                if (aux is not null) stackOperators.Add(aux); //una vez se desapilaron los que se tienen que desapilar, agregar el que se tenia a la pila de operadores 
             }
         }
         //una vez se tiene una notacion postfija agregar los operadores restantes de la pila 
@@ -236,28 +239,29 @@ public class Parser
         {
             Token ?aux = null;
             if(postFix[i] is Token) aux = (Token)postFix[i];
-            if(aux is not null && aux.Type == TokenType.Number) nodes.Add(new NumberLiteralNode(int.Parse(aux.Value)));//si el tipo de token actual es un numero agregar a la lista de nodos un nodo literal numerico 
-            else if(aux is not null && aux.Type == TokenType.String) nodes.Add(new StringLiteralNode(aux.Value));//si el tipo de token actual es un string agregar a la lista de nodos un nodo literal de string  
-            else if(aux is not null && aux.Type == TokenType.Bool) nodes.Add(new BooleanLiteralNode(bool.Parse(aux.Value)));//si el tipo de token actual es un booleano agregar a la lista de nodos un nodo literal booleano
-            else if(aux is null) //si es una variable o un metodoooooo
+            if (aux is not null && aux.Type == TokenType.Number) nodes.Add(new NumberLiteralNode(int.Parse(aux.Value)));//si el tipo de token actual es un numero agregar a la lista de nodos un nodo literal numerico 
+            else if (aux is not null && aux.Type == TokenType.String) nodes.Add(new StringLiteralNode(aux.Value));//si el tipo de token actual es un string agregar a la lista de nodos un nodo literal de string  
+            else if (aux is not null && aux.Type == TokenType.Bool) nodes.Add(new BooleanLiteralNode(bool.Parse(aux.Value)));//si el tipo de token actual es un booleano agregar a la lista de nodos un nodo literal booleano
+            else if (aux is null) //si es una variable o un metodoooooo
             {
                 nodes.Add((ASTNode)postFix[i]);
-            } 
+            }
             //si el tipo de token actual es un operador aritmetico o logico se debe crear un nodo de operacion bineria con el los ultimos dos nodos como hijos derecho e izquierdo   
-            else if(aux is not null && (aux.Type == TokenType.ArithmeticOperator || aux.Type == TokenType.LogicOperator || aux.Type == TokenType.ComparisonOperator))
+            else if (aux is not null && (aux.Type == TokenType.ArithmeticOperator || aux.Type == TokenType.LogicOperator || aux.Type == TokenType.ComparisonOperator))
             {
-                BinaryOperationNode binaryOperationNode = new BinaryOperationNode(aux , nodes[nodes.Count-2] , nodes[nodes.Count-1]); //crear nodo con el operador actual y con los respectivos dos ultimos nodos como hijos 
-                nodes.RemoveAt(nodes.Count-1); //una vez se creo el nodo elimnar los dos ultimos nodos hojas
-                nodes.RemoveAt(nodes.Count-1); //...
+                BinaryOperationNode binaryOperationNode = new BinaryOperationNode(aux, nodes[nodes.Count - 2], nodes[nodes.Count - 1]); //crear nodo con el operador actual y con los respectivos dos ultimos nodos como hijos 
+                nodes.RemoveAt(nodes.Count - 1); //una vez se creo el nodo elimnar los dos ultimos nodos hojas
+                nodes.RemoveAt(nodes.Count - 1); //...
                 nodes.Add(binaryOperationNode); //agregar a la lista de nodos el nuevo nodo ya creado 
-                if(i == postFix.Count-1) return binaryOperationNode;
+                if (i == postFix.Count - 1) return binaryOperationNode;
             }
         }
+
         ASTNode [] list = nodes.ToArray();//convertir la lista de nodos a array para poder indexar correctamente sin tener problemas 
         if(list.Length > 0)return list[0]; //retornar el primer nodo y unico
         else return null;
     }
-    private VariableNode ParseVariable() //metodo prinicpla para parsear asignaciones de variable 
+    private VariableNode ParseVariable() //metodo prinicpal para parsear asignaciones de variable 
     {
         if (currentIndex >= tokens.Count) return new VariableNode("", null); //si no se esta en rangos salir, se llego aqui por error(extremo)
 
@@ -271,9 +275,8 @@ public class Parser
 
         while (currentIndex < tokens.Count && tokens[currentIndex].Type != TokenType.LineJump) //mientras se tengan tokens por consumir y no sea unn salto de linea continuar 
         {
-            System.Console.WriteLine("pppppppppppppp");
             //si se trata de una de una funcion 
-            if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter && tokens[currentIndex-1].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex-1].Type == TokenType.LogicOperator ||  tokens[currentIndex-1].Type == TokenType.ComparisonOperator)
+            if (tokens[currentIndex].Type == TokenType.Identifier && currentIndex + 1 < tokens.Count && tokens[currentIndex + 1].Type == TokenType.Delimiter && (tokens[currentIndex-1].Type == TokenType.ArithmeticOperator ||  tokens[currentIndex-1].Type == TokenType.LogicOperator ||  tokens[currentIndex-1].Type == TokenType.ComparisonOperator || tokens[currentIndex-1].Type == TokenType.AssignmentOperator))
             {
                 if(infix.Count == 0) infix.Add(ParseFunction());
                 else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
@@ -306,10 +309,12 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
-                            else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                            Token aux = null;
+                            if (infix.Count > 0) aux =(Token)infix[infix.Count - 1];
+                            if (infix.Count == 0) infix.Add(Context.variableNodes[i]);
+                            else if (infix.Count != 0 && aux!.Type != TokenType.LogicOperator && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.ComparisonOperator)
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
+                                Error.errors.Add((ErrorType.Syntax_Error, $"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 infix.Add(Context.variableNodes[i]);
                             }
                             else infix.Add(Context.variableNodes[i]);
@@ -341,10 +346,12 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
-                            else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                            Token aux = null;
+                            if (infix.Count > 0) aux =(Token)infix[infix.Count - 1];
+                            if (infix.Count == 0) infix.Add(Context.variableNodes[i]);
+                            else if (infix.Count != 0  && aux!.Type != TokenType.LogicOperator && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.ComparisonOperator)
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
+                                Error.errors.Add((ErrorType.Syntax_Error, $"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 infix.Add(Context.variableNodes[i]);
                             }
                             else infix.Add(Context.variableNodes[i]);
@@ -407,10 +414,12 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
-                            else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                            Token aux = null;
+                            if (infix.Count > 0) aux =(Token)infix[infix.Count - 1];
+                            if (infix.Count == 0) infix.Add(Context.variableNodes[i]);
+                            else if (infix.Count != 0 && aux!.Type != TokenType.LogicOperator && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.ComparisonOperator)
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
+                                Error.errors.Add((ErrorType.Syntax_Error, $"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 infix.Add(Context.variableNodes[i]);
                             }
                             else infix.Add(Context.variableNodes[i]);
@@ -438,10 +447,12 @@ public class Parser
                     {
                         if(Context.variableNodes[i].Name == tokens[currentIndex].Value)
                         {
-                            if(infix.Count == 0) infix.Add(Context.variableNodes[i]);
-                            else if(infix.Count != 0 && (string)infix[infix.Count - 1] != "+" && (string)infix[infix.Count - 1] != "-" && (string)infix[infix.Count - 1] != "*" && (string)infix[infix.Count - 1] != "/" && (string)infix[infix.Count - 1] != "%" && (string)infix[infix.Count - 1] != "**")
+                            Token aux = null;
+                            if (infix.Count > 0) aux =(Token)infix[infix.Count - 1];
+                            if (infix.Count == 0) infix.Add(Context.variableNodes[i]);
+                            else if (infix.Count != 0 && aux!.Type != TokenType.LogicOperator && aux.Type != TokenType.ArithmeticOperator && aux.Type != TokenType.ComparisonOperator)
                             {
-                                Error.errors.Add((ErrorType.Syntax_Error,$"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
+                                Error.errors.Add((ErrorType.Syntax_Error, $"Invalid expression, TokenType have been expected is an Operator" + $" ErrorLine : {Context.errorLine}"));
                                 infix.Add(Context.variableNodes[i]);
                             }
                             else infix.Add(Context.variableNodes[i]);

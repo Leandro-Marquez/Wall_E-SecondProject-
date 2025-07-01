@@ -9,7 +9,8 @@ class Context
     //todos los metodos y propiedades de esta clase son estaticos para q sin importar la instancia el contexto permanezca intacto
     public static Dictionary<string , object > variablesValues = new Dictionary<string , object >(); //diccionario para guardar cada variable con su respectivo valor 
     public static List<VariableNode> variableNodes = new List<VariableNode>(); //lista de nodos variables 
-    public static Dictionary<string , int > labels = new Dictionary<string,int> (); //diccionario donde se tendra la etiqueta y su indice para cuando se evalue llegar volver a donde se estaba evaluando 
+    public static List<FunctionNode> functionNodes = new List<FunctionNode>(); //lista de nodos funciones
+    public static Dictionary<string, int> labels = new Dictionary<string, int>(); //diccionario donde se tendra la etiqueta y su indice para cuando se evalue llegar volver a donde se estaba evaluando 
     public static (int x , int y) wallEPosition; //posicion actual de Wall_E (X,Y)
     public static bool wallEPositionChanged = false;
     public static int errorLine = 0;
